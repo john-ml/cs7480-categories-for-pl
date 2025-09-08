@@ -1,0 +1,422 @@
+\usepackage{tikz,tikz-cd,relsize,hyperref}
+\usepackage[nameinlink,capitalise]{cleveref} \usepackage{enumitem}
+\usepackage{mathtools,subcaption}
+\usepackage{amsmath,amssymb,stmaryrd,mathpartir,listings,xcolor}
+\usepackage[utf8]{inputenc} % for hiragana yo
+\usepackage{mdframed}
+
+\usetikzlibrary{positioning,arrows}
+        
+\mdfdefinestyle{theoremstyle}{%
+  linecolor=black,linewidth=1pt,%
+  frametitlerule=true,%
+  frametitlebackgroundcolor=gray!20,
+  innertopmargin=\topskip,
+}
+\mdtheorem[style=theoremstyle]{definition}{Definition}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+% This order is important: \newtheorem needs to be after importing \cleveref
+% https://stackoverflow.com/questions/6499504/cleveref-fails-for-theorem-environments-sharing-the-same-counter
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{hope}[theorem]{Hope}
+\newtheorem{belief}[theorem]{Belief}
+\newtheorem{construction}[theorem]{Construction}
+\newtheorem{intuition}[theorem]{Intuition}
+% \newtheorem{definition}[theorem]{Definition}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{warning}[theorem]{Warning}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{procedure}[theorem]{Procedure}
+\newtheorem{note}[theorem]{Note}
+\newtheorem{question}[theorem]{Question}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{assumption}[theorem]{{\color{red}Assumption}}
+\newtheorem{metatheorem}[theorem]{Metatheorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{problem}{Problem}
+\newtheorem{problem-part}{Part}[problem]
+\newenvironment{answer}{\renewcommand{\proofname}{Answer}\begin{proof}}{\end{proof}}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{construction}{Construction}{Constructions}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{hope}{Hope}{Hopes}
+\crefname{belief}{Belief}{Beliefs}
+\crefname{construction}{Construction}{Constructions}
+\crefname{intuition}{Intuition}{Intuitions}
+\crefname{definition}{Definition}{Definitions}
+\crefname{notation}{Notation}{Notations}
+\crefname{example}{Example}{Examples}
+\crefname{warning}{Warning}{Warnings}
+\crefname{claim}{Claim}{Claims}
+\crefname{procedure}{Procedure}{Procedures}
+\crefname{note}{Note}{Notes}
+\crefname{question}{Question}{Questions}
+\crefname{fact}{Fact}{Facts}
+\crefname{assumption}{Assumption}{Assumptions}
+\crefname{metatheorem}{Metatheorem}{Metatheorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{metatheorem}{Metatheorem}{Metatheorems}
+\crefname{problem}{Problem}{Problems}
+\crefname{problem-part}{Part}{Parts}
+
+\DeclareFontFamily{U}{min}{}
+\DeclareFontShape{U}{min}{m}{n}{<-> udmj30}{}
+\newcommand\yo{\!\text{\usefont{U}{min}{m}{n}\symbol{'207}}\!}
+
+\newcommand\subtext[1]{{\color{lightgray}#1}}
+
+\newcommand\Set{\mathbf{Set}}
+\newcommand\FinSet{\mathbf{FinSet}}
+\newcommand\Cat{\mathbf{Cat}}
+\newcommand\Vect{\mathbf{Vect}}
+\newcommand\Group{\mathbf{Group}}
+\newcommand\ofty{\,{:}\,}
+\newcommand\bool{\mathrm{bool}}
+\newcommand\true{\mathrm{true}}
+\newcommand\false{\mathrm{false}}
+\newcommand\colim{\operatorname{colim}}
+\newcommand\copi{\text{\rotatebox[origin=c]{180}{$\pi$}}}
+\newcommand\adjunct{\mathop{\text{\reflectbox{$\rightleftarrows$}}}}
+\newcommand\img{\operatorname{im}}
+\newcommand\Sh{\operatorname{Sh}}
+\newcommand\psh{\operatorname{PSh}}
+\newcommand\Aut{\operatorname{Aut}}
+\newcommand{\ama}{\operatorname{\mathsf{amalg}}}
+\newcommand{\dom}{\operatorname{\mathsf{dom}}}
+\newcommand{\cod}{\operatorname{\mathsf{cod}}}
+\newcommand{\idt}{\mathsf{id}}
+\newcommand\todo{{\color{red}\bf todo}}
+\newcommand\Sub{\operatorname{Sub}}
+\newcommand\Hom{\operatorname{Hom}}
+\newcommand\id{\operatorname{id}}
+\newcommand\dnclose{\operatorname{\downarrow}}
+\newcommand\calA{\mathcal A}
+\newcommand\calB{\mathcal B}
+\newcommand\calC{\mathcal C}
+\newcommand\calD{\mathcal D}
+\newcommand\calE{\mathcal E}
+\newcommand\calF{\mathcal F}
+\newcommand\calG{\mathcal G}
+\newcommand\calH{\mathcal H}
+\newcommand\calI{\mathcal I}
+\newcommand\calJ{\mathcal J}
+\newcommand\calK{\mathcal K}
+\newcommand\calL{\mathcal L}
+\newcommand\calM{\mathcal M}
+\newcommand\calN{\mathcal N}
+\newcommand\calO{\mathcal O}
+\newcommand\calP{\mathcal P}
+\newcommand\calQ{\mathcal Q}
+\newcommand\calR{\mathcal R}
+\newcommand\calS{\mathcal S}
+\newcommand\calT{\mathcal T}
+\newcommand\calU{\mathcal U}
+\newcommand\calV{\mathcal V}
+\newcommand\llbr[1]{\left\llbracket #1\right\rrbracket}
+\newcommand\ite[3]{\mathrm{if}~#1~\mathrm{then}~#2~\mathrm{else}~#3}
+\newcommand\R{\mathbb R}
+\newcommand\N{\mathbb N}
+\newcommand\Q{\mathbb Q}
+\newcommand\Z{\mathbb Z}
+\newcommand\Ber{\operatorname{Ber}}
+\newcommand\Ob{\operatorname{Ob}}
+\newcommand\angled[1]{\langle #1\rangle}
+\newcommand\frakA{\mathfrak A}
+\newcommand\frakB{\mathfrak B}
+\newcommand\frakC{\mathfrak C}
+\newcommand\frakD{\mathfrak D}
+\newcommand\frakE{\mathfrak E}
+\newcommand\frakF{\mathfrak F}
+\newcommand\frakG{\mathfrak G}
+\newcommand\frakH{\mathfrak H}
+\newcommand\frakM{\mathfrak M}
+\newcommand\frakN{\mathfrak N}
+\newcommand\frakO{\mathfrak O}
+\newcommand\frakP{\mathfrak P}
+\newcommand\frakQ{\mathfrak Q}
+\newcommand\frakU{\mathfrak U}
+\newcommand\frakV{\mathfrak V}
+\newcommand\stepsto{\rightarrow}
+
+\newcommand\plkwcolor[1]{{\color{blue}#1}}
+\newcommand\pllitcolor[1]{{\color{teal}#1}}
+\newcommand\plfont[1]{\mathsf{#1}}
+\newcommand\dbracket[1]{\left\llbracket #1 \right\rrbracket}
+\newcommand\sem[1]{{\color{blue} #1}}
+\newcommand\plkw[1]{\plfont{\plkwcolor{#1}}}
+\newcommand\pllit[1]{\mathsf{\pllitcolor{#1}}}
+\newcommand\pllet[3]{\plkw{let}~#1~\plkw{be}~#2~\plkw{in}~#3}
+\newcommand\plret[1]{\plkw{ret}~#1}
+\newcommand\plproj[2]{\plkw{proj}_{\plkwcolor{#1}}~#2}
+\newcommand\plinj[2]{\plkw{inj}_{\plkwcolor{#1}}~#2}
+
+\newcommand\plUnit{\plkw{Unit}}
+\newcommand\plunit{{\plkwcolor{\angled{}}}}
+
+\newcommand\pltimes{\mathbin{\plkwcolor\times}}
+\newcommand\plpair[2]{\plkwcolor{\angled{{\normalcolor #1\plkwcolor{,}\, #2}}}}
+\newcommand\plfst[1]{\plkw{fst}\,#1}
+\newcommand\plsnd[1]{\plkw{snd}\,#1}
+\newcommand\plflip[0]{\plkw{flip}}
+\newcommand\pltrue[0]{\plkw{true}}
+\newcommand\plfalse[0]{\plkw{false}}
+\newcommand\plBool[0]{\plkw{Bool}}
+
+\newcommand\plto{\mathbin{\plkwcolor\to}}
+\newcommand\pllam[2]{\plkwcolor{\lambda}\,#1\plkwcolor{.}\,#2}
+\newcommand\plapp[2]{#1\,#2}
+
+\newcommand\plVoid{\plkw{Void}}
+\newcommand\plunreachable[1]{\plkw{unreachable}\,#1}
+
+\newcommand\plplus{\mathbin{\plkwcolor+}}
+\newcommand\plinl[1]{\plkw{inl}\,#1}
+\newcommand\plinr[1]{\plkw{inr}\,#1}
+\newcommand\plcase[5]
+{\plkw{case}\plkwcolor{(}#1\plkwcolor{,}~
+  #2\plkwcolor{.}\,#3\plkwcolor{,}~
+  #4\plkwcolor{.}\,#5)}
+
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAZAF9T1Nd9CKMgEYqtRizYMA5FzEwoAc3hFQAMwBOEALZIyIHBCTDq9Zq0Qg1IagzoAjGAwAKfPATYasigBY45nEA
+% 1
+% |
+% | 2
+% v
+% 3
+\newcommand\vertarrow[3]{
+  \begin{tikzcd}[ampersand replacement=\&]
+    {#1} \arrow[d, "{#2}"'] \\
+    {#3}               
+  \end{tikzcd}
+}
+
+%      2
+%   1 --> 3
+% 4 |     | 5
+%   v     v
+%   6 --> 8
+%      7
+\newcommand\commsquare[8]{
+\begin{tikzcd}[ampersand replacement=\&]
+{#1} \arrow[d, "{#4}"'] \arrow[r, "{#2}"] \& {#3} \arrow[d, "{#5}"] \\
+{#6} \arrow[r, "{#7}"']                \& {#8}
+\end{tikzcd}
+}
+
+%      2
+%   1 --> 3
+% 4 | _|  | 5
+%   v     v
+%   6 --> 8
+%      7
+\newcommand\pullback[8]{
+\begin{tikzcd}[ampersand replacement=\&]
+{#1} \arrow[d, "{#4}"'] \arrow[r, "{#2}"]
+\arrow[dr, phantom, "\lrcorner", very near start]
+\& {#3} \arrow[d, "{#5}"] \\
+{#6} \arrow[r, "{#7}"'] \& {#8}
+\end{tikzcd}
+}
+
+% takes the arguments for \pullback first, and then takes arguments for the cone, then mediating map
+\newcommand\pullbackump[3]{%
+  \def\tempa{#1}%
+  \def\tempb{#2}%
+  \def\tempc{#3}%
+  \pullbackumprest
+}
+\newcommand\pullbackumprest[9]{
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRDpAF9T1Nd9CKAEzkqtRizYAjLjxAZseAkTJCx9Zq0QgAxrN6KBREWuobJ2qPvl8lg5AAZSD9RK0hWnMTCgBzeESgAGYAThAAtkgALNQ4EEgiIFIwYFaIALQAzE7immwAFiDUDHTJDAAKtkbaIVi++TjWoRHRsfGIZEkpadlmbmwA1k1hkYg5cUid5u5oQcMtHW1ImX152r7zo4kTiCu5FiBzxaUwFVXKNXUNm0jj7YnTbGgbx2WVhhcgtfWN3MEjrRAOxyJTe50EXyujVWByYXAonCAA
+\begin{tikzcd}[ampersand replacement=\&]
+  #6 \arrow[rdd, "#7"', bend right] \arrow[rrd, "#8", bend left] \arrow[rd, "#9"'] \&                                    \&                  \\
+     \& \tempa \arrow[r, "\tempb"] \arrow[d, "#1"'] 
+        \arrow[dr, phantom, "\lrcorner", very near start]
+     \& \tempc \arrow[d, "#2"] \\
+     \& #3 \arrow[r, "#4"']                  \& #5               
+  \end{tikzcd}
+}
+
+%    2     4
+% 1 --> 3 --> 6
+%         -->
+%          5 
+\newcommand\weakequalizer[6]{
+  \begin{tikzcd}[ampersand replacement=\&]
+      #1 \arrow[r, "#2"'] 
+      \& #3 \arrow[r, "#5"', shift right=1] \arrow[r, "#4", shift left=1]
+      \& #6
+  \end{tikzcd}
+}
+
+%    2     4
+% 1 --> 3 --> 6
+%         -->
+%          5 
+% hookrightarrow on 2
+\newcommand\equalizer[6]{
+  \begin{tikzcd}[ampersand replacement=\&]
+      #1 \arrow[r, "#2"', hook] 
+      \& #3 \arrow[r, "#5"', shift right=1] \arrow[r, "#4", shift left=1]
+      \& #6
+  \end{tikzcd}
+}
+
+%    2     5
+% 1 --> 4 --> 6
+%   --> 
+%    3  
+\newcommand\weakcoequalizer[6]{
+  \begin{tikzcd}[ampersand replacement=\&]
+      #1 \arrow[r, "#3"', shift right=1] \arrow[r, "#2", shift left=1]
+      \& #4 \arrow[r, "#5"'] 
+      \& #6
+  \end{tikzcd}
+}
+
+%    2         4
+% 1 --> 3 ----------> 6
+%         ---------->
+%              5
+\newcommand\longequalizer[6]{
+  \begin{tikzcd}[ampersand replacement=\&]
+      #1 \arrow[r, "#2"', hook] 
+      \& #3 \arrow[rr, "#5"', shift right=1] \arrow[rr, "#4", shift left=1]
+      \& {} \& #6
+  \end{tikzcd}
+}
+
+%    2
+% 1 <-- 4
+%   -->
+%    3
+\newcommand\adjunction[4]{
+  {#1}~~\underset{\mathlarger{\underset {#3}\longrightarrow}}{\overset{\mathlarger{\overset {#2}\longleftarrow}}{\mathsmaller{\mathsmaller\bot}}}~~{#4}
+}
+
+%    2
+% 1 ---> 3
+%   \   /
+%  4 \ / 5     (diagonal arrow on the right dashed)
+%     6
+\newcommand\uniqext[6]{
+  \begin{tikzcd}[ampersand replacement = \&]
+  #1 \arrow[rd, "#4"'] \arrow[rr, "#2"] \&   \& #3 \arrow[ld, "#5", dashed] \\
+  \& #6 \&
+  \end{tikzcd}
+}
+
+%   2      4
+% 1 --> 3 --> 5
+% |     |     |
+% |6    |7    |8
+% v     v     v
+% 9 --> 11 -> 13
+%   10     12
+%
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRDpAF9T1Nd9CKAIzkqtRizYAjLjxAZseAkQBMo6vWatEIAMazeigUTJCxmyTqgH5fJYOQizGidpCtuh-spRrn4rTYAMy4xGCgAc3giUCCAJwgAWyQyEBwIJBEAyxAAMRt4pMzqdKQ1bLcAcQKE5MRU0sQAZhdAnQAJGqLELMaAFlacgEkuuvLGgFZBtwApUaQWtIzEAYq2AGkQagY6KRgGAAU7Yx04rAiACxx5lZLlqbWdABktkB29w+OfEDPL684KJwgA
+\newcommand\commrect[6]{%
+  \def\tempa{#1}%
+  \def\tempb{#2}%
+  \def\tempc{#3}%
+  \def\tempd{#4}%
+  \def\tempe{#5}%
+  \def\tempf{#6}%
+  \commrectrest
+}
+\newcommand\commrectrest[7]{%
+\begin{tikzcd}[ampersand replacement = \&]
+\tempa \arrow[r, "\tempb"] \arrow[d, "\tempf"] \& \tempc \arrow[r, "\tempd"] \arrow[d, "#1"] \& \tempe \arrow[d, "#2"] \\
+#3 \arrow[r, "#4"']               \& #5 \arrow[r, "#6"']               \& #7
+\end{tikzcd}
+}
+
+%     2
+%   ---->    5
+% 1       4 --->> 6
+%   ---->
+%     3
+\newcommand\coequalizer[6]{
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGIBGEAX1PUy58hFJ3JVajFm3YAWXvxAZseAkQBM46vWatEHAGy8JMKAHN4RUADMAThAC2SMiBwQkYkHAAWWazg9tKT0OAGYQagY6ACMYBgAFQVUREFssM28Avht7J0QXN0CvX38kAFpPHWl9dnUFHMciwsRNSV0ZAFYIkG8YOig2HAB3CF7+hB4KHiA
+\begin{tikzcd}[ampersand replacement=\&]
+  {#1} \arrow[r, "{#3}"', shift right] \arrow[r, "{#2}", shift left] \& {#4} \arrow[r, "{#5}", two heads] \& {#6}
+  \end{tikzcd}
+}
+
+%       2
+%  1  ---->>  3
+%  |          |
+% 4|          |5
+%  v          v
+%  6 hook---> 8
+%        7
+\newcommand\strongepiunfilled[8]{
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGIBGEAX1PUy58hFJ3JVajFm3YBmXvxAZseAkTKcJ9Zq0QcAbAoErhRMZurbpe9gA5eEmFADm8IqABmAJwgBbJGQgOBBIYpI6MgBMINQAFjB0UGw4AO4Q8YkIfJ4+-oiBwUiRllK6HAAsMSAMdABGMAwACoKqIiBeWM6xOEYg3n6h1IWIsiURNgCsvf15xUEhI0N0WAxssRAQANZVVmXsAOxVNfVNLaZ6HV09PBQ8QA
+\begin{tikzcd}[ampersand replacement=\&]
+  {#1} \arrow[r, "{#2}", two heads] \arrow[d, "{#4}"'] \& {#3} \arrow[d, "{#5}"] \\
+  {#6} \arrow[r, "{#7}"', hook]                      \& {#8}                
+  \end{tikzcd}
+}
+
+%       2
+%  1  ---->>   3
+%  |     /     |
+% 4|  9/dashed |5
+%  v v         v
+%  6 hook---> 8
+%        7
+\newcommand\strongepi[9]{
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGIBGEAX1PUy58hFJ3JVajFm3YBmXvxAZseAkTKcJ9Zq0QcAbAoErhRMZurbpe9gA5eEmFADm8IqABmAJwgBbJGQgOBBIYpI6MgBMINQAFjB0UGw4AO4Q8YkIfJ4+-oiBwUiRllK6HAAsMSAMdABGMAwACoKqIiBeWM6xOEYg3n6h1IWIsiURNgCsvf15xUEhI0N0WAxssRAQANZVVmXsAOxVNfVNLaZ6HV092X25g-NFY9YcAJxHWGBlUHRw8Uk8FB4QA
+\begin{tikzcd}[ampersand replacement=\&]
+  {#1} \arrow[r, "{#2}", two heads] \arrow[d, "{#4}"'] \& {#3} \arrow[d, "{#5}"] \arrow[ld, "{#9}", dashed] \\
+  {#6} \arrow[r, "{#7}"', hook]                      \& {#8}                                         
+\end{tikzcd}
+}
+
+%       3
+%      ^ \hook
+%   2 /   \4
+%    /     v
+%  1 ------>> 6
+%       5
+\newcommand\extremalepi[6]{
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkRgBicgXxB9LpMufIRTlSxanSat2XAMx8BQ7HgJEATBWkMWbRB04A2ZdJhQA5vCKgAZgCcIAWyRkQOCEgkz98zprKgiCOLm40nkjaIAAWMPRQ7DgA7hBxCQg0enKGXACsfDSM9ABGMIwACsLqYiAOWJYxOPzBoa6IPpGI0Tj0WIzsMRAQANYgWbIGRgAsZjxAA
+\begin{tikzcd}[ampersand replacement=\&]
+  \& {#3} \arrow[rd, "{#4}", hook] \&      \\
+{#1} \arrow[ru, "{#2}"] \arrow[rr, "{#5}"', two heads] \&                               \& {#6}
+\end{tikzcd}
+}
+
+

@@ -1,0 +1,395 @@
+\chapter{Universal Constructions I}
+We've been hinting at the utility of knowing that categories that have certain
+special objects in them. For example, if we want to give a category that lets us
+validate equations of programming languages, that category will need to be able 
+to represent the many features that programs might have: products, sums, 
+functions, etc. Here we will introduce the essential idea of a \textbf{universal 
+construction} that characterizes when categories contain these special objects.
+
+\section{Terminal objects \& the unit type}
+Recall that when designing categorical semantics for programming languages we
+associate types and typing contexts with objects in the category and terms with
+morphisms. Concretely, if we have a well-typed term $\Gamma \vdash e : A$,
+its interpretation $\dbracket{\Gamma \vdash e : A}$ is a morphism
+$\dbracket{\Gamma} \xrightarrow{\dbracket{e}} \dbracket{A}$.
+Previously, we showed how \(\FinSet\) can be used to give an interpretation 
+to \ref{lang:calc} programs by associating types like the unit type $\plUnit$
+with special sets, like a set containing only a single element $\{\star\}$.
+But, what if we want to see if categories other than $\FinSet$ can give give a 
+reasonable interpretation for $\plUnit$?
+
+To proceed, let's pick a particular object $\dbracket{\plUnit}$ 
+in a category $\calC$ and explore what properties it needs to have in order 
+to be ``$\plUnit$-like'':
+\begin{itemize}
+  \item \textbf{Fact 1, Introduction rules}: It must be possible in any typing context to
+  produce a value of type $\plUnit$.  This tells us that for any context
+  $\Gamma$, there must exist a $\calC$-morphism
+  $\dbracket{\Gamma} \to \dbracket{\plUnit}$.
+  For example, it must 
+  be the case that 
+  $\dbracket{\Gamma} \xrightarrow{\dbracket{\plunit}} \dbracket{\plUnit}$.
+
+  \item \textbf{Fact 2, Equational laws}: Since \ref{lang:calc} has no effects, 
+  it is the case that if $\Gamma \vdash e : \plUnit$, then it is indistinguishable 
+  from the term $\plunit$. This is called \textbf{eta equality}, and we write
+  this as $e \equiv \plunit$.\footnote{The symbol ``$\equiv$'' means ``is
+  equationally equal to''.} Eta equality is an equational law that characterizes
+  how a $\plUnit$ term must behave. Now for an insight: \emph{these equational
+  laws are translated into morphism equalities}. It must be that, for any
+  morphism $\dbracket{\Gamma} \xrightarrow{\dbracket{e}} \dbracket{\plUnit}$, it
+  is the case that $\dbracket{e} = \dbracket{\plunit}$.  In other words, the
+  morphism $\dbracket{\Gamma} \xrightarrow{\dbracket{\plunit}} \plUnit$ must be
+  unique.
+\end{itemize}
+
+These two properties can be packaged up into a nice concise definition:
+
+\begin{definition}[Terminal object]
+  An object $T$ in $\calC$ is called a terminal object
+  if, for every other object $A$ in $\calC$ there exists a unique 
+  morphism $A \xrightarrow{f} T$. Graphically,
+
+  \begin{center}
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbACrdxMKAHN4RUADMAThAC2SMiBwQkokAyxhWiEHAhmoIagzoAjGAwAK-PATYMYanAcJZksQAB0wmAAPLDgcOABCOS4gA
+\begin{tikzcd}
+  A \arrow[r, "\exists!"] & T
+  \end{tikzcd}
+\end{center}
+\end{definition}
+
+We say a category \textbf{has terminal objects} if there is an object in the
+category that is a terminal object. This is our first example of a 
+\textbf{universal construction}, which are special objects in categories 
+characterized by their morphisms into them. We will see how universal 
+constructions can be used to give interpretations to all the type 
+formers we have seen so far. But, we can already see their utility: 
+whether or not a particular category admits certain universal constructions
+will immediately inform us of that category's suitability for modeling 
+certain language properties.
+
+\subsection{$\FinSet$ has terminal objects, isomorphisms}
+We saw in previous lectures that we could use the singleton set 
+$\{\star\}$ to give an interpretation to $\plUnit$ in $\FinSet$.
+We can easily prove that $\{\star\}$ is a terminal object:
+\begin{theorem}
+  The singleton set $\{\star\}$ is terminal in $\FinSet$.
+\end{theorem}
+\begin{proof}
+  \begin{itemize}
+    \item Existence: The map $\_ \mapsto \{\star\}$ has the required type.
+    \item Uniqueness: Suppose we have two morphisms $A \xrightarrow{f} \{\star\}$ and
+    $A \xrightarrow{g} \{\star\}$. 
+    Then by function extensionality we immediately have that $f = g$ 
+    as set-functions, and so they are equal as $\FinSet$ morphisms.
+  \end{itemize}
+\end{proof}
+
+Now you can observe the above proof and see that it immediately 
+works for \emph{any} choice of singleton set: does this mean that $\FinSet$
+has \emph{many terminal objects?} Yes, and no. \emph{Yes}, in the sense 
+that there are indeed many valid choices of terminal object; but \emph{no}, 
+in the sense that the choice itself does not (\emph{should} not!) actually 
+matter. We capture this by the notion of isomorphism:
+
+\begin{definition}[Isomorphism of objects]
+  \sloppy
+  Two objects $A$ and $B$ in a category $\calC$ are isomorphic if 
+  there exist morphisms $A \xrightarrow{f} B$ and $B \xrightarrow{g} A$
+  such that (1) $g \circ f = \id_A$ and (2) $f \circ g = \id_B$.
+\end{definition}
+
+We can immediately see that any two singleton sets in $\FinSet$ are isomorphic:
+this proof is straightforward. What might be surprising is that this 
+fact is true for all terminal objects:
+
+\begin{theorem} \label{thm:terminal-object-unique}
+  Terminal objects are unique up to isomorphism.
+\end{theorem}
+\begin{proof}
+  Let $X$ and $Y$ be terminal objects in some category $\calC$. 
+  Then there exists a pair of unique morphisms between them:
+
+  \begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRQBGclVqMWbAJrdxMKAHN4RUADMAThAC2SMiBwQkokACMYYKEgDM++s1aIQAQjXdeITTuPVDe6uaWNnaSji6KclxAA
+\begin{tikzcd}
+  X \arrow[r, "!f", bend left] & Y \arrow[l, "!g", bend left]
+  \end{tikzcd} 
+\end{center}
+By the fact that $X$ and $Y$ are terminal, they must also have unique identity
+morphisms $\id_X$ and $\id_Y$. Then by the uniqueness of identity we have that $f \circ g = \id_X$ and $g \circ f = \id_Y$.
+\end{proof}
+
+This provides some evidence that the choice of terminal object does not matter.
+  But are we done? Suppose we had two terminal objects \(T\) and \(T'\).
+  By the above argument, we have that these two objects are isomorphic.
+  But now another potential choice arises: what if there are multiple different
+  \emph{isomorphisms} between \(T\) and \(T'\)?
+  Then it could be that the choice to use \(T\) instead of \(T'\)
+  may implicitly come with a choice of specific isomorphism as well.
+
+  Luckily, terminal objects satisfy a stronger property
+  which ensures that one's choice is terminal object is truly irrelevant.
+
+\begin{proposition}
+  Terminal objects are unique up to \emph{unique} isomorphism.
+  That is, if \(T\) and \(T'\) are both terminal,
+  then there is exactly one isomorphism
+  \((f:T\to T',g:T'\to T)\)
+  between \(T\) and \(T'\).
+\end{proposition}
+\begin{proof}
+  Both \(f\) and \(g\), as constructed in the proof of
+  \Cref{thm:terminal-object-unique},
+  are the only possible morphisms \(T \to T'\) and \(T'\to T\)
+  respectively. Thus they together form the only isomorphism
+  between \(T\) and \(T'\).
+\end{proof}
+
+Later on, when we have the language for it, we will show that
+all universal constructions are unique up to unique isomorphism
+in this sense, and hence free of non-canonical choices.
+
+% \subsection{Terminal objects for preorders}
+% Universal constructions are one of the engines for analogy in category theory:
+% very different-seeming concepts can be cast as instances of the same 
+% universal construction, which can bring clarity to what each of those disparate 
+% concepts means. When cast order-theoretically, the terminal object can 
+% be thought of as ``the greatest object in a category.''
+% % The first instance we will see of a universal construction is a \textbf{terminal 
+% % object}, which can be thought of as ``the largest object in a category'' if one 
+% % recalls the preorder intuition of morphisms. 
+
+% An element of a preorder is the largest if it is greater than every other 
+% element: i.e., there exists a morphism from every other element to it.
+% This definition works for a general category: one could say an object is 
+% largest if there exists a morphism from every other object into it.
+% This characterization however doesn't take into account that there 
+% can be more than 1 morphism between any two objects in a category: intuitively, 
+% this means that one object can be greater than another in more than one way.
+
+\section{Products}
+Next we want to interpret product types $\dbracket{A \times B}$.
+
+Introduction rules
+\begin{mathpar}
+\inferrule*
+    {\Gamma\vdash M : A
+      \\
+    \Gamma\vdash N : B
+    }
+    {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
+\end{mathpar}
+Elimination rules
+\begin{mathpar}
+\inferrule*
+    {\Gamma\vdash M : A \pltimes B}
+    {\Gamma \vdash \plfst{M} : A}
+\and
+\inferrule*
+    {\Gamma\vdash M : A \pltimes B}
+    {\Gamma \vdash \plsnd{M} : B}
+\end{mathpar}
+Equational theory part 1: elim after intro (sometimes called \(\beta\) rules)
+\begin{mathpar}
+\inferrule*
+    {\Gamma\vdash M : A
+      \\
+    \Gamma\vdash N : B
+    }
+    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}
+\and
+\inferrule*
+    {\Gamma\vdash M : A
+      \\
+    \Gamma\vdash N : B
+    }
+    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv N : B}
+\end{mathpar}
+Equational theory part 2: intro after elim (sometimes called \(\eta\) rules)
+\begin{mathpar}
+\inferrule*
+    {\Gamma\vdash M : A \pltimes B
+    }
+    {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} : A \pltimes B}
+\end{mathpar}
+
+\begin{definition}[Product]
+  Let \(A\) and \(B\) be two objects of a category \(\calC\).
+  A \emph{product of \(A\) and \(B\)}
+  is a tuple \((P,p,q)\)
+  where
+  \begin{itemize}
+  \item \(P\) is an object of \(\calC\).
+  \item \(p\) is a morphism from \(P\) to \(A\),
+    called the \emph{projection onto \(A\)}.
+  \item \(q\) is a morphism from \(P\) to \(B\),
+    called the \emph{projection onto \(B\)}.
+  \end{itemize}
+  such that
+  \begin{itemize}
+  \item For any object \(\Gamma\) and any two morphisms \(f : \Gamma \to A\)
+    and \(g : \Gamma \to B\),
+    there exists a morphism \(\angled{f,g} : \Gamma \to P\)
+    such that the following equations hold:
+    \begin{align}
+      p \circ \angled{f,g} = f \\
+      q \circ \angled{f,g} = g
+    \end{align}
+  \item The following equation holds for any morphism \(h : \Gamma \to P\).
+    \begin{align}
+      h = \angled{p \circ h, q \circ h}
+    \end{align}
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}
+  Let \(A\) and \(B\) be finite sets.
+  The tuple \((A \times B, p, q)\)
+  is a product in \(\FinSet\),
+  where \(p\) is the morphism \((A\times B,\pi_A,B)\)
+  and \(q\) is the morphism \((A \times B,\pi_B,B)\).
+\end{proposition}
+
+\begin{proposition}
+  Let \(A\) and \(B\) be two objects of a category \(\calC\).
+  A tuple \((P,p,q)\) is a product of \(A\) and \(B\)
+  if and only if the following \textbf{universal property}
+  holds:
+  for any object \(\Gamma\) and any two morphisms \(f : \Gamma \to A\)
+  and \(g : \Gamma \to B\),
+  there exists a unique morphism \(h : \Gamma \to P\)
+  such that \(p \circ h = f\) and \(q \circ h = g\).
+\end{proposition}
+
+Algebraically, the universal property can be formulated as saying
+  the following system of equations has exactly one solution
+  in the unknown \(h : \Gamma \to P\).
+  \begin{align}
+    p \circ h = f \\
+    q \circ h = g
+  \end{align}
+Diagramatically, it can be formulated as saying there exists a unique
+dashed arrow that fills in all the triangles in the following picture.
+\begin{equation}
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQAdDgcXoFs+9EAF9S6TLnyEU5CtTpNW7AAoixIDNjwEiAJlLF5DFm0QgAgmvFape0rqOLTIAEIj5MKAHN4RUADMAJwg+JDIQHAgkfQUTdn8QGgAjGDAoJABmYlEA4NDEcMikWRBGLDBnKHo4AAtPRNilMxqrECCQsJoixAyaYyaQLwbGehTGZQltaRBArC8anAaUtKQAWiyctrzirqjEGP7nNGHRmHHJ2zNZ+cXN9vyS7t7G5wBHd2EgA
+\begin{tikzcd}
+                                                                                        &                                    & A \\
+\Gamma \arrow[rru, "f", bend left] \arrow[r, "h", dashed] \arrow[rrd, "g"', bend right] & P \arrow[ru, "p"'] \arrow[rd, "q"] &   \\
+                                                                                        &                                    & B
+\end{tikzcd}
+\end{equation}
+
+\section{Products as Terminal Objects}
+
+The diagrammatic form suggests a
+a order-based intuition for products:
+the product \((P,p,q)\) is
+in some sense the ``largest''
+tuple of that shape,
+with its universal property
+showing that any other tuple of the same shape is
+``less than or equal'' to it by virtue of the existence of
+the dashed morphism.
+
+\begin{definition}[category of rooted spans]
+  \sloppy
+  Let \(A\) and \(B\) be objects of a category \(\calC\).
+The category of \emph{spans in \(\calC\) rooted at \(A\) and \(B\)},
+written \(\mathsf{Span}_\calC(A,B)\),
+is the category whose
+\begin{itemize}
+  \item Objects are tuples \((X,f,g)\)
+    where \(X\) is an object of \(\calC\),
+    \(f : X \to A\), and \(g : X \to B\).
+    Pictorially:
+    \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKcqWLU6TVuwCCPPiAzY8BIqIBMEhizaIQAIR4SYUAObwioAGYAnCAFskZEDghJ1NbdL2mQNRvQARjCMAAoCKsIgNlimABY48tZ2jojOrkiikjrsVkbcQA
+\begin{tikzcd}
+                                   & A \\
+X \arrow[rd, "g"'] \arrow[ru, "f"] &   \\
+                                   & B
+\end{tikzcd}\]
+  \item A morphism is a tuple
+    \(((X,f,g),\alpha,(X',f',g'))\)
+    where \((X,f,g)\) and  \((X',f',g')\)
+    are objects and \(\alpha : X \to X'\)
+    is a morphism of \(\calC\)
+    such that \(f' \circ \alpha = f\)
+    and \(g' \circ \alpha = g\).
+    Pictorially:
+    \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKAEyli1Ok1bsAgjz4gM2PASJiRkhizaIQAIQX8VQouQpbpuzgHIekmFADm8IqABmAJwgBbJGRAcCCQxKR12JxAaRnoAIxhGAAUBVWEQTywnAAscKJB4sCgkAFoAZmJeD28-RACgpHMwmT13PIKixHLKkC9fJFKaesRG7Waeu2i4hOSTNT0M7Nzu3pqBwODEUNHrJztl6v9BjbXt9gAdM6Y0LPp7biA
+\begin{tikzcd}
+                                                                                &                                       & A \\
+X \arrow[rrd, "g"', bend right] \arrow[rru, "f", bend left] \arrow[r, "\alpha"] & X' \arrow[ru, "f'"'] \arrow[rd, "g'"] &   \\
+                                                                                &                                       & B
+\end{tikzcd}\]
+
+\item Composition is defined by
+  \begin{align}
+    &((X',f',g'),\alpha',(X'',f'',g''))\circ ((X,f,g),\alpha,(X',f',g'))\\
+    &= ((X,f,g),\alpha'\circ \alpha,(X'',f'',g'')).
+  \end{align}
+  Pictorially:
+  \begin{equation}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZAJgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKMsWp0mrdgCEefEBmx4CRMgEZxDFm0QgAGgHIDc-kqFE1pDTS1TdhkwoHLhyclc2Sd+493EwoAHN4IlAAMwAnCABbJDIQHAgkdwltdjCjR0iYuJpEpEtUuxBAzJpGegAjGEYABWdzXQisQIALHCyo2MQAZjykxHjbbwAdEaY0VvpfeWzuvoSBlOH04xpqsChk3nCupAX8xEKNrcRlr3ZSkHKqmvqzFSaW9s6cxAAWfuT1mE3987SujCr26n0WBR+f0QAFoegDioFriAKtU6g1HiBmm0OjsQHMkGDDgsVroxhMpjxKNwgA
+\begin{tikzcd}
+                                                                                 &                                                            & A                                      \\
+X' \arrow[rru, "f", bend left] \arrow[rrd, "g"', bend right] \arrow[r, "\alpha"] & X' \arrow[r, "\alpha'"] \arrow[ru, "f'"] \arrow[rd, "g'"'] & X'' \arrow[u, "f''"] \arrow[d, "g''"'] \\
+                                                                                 &                                                            & B
+\end{tikzcd}
+  \end{equation}
+
+  \item The identity morphism at \((X,f,g)\) is \(((X,f,g),\idt_{X},(X,f,g))\).
+\end{itemize}
+The associativity and identity laws in \(\mathsf{Span}_\calC(A,B)\)
+are inherited from the corresponding laws for in \(\calC\).
+\end{definition}
+
+This perhaps tortured-looking category serves a valuable purpose:
+it makes precise the sense in which a product \((P,p,q)\)
+is the ``largest'' among such tuples.
+
+\begin{proposition}
+  Let \(A\) and \(B\) be objects of a category \(\calC\).
+  A tuple \((P,p,q)\) is a product of \(A\) and \(B\)
+  if and only if it is a terminal object of \(\mathsf{Span}_\calC(A,B)\).
+\end{proposition}
+
+To unpack what this is saying, from the perspective of categories as metalanguages:
+a product for \(A\) and \(B\) in the metalanguage embodied
+by \(\calC\) is a unit type for the metalanguage
+embodied by \(\mathsf{Span}_\calC(A,B)\).
+Some of the power of category theory can be seen here:
+\begin{itemize}
+\item Constructions on categories can be used to quickly build
+  nontrivial ``metalanguages'' from old.
+  (What would \(\mathsf{Span}_\calC(A,B)\) even look like as a traditional language?)
+\item Category theory ``eats itself'': the categorical notion of terminal object
+  sheds light on the categorical notion of product, if one knows to look at
+  the right category.
+\end{itemize}
+To illustrate the benefits of this perspective,
+we get a proof that products are suitably unique
+just like terminal objects are, simply because they \emph{are terminal objects}:
+\begin{proposition}
+  Products are unique up to unique isomorphism.
+\end{proposition}
+\begin{proof}
+  Products are terminal objects,
+  and terminal objects are unique up to unique isomorphism.
+\end{proof}
+
+\chapter{Universal Constructions II}
+
+% Brief interlude: substitution
+% - The syntax of (parallel) substitutions
+% - Using products to interpret substitutions
+% - Substitution as precomposition
+% - All semantic interpretation functions are stable under substitution
+%   - Example: pair formation and projection are stable
+
+% Exponentials
+% - Textbook definition of exponentials. How to get here from STLC?
+% - Give standard rules for function types
+% - Golf rules using substitution
+% - Reverse engineer textbook definition

@@ -1,0 +1,1220 @@
+\chapter*{Preface}
+
+\marginnote{This preface is written by Steven.}
+This is a course on category theory for programming languages researchers.  I
+would say that this book, and this course, are developed in anger: I have been
+forced to learn and understand a bit about category theory due to its inevitable
+usefulness. 
+I would not describe myself as a category theorist, and this class is quite 
+unlike any I've ever tried to teach before.
+My goal in this class is to tease out what I find inevitable 
+about category theory, and present it in the way that makes the most sense to 
+me. Of course, this isn't possible without John, who is the one who 
+really understands everything here.
+
+Many programming languages researchers and students have encountered category
+theory at one point or another. Probably most see it for the first time when
+they are learning Haskell, when they see words like ``monad'' and ``functor.''
+Perhaps others who are more mathematically inclined see it when they are
+learning about the lambda calculus and hear about Scott, Smyth, and Plotkin's
+famous developments of the model theory of the untyped lambda
+calculus~\citep{smyth1982category}. You're here because you probably saw 
+category theory somewhere and wondered why it was needed, or perhaps 
+were skeptical that it was really necessary.
+
+For me, the first time I saw category theory appear in my own research that 
+forced me to stop and understand it was Heunen et al.'s quasi-Borel spaces paper.~\cite{heunen2017convenient} This was 
+during my second year of grad school, and I have to admit I found it 
+extremely intimidating. This paper was a terrifying combination of (1) seeming 
+very important to my immediate research, and (2) being utterly and completely incomprehensible.
+In a nutshell, this paper introduced a denotational semantics for a higher-order 
+probabilistic programming language with continuous probability distributions called \emph{quasi-Borel spaces} (QBS).
+I was -- and still am! -- a probabilistic programming languages researcher, so this result seemed pivotal: 
+I like functions!
+However, at the time, it wasn't even obvious to me \emph{why this was a hard thing to do
+in the first place!} If you can't understand the motivation for a problem, 
+good luck understanding its solution. 
+
+The core challenge, helpfully provided in the second paragraph 
+of the paper, is:
+
+\begin{quotation}
+  ``Programs in these languages may combine higher-order functions and
+  continuous distributions, or even define a probability distribution on
+  functions. But the standard measure theoretic formalization of probability
+  theory does not handle
+higher-order functions well, as the category of measurable
+spaces is not cartesian closed.''~\citep{heunen2017convenient}
+\end{quotation}
+
+This made \emph{absolutely no sense to me}. The only citation is to a paper from 1961, called
+``Borel structures for function spaces''~\citep{aumann1961borel}, which was
+equally (if not even more!) incomprehensible than the current paper I was trying
+to understand. I was out of my depth and had to move on, and I did not 
+understand this paper for many years.
+
+At the time the QBS paper seemed like it came like a bolt from the blue and
+really shook my confidence in my own ability to do research, but over the past 8
+years I've come to realize that, in some sense, this seemingly tour-de-force
+alien paper was an almost inevitable combination of simple ideas.  It turns out
+that the idea for quasi-Borel spaces was born not in probability but in a
+seemingly totally disparate corner of mathematics: differential geometry and
+topology. Last year I was having a conversation with Max New about QBS, who told me that the setup
+had occurred to him in grad school, but he wasn't motivated to fully develop it due to its 
+seemingly straightforward relationship to diffeological spaces: 
+these results are so similar, structurally, that to a trained expert the monstrous
+QBS paper almost seems \emph{too trivial!}
+This is our first answer to the question of \emph{why category theory?} -- it makes precise the analogies 
+that exist between disparate areas of mathematics, allowing you to solve different 
+problems using very similar machinery.
+
+If this was the only time I encountered category theory I would not have
+become invested enough in it to attempt to teach a course on it. But, 
+it continues to appear. My subsequent encounters with category 
+theory were driven primarily by my PhD. student John, who is helping me 
+teach this class and write this book. This story begins with Lilac~\citep{li2023lilac}, 
+a probabilistic separation logic that we developed during the first two 
+years of John's PhD. Before we get into that we need to briefly discuss 
+separation logics -- I promise we'll get to category theory.
+
+Separation logics are logics that describe resources. They are widely 
+used within programming languages to model how resources like memory
+flow around programs. Concretely, consider the following C program:
+
+\begin{lstlisting}[mathescape=true]
+void foo(int* x, int* y) {
+  for(int i = 0; i < 3; i++) {
+    *x += *y;
+  }
+}
+\end{lstlisting}
+
+One might look at \texttt{foo} and assume that it is very inefficiently written:
+it could be optimized to simply add \texttt{3*y} to \texttt{x}.  But, \emph{what
+if \texttt{x} and \texttt{y} point to the same location in memory} (i.e., they
+are aliases)? Then, this optimization is no longer valid, since
+\texttt{y} is also mutating on each iteration of the loop. Since the C compiler 
+must be pessimistic, it cannot perform this optimization.
+
+Separation logics give us a language for describing memory ownership so that 
+we can tell the compiler that these pointers do not alias. If we 
+want this optimization to be valid, then  \texttt{foo} must have a
+\emph{precondition} that asserts that the two arguments 
+must not be aliases of each other. In separation logic, this precondition 
+can be written as:
+\begin{align*}
+  [\texttt{x} \mapsto -] * [\texttt{y} \mapsto -]
+\end{align*}
+
+The $*$ is called the \emph{separating conjunction}: it states that the two
+propositions $[\texttt{x} \mapsto -]$ (read ``\texttt{x} points to some 
+location'') and $[\texttt{y} \mapsto -]$ hold of \emph{disjoint} portions of the
+heap, and hence \texttt{x} and \texttt{y} cannot be aliases of one another.
+
+However, memory is not the only kind of resource in a program: \emph{randomness}
+is also a natural kind of resource. In probabilistic programs, we might like to 
+express propositions like:
+\begin{align*}
+  [x \sim \texttt{Bern}~1/2] * [y \sim \texttt{Bern}~1/2]
+\end{align*}
+This would express that two variables $x$ and $y$ are \emph{independent}
+Bernoulli random variables.
+Beyond probability, it's clear that programs might have many other notions of
+resources, like network sockets, mutex locks, etc. Must we develop
+\emph{from-scratch} separation logics for each of them?
+
+This leads us to the second answer to the \emph{why category theory?}
+question: it makes certain choices that seem ad-hoc \emph{forced}.  We will see
+how there is a categorical description of the separating
+conjunction that can be \emph{calculated} using something called the ``Day
+convolution''~\citep{dongol2016convolution,biering2007bi}.
+If your 
+interpretation of $*$ arises from this construction, then you get \emph{for free}
+that it satisfies many other well-formedness requirements for separating conjunction.\marginnote{We 
+are foreshadowing here, but we will return the Day convolution later on 
+in the course once we've worked up to it.}
+This shows how category 
+theory can bring clarity to this 
+proliferation of interactions by highlighting which decisions you've made 
+are actually \emph{new} and which are \emph{consequences}: it forces your hand,
+which is very useful when you don't know where your hand is supposed to go.
+
+At this point, I'm convinced some familiarity with category theory 
+is a worthwhile investment for anyone doing research in programming 
+languages, especially those working with exotic effects like 
+probability or those working with program logics. I also have some hubris: 
+I believe that it is not so hard to understand, especially if one 
+is sufficiently motivated by some of the applications that we will 
+attempt to highlight as we go.
+My target audience for this class is past me from 2017 seeing an important 
+paper in their area that feels terribly out of reach because of its 
+fluent application of categorical ideas. I hope that we can 
+present some of these ideas clearly enough for you to see the inevitability, 
+rather than be drowned by the unintelligability, of these elegant ideas.
+
+\chapter{Semantics of Programs}
+
+One of the most common places one encounters category theory is in semantics. To
+illustrate why categories appear here and what they are typically used for,
+we'll consider a concrete example that every programmer has encountered: 
+we want to establish which operations change the behavior of our programs
+and which are irrelevant.
+
+Let's start by examining a simple programming language, a tiny language 
+with let-bindings, pairs, and the unit value:
+\begin{gather}
+  \begin{aligned}
+  M,N &::= \pllet{x}{M}{N} \mid x \mid \plunit{} \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
+  A,B &::= A \times B \mid \plUnit
+  \end{aligned}
+  \tag{\textsc{Calc}}
+  \label{lang:calc}
+\end{gather}
+
+\ref{lang:calc} has  a very simple type system that ensures well-formedness of programs.
+The \emph{typing context} $\Gamma$ is a set of variables; we denote the empty context as $\bullet$. The relation $\Gamma \vdash M : A$ 
+says that ``the term $M$ is well-typed using context $\Gamma$''. We can then define 
+this relation inductively on terms:
+\begin{mathpar}
+  \inferrule{~}{\Gamma \vdash \plunit : \plUnit}
+  \qquad
+  \inferrule{\Gamma \vdash M : A \and \Gamma \vdash N : B}
+  {\Gamma \vdash \plpair{M}{N} : A \times B}
+  \\
+  \inferrule{x : A \in \Gamma}{\Gamma \vdash x : A}
+  \qquad
+  \inferrule{\Gamma \vdash M : A \times B}
+  {\Gamma \vdash \plfst{M} : A}
+  \qquad
+  \inferrule{\Gamma \vdash M : A \times B}
+  {\Gamma \vdash \plsnd{M} : B}
+  \\
+  \inferrule{\Gamma \vdash M : A \and \Gamma, x : A \vdash N : B}
+  {\Gamma \vdash \pllet{x}{M}{N} : B}
+\end{mathpar}
+
+
+Now consider the following example \textsc{Calc} program, which is well-typed in 
+some context $\Gamma$:
+\begin{align}
+  \pllet{x}{M}{\Big( \pllet{y}{N}{\plpair{x}{y}} \Big)}
+\end{align}
+
+If we assume that $N$ does not refer to $x$, then we ought to 
+be able to reorder the let-bindings without changing the meaning of 
+the program, like so:
+
+\begin{align}
+  \pllet{y}{N}{\Big( \pllet{x}{M}{\plpair{x}{y}} \Big)}
+\end{align}
+
+Now, how can we prove this reordering is valid? We need to give a 
+formal semantics to \textsc{Calc} programs, and prove that the 
+semantics of these two programs is the same.
+
+\section{A Denotational Semantics for \textsc{Calc}}
+The first step in designing a semantics is to choose a \textbf{metalanguage} for
+stating these semantics.  The metalanguage should be a formal language that
+unambiguous to describe and use, because its meaning will be taken for granted
+when we interpret programs using it.  A natural choice of metalanguage is the
+language of sets and functions between sets.
+
+Using this metalanguage we can give a \textbf{denotational semantics} to
+\textsc{Calc} programs that describes the meaning of syntactic programs using 
+our choice of metalanguage.
+We use the \textbf{semantic bracket} $\dbracket{-}$ to define these semantics.
+
+To give a semantics of \textsc{Calc} programs, it is first useful to give a
+semantics of types and contexts.  Types will be interpreted as sets:
+\begin{align*}
+  \dbracket{\plUnit} &= \{\star\} \\
+  \dbracket{\plpair{A}{B}} &= \dbracket{A} \times \dbracket{B}
+\end{align*}
+
+The symbol $\{\star\}$ is the set containing a single element. The symbol
+$\dbracket{A} \times \dbracket{B}$ denotes the Cartesian product of two sets.
+Notice that the semantics types is described \emph{compositionally}: the 
+semantics of the type $\plpair{A}{B}$ is given by the meaning of its subterms.
+
+Next, we can give a semantic interpretation of contexts. The semantics of 
+contexts is also a set, which is defined inductively 
+again using Cartesian products:
+\begin{align*}
+  \dbracket{\bullet} = \emptyset,
+  \qquad\qquad
+  \dbracket{\Gamma, x : A} =  \dbracket{\Gamma} \times \dbracket{A}
+\end{align*}
+
+Now we can give a semantics of \textsc{Calc} terms as functions between sets. 
+The semantics of terms has the form $\dbracket{\Gamma \vdash M : A}
+: \dbracket{\Gamma} \to \dbracket{A}$.
+We can define these semantics as follows:
+\marginnote{Unpacking notation: the ``$\gamma \mapsto v$'' symbol defines a set function that 
+associates a substitution $\gamma$ of type $\dbracket{\Gamma}$ with value $v$. The
+pair former $(-,-)$ forms a set pair, and the projects $\pi_1$ and $\pi_2$ 
+are the set-functions that project out the first and second component respectively.}
+\begin{align*}
+  \dbracket{\plunit{}} &= \gamma \mapsto \star\\
+  \dbracket{\plpair{M}{N}} &= \gamma \mapsto (\dbracket{M}~\gamma, \dbracket{N}~\gamma) \\
+  \dbracket{\plfst{M}} &= \gamma \mapsto \pi_1 (\dbracket{M}~\gamma) \\
+  \dbracket{\plsnd{M}} &= \gamma \mapsto \pi_2 (\dbracket{M}~\gamma) \\
+  \dbracket{x} &= \gamma \mapsto \pi_x (\gamma) \\
+  \dbracket{\pllet{x}{M}{N}} &= \gamma \mapsto \dbracket{N}~\gamma[x \mapsto \dbracket{M}~\gamma]
+\end{align*}
+
+Now we can use these semantics to validate our reorderings from earlier:
+\begin{fullwidth}
+\begin{align*}
+  \dbracket{\pllet{x}{M}{\Big( \pllet{y}{N}{\plpair{x}{y}} \Big)}}
+  = \gamma \mapsto (\dbracket{M}~\gamma, \dbracket{N}~\gamma)
+  = \dbracket{\pllet{y}{N}{\Big( \pllet{x}{M}{\plpair{x}{y}} \Big)}}
+\end{align*}
+\end{fullwidth}
+
+But, notice that there are subtleties! We are relying on our metalanguage's
+notion of equality of functions here to determine equality. Two functions $f,g :
+A \to B$ are considered equal if they are \emph{extensionally equal}, meaning
+that for all $a \in A$, it is the case that $f(a) = g(a)$. 
+If we carefully unpacked these two semantics, we would see that the functions 
+$\dbracket{M}$ and $\dbracket{N}$ are composed in different orders. 
+Under the semantics of sets, this order of composition does not matter since 
+it does not change the input--output behavior.
+
+\section{The Need for Generality}
+To sum up what just happened: in order to prove a natural program equivalence 
+involving reorder of let-bindings, we gave a denotational semantics to \ref{lang:calc} in terms
+of sets and functions. Then, a property of the metalanguage -- extensional
+equality of functions -- directly implied that the rewriting was
+semantics-preserving.\footnote{This idea of using denotational semantics to 
+capture program equivalences originates with Plotkin~\citep{plotkin1977lcf} and
+the notion of full abstraction. We are intentionally eliding these details here,
+since they involve defining observational equivalence.} 
+
+This style of denotational reasoning worked quite well for validating program
+equivalences, which begs the question: \emph{how well does it generalize} to
+other kinds of programming languages and analyses?  There are several
+interesting dimensions along which we may want to generalize this kind of
+argument:
+\begin{enumerate}
+  \item To languages with more interesting kinds of effects, such as allocation
+  of randomness, nondeterminism, or memory; 
+  \item To languages with more interesting features, such as higher-order
+  functions or more interesting type systems;
+  \item To settings where we desire more exotic notions of program equivalences;
+  \item To analyses other than program reordering, such as abstract interpretation 
+  and logical relations.
+\end{enumerate}
+
+We will see that it is actually quite inconvenient to use sets and functions as a metalangauge, 
+which will be a central motivation our development of category theory as an alternative 
+and more flexible metalangauge for giving semantics to programs (and other things, like 
+program logics).
+But before we can see this,
+we will first need to see an example of each of these kinds of generalization.
+
+\section{Generalization 1: Probabilistic Effects}
+Let's see an example of generalizing to languages with an interesting probabilistic 
+effect. Consider the follow little \emph{probabilistic programming language} called
+\textsc{TinyPPL}:
+\begin{gather}
+  \begin{aligned}
+  M,N ::=& \pllet{x}{M}{N} \mid x \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
+   & \plflip{} \mid \pltrue{} \mid \plfalse{}  \\
+  A,B ::=& A \times B \mid \plBool
+  \end{aligned}
+  \tag{\textsc{TinyPPL}}
+  \label{lang:tinyppl}
+\end{gather}
+
+Probabilistic programming languages denote probability distributions. For instance,
+here is the denotation of $\plflip{}$:
+\begin{align*}
+  \dbracket{\plflip{}} = v \mapsto 
+  \begin{cases}
+    1/2 \quad& \text{if }v=\pltrue\\
+    1/2 \quad& \text{if }v=\plfalse\\
+    0 \quad& \text{otherwise.}
+  \end{cases}
+\end{align*}
+We are again interested in proving natural equivalences such as the one 
+we saw earlier where let-bindings can be reordered (recall that 
+$N$ does not refer to $x$):
+\begin{align*}
+  &\pllet{x}{M}{\Big( \pllet{y}{N}{\plpair{x}{y}} \Big)}\\
+  &\stackrel{?}{=}\\
+  &\pllet{y}{N}{\Big( \pllet{x}{M}{\plpair{x}{y}} \Big)}
+\end{align*}
+
+Intuitively, it seems like this ought to be a semantics-preserving rewrite for a
+very similar reason to the fact that an identical rewrite is true for
+\ref{lang:calc}. But, \ref{lang:tinyppl} does not have an identical denotation,
+and so it seems like it requires a from-scratch proof to establish that 
+this rewriting is sound.
+
+Clearly this reordering is a general phenomenon we would like to study across 
+many languages with different semantic interpretations.  Category theory gives
+us a name for property of a semantic domain: it is called 
+\textbf{commutativity}.  Moreover, category theory gives us language for
+describing properties of a wide array of effects: probability is an example of a
+\textbf{monad}, and this monad is commutative and hence such rewritings are
+valid for \emph{all commutative monads}.\footnote{This commutativity property
+was studied first by \citep{staton2017commutative}; it follows essentially the
+order of summation can be interchanged. In the continuous case, this fact is
+true by Fubini's theorem.}
+
+\section{Generalization 2: Higher-order functions}
+Functional languages have more than let-bindings and pairs. For instance, 
+OCaml has higher-order functions, sum-types, and pattern-matching. These 
+features can be difficult to specify, and category theory gives us a canonical 
+way of designing these specifications.\footnote{Mention the categorical abstract machine}
+
+We will illustrate this principle by higher-order functions:
+
+\begin{gather}
+  \begin{aligned}
+   A,B &::= \plkw{Unit}
+     \mid A \pltimes B
+     \mid A \plto B
+  \\
+  M,N &::= \plunit{}
+      \mid \plpair{M}{N}
+      \mid \plfst{M}
+      \mid \plsnd{M}
+      \mid \pllam{x}{M}
+      \mid \plapp{M}{N}
+      \mid x
+  \end{aligned}
+  \label{lang:stlc}
+  \tag{\textsc{stlc}}
+\end{gather}
+
+The \textbf{function type} $A \plkw{\to} B$ denotes functions from $A$ 
+to $B$. Functions are introduced using lambda abstraction rule $\pllam{x}{M}$, defines a function 
+with free variable $x$. Functions are eliminated with the lambda 
+application rule $\plapp{M}{N}$, which calls the function $M$ with argument $N$.
+
+Following our original setup with \ref{lang:calc}, we can give a denotational 
+semantics to \ref{lang:stlc} by associating each type with a set and each 
+term with a function between sets. For functions and function applications, this
+looks like:
+\begin{align*}
+   \llbr{\pllam{x}{M}} &= \gamma \mapsto (v \mapsto \llbr{M}(\gamma[x \mapsto v])) \\
+  \llbr{\plapp{M}{N}} &= \gamma \mapsto (\llbr{M}\gamma)(\llbr{N}\gamma) \\
+\end{align*}
+
+You should notice that it is not obvious that this interpretation is valid: 
+it remains to be argued that $(v \mapsto \llbr{M}(\gamma[x \mapsto v]))$
+is itself representable as an element of a set. 
+This is true because it is possible to represent the set of all functions 
+between two sets as a set: a function can be represented as its \emph{graph} (i.e., 
+a set of input-output pairs), which is itself a set.
+
+Again, following our previous development from \ref{lang:calc} to \ref{lang:tinyppl},
+we wonder: is it similarly possible to represent first-class functions in 
+the denotation of a probabilistic programming language? It's not at all obvious, 
+at first, what shape a first-class function in a probabilistic programming 
+language should have and whether it's possible to represent such an object.
+In discrete probability it is possible to represent first-class functions, 
+but in continuous probability it is not at all so straightforward: this was the 
+problem being studied by \citep{heunen2017convenient}.
+
+The crucial idea is that category theory will give us a general characterization 
+of what it means for a semantic domain to support a first-class function: 
+these will be called \emph{exponential objects}, and categories that have 
+exponential objects are called \emph{Cartesian closed}
+and are capable of giving denotations to simply-typed lambda calculi.
+
+
+
+% \begin{align*}
+%   \llbr{\Gamma} &= \prod_{(x\ofty A)\in\Gamma} \llbr{A}
+% \end{align*}
+% \begin{align*}
+%   \llbr{\Gamma \vdash M : A} &: \llbr{\Gamma} \to \llbr{A} \\
+%   \llbr{\plunit} &= \_ \mapsto \angled{} \\
+%   \llbr{\plpair{M}{N}} &= \gamma \mapsto (\llbr{M}\gamma,\llbr{N}\gamma) \\
+%   \llbr{\plfst{M}} &= \gamma \mapsto \pi_1(\llbr{M}\gamma) \\
+%   \llbr{\plsnd{M}} &= \gamma \mapsto \pi_2(\llbr{M}\gamma) \\
+%   \llbr{\pllam{x}{M}} &= \gamma \mapsto (v \mapsto \llbr{M}(\gamma[x \mapsto v])) \\
+%   \llbr{\plapp{M}{N}} &= \gamma \mapsto (\llbr{M}\gamma)(\llbr{N}\gamma) \\
+%   \llbr{x} &= \gamma \mapsto \gamma(x) \\
+%   \llbr{\plunreachable{M}} &= \text{the empty function \(\llbr{\Gamma} \to \llbr{A}\)} \\
+%   \llbr{\plinl{M}} &= \gamma \mapsto (1, \llbr{M}\gamma) \\
+%   \llbr{\plinr{M}} &= \gamma \mapsto (2, \llbr{M}\gamma) \\
+%   \llbr{\plcase{M}{x}{N}{y}{O}} &= \gamma \mapsto \begin{cases}
+%       \llbr{N}(\gamma[x\mapsto v]), & \text{if }\llbr{M}\gamma = (1,v) \\
+%       \llbr{O}(\gamma[y\mapsto w]), & \text{if }\llbr{M}\gamma = (2,w)
+%     \end{cases}
+% \end{align*}
+
+% \begin{itemize}
+% \item Example: \(f\ofty(B\plto C), g\ofty(A\plto B) \vdash \pllam{a}{\plapp{f}{(\plapp{g}{a})}} : A \plto C\)
+%   denotes function composition
+% \end{itemize}
+
+% \section{Generalization 3: Proof Irrelevance}
+% Behavioral equivalence is slippery because there are many 
+% valid notions of observer.
+% % When reasoning about programs, it is often useful to reach for more exotic
+% % interpretations than these. A well-known example is \emph{abstract
+% % interpretation}~\citep{cousot1979systematic}, where programs can be analyzed by
+% % interpreting them in an ``abstract domain''.
+% %% For instance, suppose our abstract
+% %% domain consist of 2 possible states: \texttt{\{even\}, \{odd\}}.
+% %% We can interpret \ref{lang:razor} programs as manipulating these predicates:
+
+% \begin{align*}
+%   \llbr{\plUnit} &= \top \\
+%   \llbr{\plVoid} &= \bot \\
+%   \llbr{A \pltimes B} &= \llbr{A} \land \llbr{B} \\
+%   \llbr{A \plplus B} &= \llbr{A} \lor \llbr{B} \\
+%   \llbr{A \plto B} &= \llbr{A} \Rightarrow \llbr{B}
+% \end{align*}
+% \begin{align*}
+%   \llbr{\Gamma} &= \bigwedge_{(x\ofty A)\in \Gamma} \llbr{A}
+% \end{align*}
+% \begin{align*}
+%   \mathsf{Ent}(\Gamma,A)
+%   &= \begin{cases}
+%     \{\star\}, &\text{if }\llbr{\Gamma} \vDash \llbr{A} \\
+%     \varnothing, &\text{if }\llbr{\Gamma} \not\vDash \llbr{A}
+%   \end{cases}
+% \end{align*}
+
+% \begin{proposition}
+%   If \(\Gamma \vdash M : A\)
+%   then \(\mathsf{Ent}(\Gamma, A) = \{\star\}\).
+% \end{proposition}
+% \begin{proof}
+%   By induction on \(\Gamma \vdash M : A\).
+% \end{proof}
+
+% \begin{align*}
+%   \llbr{\Gamma \vdash M : A} &\in \mathsf{Ent}(\Gamma,A) \\
+%   \llbr{M} &= \star
+% \end{align*}
+
+%% The symbol $\uplus$ denotes \emph{disjoint union of sets}. So, the
+%% interpretation of $\dbracket{\texttt{3}}$ would be a set containing three stars
+%% in it; and, then, addition simply combines these two sets. This is a sort of
+%% unary representation.
+
+
+%% \begin{gather}
+%%   \begin{aligned}
+%%   \dbracket{\texttt{n}} &= \begin{cases}
+%%     \texttt{\{even\}} \qquad & \text{if \texttt{n} is even}\\
+%%     \texttt{\{odd\}} \qquad & \text{otherwise}
+%%   \end{cases} \\
+%%   \dbracket{e_1 + e_2} &= \begin{cases}
+%%     \texttt{\{even\}} \qquad & \text{if $\dbracket{e_1}=\texttt{\{even\}}$, $\dbracket{e_1}=\texttt{\{even\}}$}\\
+%%     \texttt{\{even\}} \qquad & \text{if $\dbracket{e_1}=\texttt{\{odd\}}$, $\dbracket{e_1}=\texttt{\{odd\}}$}\\
+%%     \texttt{\{odd\}} \qquad & \text{if $\dbracket{e_1}=\texttt{\{odd\}}$, $\dbracket{e_1}=\texttt{\{even\}}$}\\
+%%     \texttt{\{odd\}} \qquad & \text{if $\dbracket{e_1}=\texttt{\{even\}}$, $\dbracket{e_1}=\texttt{\{odd\}}$}\\
+%%   \end{cases}
+%%   \end{aligned}
+%% \end{gather}
+
+% \section{A Final Encounter: Type Theory}
+
+% Indeed, the more you study programming languages, the more you realize that
+% there is great utility in having flexibility in how various programs are
+% interpreted: the same syntax, when interpreted in a different light, can
+% be given many useful and different meanings.
+
+% A final example comes from type theory. Type theorists are often concerned with \emph{canonicity},
+% which states that all well typed terms have a recognizable form.
+
+% \begin{itemize}
+% \item In the standard set-theoretic semantics,
+%   types denote sets: \(\llbr{\plUnit}\) is the singleton set.
+% \item In the truth value semantics,
+%   types denote logical formulas: \(\llbr{\plUnit}\) is the formula \(\top\).
+% \item In the ``canonicity'' semantics,
+%   types denote sets of well-behaved syntactic terms:
+%   \(\llbr{\plUnit}\) denotes those closed terms of type \(\plUnit\) that are
+%   equationally equal to \(\star\).
+% \end{itemize}
+
+% \begin{align*}
+%   \llbr{A} &\subseteq \{M \mid {}\vdash M : A\} \\
+%   \llbr{\plUnit} &= \{M \mid M \equiv \plunit\} \\
+%   \llbr{\plVoid} &= \varnothing \\
+%   \llbr{A \pltimes B} &=
+%     \{M \mid
+%       M \equiv \plpair{N}{O}
+%       \text{ and }
+%       N \in \llbr{A}
+%       \text{ and }
+%       O \in \llbr{B}\}
+%       \\
+%   \llbr{A \plplus B} &=
+%     \{M \mid
+%       \text{either }
+%       M \equiv \plinl{N}
+%       \text{ and }
+%       N \in \llbr{A}
+%       \text{ or }
+%       M \equiv \plinl{O}
+%       \text{ and }
+%       O \in \llbr{B}
+%       \}
+%       \\
+%   \llbr{A \to B} &=
+%     \{
+%      M \mid
+%      \text{if }N \in \llbr{A}
+%      \text{then }\plapp{M}{N} \in \llbr{B}
+%     \}
+% \end{align*}
+% \begin{align*}
+%   \llbr{\Gamma} &= \{ \gamma \mid  \gamma(x) \in \llbr{\Gamma(x)}
+%     \text{ for all \(x\in\Gamma\)}\}
+% \end{align*}
+% \begin{align*}
+%   \mathsf{Ent}(\Gamma,A) &= \{M \mid \Gamma\vdash M : A
+%   \text{ and } M[\gamma] \in \llbr{A} \text{ for all } \gamma\in\llbr{\Gamma}\}
+% \end{align*}
+% \begin{theorem}
+%   If \(\Gamma \vdash M : A\) then \(M \in \mathsf{Ent}(\Gamma,A)\).
+% \end{theorem}
+% \begin{corollary}
+%   If \(\vdash M : \plUnit\plplus\plUnit\)
+%   then \(M \equiv \plinl\plunit\)
+%   or \(M \equiv \plinr\plunit\).
+% \end{corollary}
+
+% We will see later on in the course that such a logical relation can be constructed by reinterpretation
+% into a category \(\mathsf{LR}\).
+
+\section{Conclusion}
+
+This invites a question: \emph{what sort of structure must a mathematical object
+have in order to be used to interpret a programming language}?
+Among many other things, category theory gives us very satisfying answers to this question:
+we will see that certain kinds of mathematical structure admit
+properties like ``higher order functions'', a meaning of ``natural numbers'',
+ ``logical truth,'' and the ``existence of fixpoints''. Category theory gives us a formal language for describing what kind of
+structure a mathematical setting has. But before we get there, we'll see
+more examples of interpreting programs.
+
+% \section{Some notes on category theory resources}
+
+% There are many excellent resources on category theory that all cover different
+% aspects of the subject. We will briefly note some here that may be useful:
+% \begin{itemize}
+%   \item 
+% \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Whence Categories}
+
+We saw last time how many programming languages can be given denotational
+interpretations in terms of sets and functions.
+In all cases the underlying recipe was the same:
+types \(A\) denote sets \(\llbr{A}\),
+typing contexts \(x\ofty A,\dots\) denote Cartesian products \(\llbr{A} \times \dots\),
+and terms \(\Gamma \vdash M : A\)
+denote functions \(\llbr\Gamma \xrightarrow{\llbr{M}} \llbr{A}\).
+In this way set theory serves as a ``metalanguage'' for giving mathematical meaning to programs.
+
+As a metalanguage, sets and functions work best as a model of \emph{purely functional} programming,
+where a program is thought of as a black box that produces a uniquely determined output value
+for each input.
+But real programs are rarely purely functional:
+programs in the wild regularly manipulate resources (pointers, files, locks),
+interact with their environment (input and output),
+and use complex control flow constructs (exceptions, coroutines).
+
+Category theory provides a framework for \emph{swapping out the ambient metalanguage}:
+it provides techniques for systematically
+replacing sets and functions with constructs that are more naturally equipped to model
+realistic programming features.
+Each category embodies a choice of metalanguage.
+Sets and functions live in a \emph{category of sets} \(\Set\),
+which we will encounter later on.
+By swapping out \(\Set\) with other categories,
+we gain access to other metalanguages that are better adapted to modelling programming language features:
+\begin{itemize}
+\item Traditional domain theory, of untyped lambda calculus and recursive
+  functional programming such as Haskell, lives in a \emph{category of domains}.
+  As a metalanguage, it supports arbitrary recursive definitions,
+  and recursive types.
+\item
+  A lot of modern semantics takes place in
+  a category of \emph{step-indexed sets}
+  which as a metalanguage supports \emph{very} recursive types.
+  We will meet this category later, when we discuss presheaves.
+\item Programs that manipulate resources
+  live in categories of \emph{resourceful sets},
+  which are used to define modern separation logics.
+  We will meet these categories when we discuss the Day convolution.
+\item Probabilistic semantics live in a \emph{category of measurable spaces}.
+  As a metalanguage, it supports getting the probability of events.
+  Higher-order probability lives in \emph{quasi-Borel spaces}.
+  We may get to these categories if time permits.
+\end{itemize}
+
+\noindent
+The concept of ``category'' abstracts over all of these examples.
+Let's take a look at how categories formalize this situation.
+First, a category is defined on a set of \textbf{objects}:
+these are the ``types'' of the metalanguage it embodies.
+Objects are related to each other by \textbf{morphisms}
+\(A \xrightarrow{f} B\), or sometimes just \(f\) for short.
+Each morphism \(A \xrightarrow{f} B\) is associated to a
+\textbf{domain} \(A\) and a \textbf{codomain} \(B\).
+Here is a \textbf{picture of a category}\footnote{A \emph{picture of a category}
+shows objects as dots and morphisms as arrows, typically drawn with a box.} with some objects and morphisms in it:
+\begin{center}
+  \includegraphics[width=0.4\linewidth]{fig/simple-cat1.png}
+\end{center}
+Morphisms can be combined via \emph{composition},
+which pastes together morphisms that are incident to each other to form new ones.
+Composing $g$ after $f$ is denoted $g \circ f$, or sometimes more tersely as \(gf\).
+The ordering is a bit confusing; I like to read $\circ$ as ``after''.
+Pictorially, we can paste together edges $f$ and $g$ to get an edge $h$:
+\begin{center}
+  \includegraphics[width=0.4\linewidth]{fig/simple-cat2.png}
+\end{center}
+Categories satisfy several requirements that force them to behave nicely:
+\begin{itemize}
+  \item Every object has a self-loop called the \textbf{identity morphism},
+  for an object $A$, we will denote its identity morphism as $\sf{id}_A$.
+  This morphism must behave like an identity: for any morphism $A \xrightarrow{f} B$,
+  it must be the case that $\sf{id}_B \circ f = f = f \circ \sf{id}_A$.
+  \item Composition is \textbf{associative}, meaning that for any three morphisms
+  $A \xrightarrow{f} B$, $B \xrightarrow{g} C$, $C \xrightarrow{h} D$,
+  it is the case that $(f \circ g) \circ h = f \circ (g \circ h)$.
+\end{itemize}
+Summing up,\footnote{This definition of a category is one of many possible definitions. 
+You may have seen different ones. This definition is used by \citep{crole1993categories}; 
+different ones are used by \citep{mac1998categories}.}
+\begin{definition}[Category]
+  \sloppy
+  A category is a tuple \((O,M,\mathsf{dom},\mathsf{cod},\mathsf{id},\mathsf{comp})\)
+  where
+  \begin{itemize}[noitemsep]
+  \item $O$ is a set whose elements are called ``objects''
+  \item $M$ is a set whose elements are called ``morphisms''
+  \item $\mathsf{dom} : M\to O$
+  \item $\mathsf{cod} : M \to O$
+  \item $\mathsf{id} : O\to \{f \in M \mid \mathsf{dom}(f) = \mathsf{cod}(f)\}$
+  \item $\mathsf{comp} : \{(f,g) \in M \times M \mid \mathsf{dom}(f) = \mathsf{cod}(g)\} \to M$
+  \end{itemize}
+  such that
+  \begin{itemize}[noitemsep]
+  \item For all $f,g,h$ in $M$ such that
+  $\mathsf{dom}(f) = \mathsf{cod}(g)$ and\\
+  $\mathsf{dom}(g) = \mathsf{cod}(h)$, it holds that
+  $$\mathsf{comp}(f,\mathsf{comp}(g,h)) = \mathsf{comp}(\mathsf{comp}(f,g),h)$$
+  \item For all $f$ in $M$ it holds that $$\mathsf{comp}(f,\mathsf{id}_{\mathsf{dom}(f)})=f=\mathsf{comp}(\mathsf{id}_{\mathsf{cod}(f)}, f)$$
+  \end{itemize}
+\end{definition}
+
+\section{Our first metalanguage}
+
+With a precise definition of category in hand, we are now ready to meet our first
+``metalanguage''.
+
+\marginnote{Set theorists may raise an eyebrow at
+      the phrase ``set of finite sets'' in this definition.
+      Strictly speaking, the set of finite sets does not form a set.
+      But it is not that big of a deal:
+      many workarounds are available.
+      For instance, one could consider just finite subsets of \(\N\),
+      or the set of \emph{hereditarily finite sets}
+      (defined to be the union \(\bigcup_{n\in\N} \wp^n(\varnothing)\)).
+      }
+\begin{definition}[the category \(\FinSet\) of finite sets]
+  \sloppy
+  Let \(\FinSet\) be the category \((O,M,\dom,\cod,\circ,\idt)\)
+  where \begin{itemize}[noitemsep]
+  \item \(O\) is the set of finite
+    sets.
+  \item \(M\) is the set of tuples \((A,f,B)\) where \(A\) and \(B\)
+    are finite sets
+    and \(f\) is a function from \(A\) to \(B\).
+  \item \(\dom\) is the function \(\dom(A,f,B) = A\).
+  \item \(\cod\) is the function \(\dom(A,f,B) = B\).
+  \item \(\circ\) is the function \((B,f,C)\circ(A,g,B) = (A,f\circ g,C)\)
+    where \(f\circ g\) is the ordinary function composition of \(f\) and \(g\),
+    well defined because the domain of \(f\) matches the codomain of \(g\).
+  \item \(\idt_A\) is \((A,i,A)\) where \(i\) is the identity function on \(A\).
+  \end{itemize}
+\end{definition}
+
+The category laws are satisfied because function composition is associative
+  and composing a function with the identity function does nothing.
+
+Mathematically, \(\FinSet\) provides a categorical home for finite set theory.
+As a metalanguage, \(\FinSet\) embodies \emph{finite purely functional programming}.
+For instance,
+the following is a picture of the negation function \(f : \{T,F\} \to \{T,F\}\) 
+in the category \(\FinSet\):
+
+\begin{center}
+  \begin{tikzpicture}
+    % Define the node
+    \node[circle, draw] (A) at (0,0) {$\{T,F\}$};
+    
+    % Draw self loop
+    \draw[->, thick] (A) to[loop above] node[above] {$f$} (A);
+
+\end{tikzpicture}
+\end{center}
+
+The above picture tells is that there \emph{is} a morphism called $f$, 
+but it does not tell us anything about the \emph{content} of $f$. In particular, 
+it is useful to know how $f$ maps elements of its domain to its codomain. 
+To see this, we can draw the \textbf{internal picture} of this category
+that visualizes the computational content of its morphisms:\footnote{Not 
+all categories will have nice internal pictures, and different kinds of category 
+will have their own visual language for describing their morphisms.}
+
+\begin{center}
+ \begin{tikzpicture}
+  % First circle with T and F dots
+  \draw[thick] (0,0) circle (1);
+  \node at (-0.3,0.3) {$\bullet$};
+  \node at (-0.3,0.6) {$T$};
+  \node at (0.3,-0.3) {$\bullet$};
+  \node at (0.3,-0.6) {$F$};
+  
+  % Second circle with T and F dots
+  \draw[thick] (4,0) circle (1);
+  \node (T2) at (3.7,0.3) {$\bullet$};
+  \node at (3.7,0.6) {$T$};
+  \node (F2) at (4.3,-0.3) {$\bullet$};
+  \node at (4.3,-0.6) {$F$};
+  
+    % Arrow from T on the left to F on the right
+    \draw[->, thick] (-0.3,0.3) -- (4.3,-0.3);
+    
+    % Arrow from F on the left to T on the right
+    \draw[->, thick] (0.3,-0.3) -- (3.7,0.3) node[midway, below] {$f$};
+\end{tikzpicture}
+\end{center}
+
+Do not confuse the internal picture of a category with its picture: the internal 
+picture ``peers inside objects'', and will not generalize to all kinds of categories.
+This internal picture visualizes how the map $f$ behaves. A crucial 
+piece information that this internal picture conveys is when two morphisms 
+in \(\FinSet\) are equal: it is when they are \emph{extensionally equal}. 
+
+
+\section{Gaining intuition for categories}
+
+The definition of category is highly abstract---and necessarily so, in order to be general enough
+to accommodate all of the metalanguages just mentioned.
+Next time, we will see how this level of abstraction allows for
+clean axiomatizations of the various kinds of ``features'' that a metalanguage may support,
+in the form of so-called ``universal constructions.''
+This is what gives category theory its unifying power.
+
+As preparation, we will first need to become quite comfortable working
+with categories in the abstract. To do this, it is key to
+have in mind a few representative examples of categories
+to draw intuition from.
+
+\subsection{Categories as graphs}
+
+The first perspective on categories, which is perhaps most
+comfortable to computer scientists, is that they are ``directed multigraphs with extra structure.''
+Objects are vertices and morphisms are edges.
+On top of this basic graph structure, categories come with a
+composition operation that pastes two incident edges together to form a third,
+and identity morphisms \(\mathsf{id}_A\) that form self-loops centered at each vertex \(A\).
+The category laws then say that pasting of edges is an associative operation,
+and that pasting with an identity morphism does nothing.
+This provides nice visual intuition, and a large stock of example categories.
+In fact,
+\begin{construction}
+  Every directed multigraph can be turned into a category.
+\end{construction}
+\begin{proof}
+  Let \(G\) be a directed multigraph,
+  encoded as a tuple \((V,E,\mathsf{src},\mathsf{trg})\)
+  where \(V\) is the set of vertices, \(E\) is the set of edges,
+  and \(\mathsf{src},\mathsf{trg}\) are functions \(E\to V\)
+  that send each edge to its source and target vertices respectively.
+  The graph \(G\) can be used to define a category
+  \[
+  \mathsf{paths}(G) = (O,M,\dom,\cod,\circ,\idt)
+  \]
+  where
+  \begin{itemize}
+  \item \(O = V\)
+  \item \(M\) is the set of paths in \(G\),
+    which are tuples \((v_s,[e_1,\dots,e_n],v_t)\)
+    where \(v_s,v_t\) are vertices and \(e_1,\dots,e_n\) is a list of edges satisfying
+    \(\mathsf{src}(e_1) = v_s\) and \(\mathsf{trg}(e_n) = v_t\)
+    and \(\mathsf{trg}(e_i) = \mathsf{src}(e_{i+1})\)
+    for all \(1\le i < n\).
+  \item \(\dom : M \to O\) is the function \(\dom(v_s,[e_1,\dots,e_n],v_t) = v_s\)
+  \item \(\cod : M \to O\) is the function \(\cod(v_s,[e_1,\dots,e_n],v_t) = v_t\)
+  \item \(\circ\) concatenates paths:
+    \((v_t,[f_1,\dots,f_n],v_u)\circ(v_s,[e_1,\dots,e_m],v_t) = (v_s,[e_1,\dots,e_m,f_1,\dots,f_n],v_u)\).
+    Note that this is well-defined because the two paths \(\vec f\) and \(\vec e\) line up tip-to-tail.
+    Note also that \(\vec e\) comes before \(\vec f\) in the concatenated path, due to the reversal of order
+    of arguments to \(\circ\).
+  \item \(\idt_v\) is the empty path \((v,[],v)\) starting and ending at \(v\).
+  \end{itemize}
+  The category laws are satisfied because concatenation of paths is associative and concatenating a path with the
+  empty path does nothing.
+\end{proof}
+\begin{note}
+  It is essential that morphisms are \emph{paths} in this construction, and not edges!
+  Otherwise, it would be unclear how to define composition and identity.
+\end{note}
+
+\subsection{A Difference Between Categories and Directed Multigraphs}
+
+A key difference between categories and graphs is that
+two morphisms in a category that come from
+different ``paths'' may nonetheless be equal.
+For example, the following two ``paths'' through \(\FinSet\)
+are actually the same, because negating a Boolean twice is the same as doing nothing:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13gAVUgMU4BfEINLpMufIRQAmclVqMWbTj35CRYkBmx4CRAIykDC+s1aIOXXgPbDBCmFADm8IqABmAJwgBbJGQgOBBIRormKuy+dDgAFnAewJA49lrefqHUwUhy4cqWnNFxCUkQKZqePv6IgdmIuWb5VlhQOAD6wKo2QsLUDHQARjAMAAoSetIgXljOsTgiFIJAA
+\begin{tikzcd}
+{\{T,F\}} \arrow[rr, "\mathsf{not}"] \arrow[rd, "{\idt_{\{T,F\}}}"'] &           & {\{T,F\}} \arrow[ld, "\mathsf{not}"] \\
+                                                                     & {\{T,F\}} &
+\end{tikzcd}\]
+This relationship between the paths \(\mathsf{not}\circ \mathsf{not}\) and \(\idt_{\{T,F\}}\)
+is often conveyed by saying that the triangle above is ``filled in'', or ``commutes''.
+The intuition being that one can then ``continuously deform''
+\(\mathsf{not}\circ\mathsf{not}\) into \(\idt_{\{T,F\}}\),
+by ``dragging'' it through the filled in triangle.
+
+This idea is a handy visual tool for organizing categorical information
+and for conducting proofs.
+
+\subsection{Categories as orders}
+
+A special case of a multigraph is a graph, where there is \emph{at most one} arrow between any given pair of vertices.
+This leads us to the second class of important examples of a category:
+\begin{definition}[preorder]
+  \sloppy
+  A preorder is a pair \((X,\preceq)\)
+  where \(X\) is a set and \(\preceq\)
+  is a binary relation on \(X\)
+  that is reflexive (\(x\preceq x\) for all \(x\) in \(X\))
+  and transitive (if \(x \preceq y\) and \(y\preceq z\) then \(x \preceq z\)).
+\end{definition}
+Preorders are often fruitfully drawn as \emph{Hasse diagrams}.
+%% An object is like an element of a preorder
+%% and a morphism \(x\to y\) is like a ``proof'' that \(x\le y\).
+A simple example is the set \(\N\) of natural numbers,
+ordered by \(m\preceq n\) if \(m\) is less than or equal to \(n\).
+We can draw this preorder as follows:
+\[
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBmAXVJADcBDAGwFcYkRiQBfU9TXfIRRkATNTpNW7AIzdeIDNjwEiZaeIYs2iECLl8lg1aWIbJ2kAB1LtKBBwIu4mFADm8IqABmAJwgBbJHIaHAgkERoACxh6KHZIMDYebz9AxAiQUKRpKJi4nQSk+V8A7JCwxDIQaNj4giTKLiA
+\begin{tikzcd}
+\vdots \arrow[d, no head] \\
+2 \arrow[d, no head]      \\
+1 \arrow[d, no head]      \\
+0
+\end{tikzcd}\]
+Hasse diagrams are read bottom-up, with the least elements 
+on the bottom and the greatest elements on the top. 
+An undirected edge is drawn between elements with no elements 
+between them (this is why we have no edge from 0 to 2 in the above figure).
+A more visually interesting preorder on \(\N\)
+is to define \(m \preceq n\) if \(m\) is a \emph{divisor} of \(n\).
+This preorder looks less like a straight line and more like a lattice:
+\[
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoBmAXVJADcBDAGwFcYkRiQBfU9TXfIRQAGUgCZqdJq3ZjuvEBmx4CRMhJoMWbRCHLy+ywUTHjJWmboCsBxfxVDko4uek6QANltKBqlGRdNN3ZiYW97YxRTQKltEJseQ19HUWFXON0AHUzaKAgcBES7Iz9kUzSgjJBs3PzChR8HNVIK2MtqnLyC7kkYKABzeCJQADMAJwgAWyQyEBwIJFEQAAsYeih2SDA2IvGppFM5hcQl1fXNgh2FPenEchp5xZozjd0tq9GJ248H48OXi7bWw3JA-I5Ie4rNavcCXYFfJBWX4zZ7QwEfEAgxBI8F3VHnN5w3YIxAAFmRiH+aMJQOJ+zJFNmAJpGKx5NxAHZ8TD3vD6WDHogABzc9F8244wUATlFLJ6XCAA
+\begin{tikzcd}
+\vdots                                                      & \vdots                                                        & \vdots                                                       \\
+6 \arrow[rd, no head] \arrow[d, no head] \arrow[u, no head] & 10 \arrow[ld, no head] \arrow[rd, no head] \arrow[u, no head] & 15 \arrow[ld, no head] \arrow[d, no head] \arrow[u, no head] \\
+2 \arrow[rd, no head]                                       & 3 \arrow[d, no head]                                          & 5 \arrow[ld, no head]                                        \\
+                                                            & 1                                                             &
+\end{tikzcd}
+\]
+Preorders don't have to be discrete either: the real numbers \(\R\),
+for instance, form a preorder with \(x \preceq y\) if \(x\) is less than or equal to \(y\). This is a little harder to draw.
+
+A preorder that arises frequently in PL is the preorder of
+\emph{run-time environments}.
+It is common to model these environments
+as partial functions \(\rho : \mathsf{Var} \rightharpoonup \mathsf{Val}\),
+assigning to each program variable \(x \in \mathsf{Var}\)
+a concrete value \(\rho(x)\).
+These substitutions form a preorder, with \(\rho \preceq \rho'\)
+if \(\rho\) is a subset of \(\rho'\), in the sense that all the 
+variables in $\rho$ are in $\rho'$ and mapped to the same values.
+%% \item Heaps under disjoint union: let \(\mathsf{Heap}\) be the category
+%%   whose objects are substitutions \(\gamma\),
+%%   i.e., partial functions \(\mathsf{Loc} \rightharpoonup \Z\),
+%%   and whose morphisms from \(h\) to \(h'\)
+%%   are heaps \(h_{\mathsf{diff}}\) such that \(h \uplus h_{\mathsf{diff}} = h\).
+
+Preorders forms a category:
+\begin{construction} \label{prop:every-preorder-is-a-category}
+  Every preorder can be turned into a category.
+  \label{eq:const-preorder}
+\end{construction}
+\begin{proof}
+  For any preorder \((X,\preceq)\), there is a category
+  \[
+    \mathsf{order}(X,\preceq) = (O,M,\dom,\cod,\circ,\idt)
+  \]
+  where
+  \begin{itemize}
+    \item \(O = X\).
+    \item \(M = (\preceq)\) (recall that a binary relation like \(\preceq\)
+      can be thought of as a set of pairs, with \((x,y) \in (\preceq)\)
+      if and only if \(x\preceq y\)).
+    \item \(\dom\) is the function \(\dom(x,y) = x\).
+    \item \(\cod\) is the function \(\cod(x,y) = y\).
+    \item \(\circ\) is the function defined by \((y,z)\circ(x,y) = (x,z)\).
+      Note that we may assume that the two arguments to \(\circ\)
+      share a component \(y\) in this definition because of the assumption
+      that \((y,z)\) and \((x,y)\) are composable.
+      Note also that the composite \((x,z)\) is indeed well-defined
+      this is well defined by the transitivity of \(\preceq\).
+    \item \(\idt_x\) is the pair \((x,x)\), which forms a valid morphpism
+      by reflexivity of \(\preceq\).
+  \end{itemize}
+  The category laws are satisfied automatically,
+  as there can only be at most one morphism between any two objects.\footnote{Pause: 
+  why is this the case?}
+\end{proof}
+\noindent
+The intuitive import of Proposition~\ref{prop:every-preorder-is-a-category}
+is that every category can be thought of as a kind of preorder,\footnote{\emph{Reminder}: not all 
+categories directly correspond to some preorder construction, since there can be multiple 
+morphisms between objects in a general category. A category with at most 1 morphism between 
+any 2 objects is called a \emph{thin category}, and it does correspond to some preorder.}
+where the existence of a morphism \(A\xrightarrow{f} B\)
+expresses that \(A\) is in some sense ``less than or equal to'' \(B\).
+Thinking of categories in this way leads to interesting questions like:
+\begin{itemize}
+\item
+  Does a category have a ``smallest'' or ``largest'' object?
+  For instance, the smallest runtime environment is the empty environment $\emptyset$
+  with no variables in it.
+\item Does a category have ``ascending sequences''?
+  For example, 
+  \begin{align}
+   \emptyset \subseteq \{x\mapsto A\} \subseteq \{x\mapsto A, y\mapsto B\} \subseteq \dots 
+   \label{eq:env-seq}
+  \end{align}
+  is an ascending sequence in the preorder of runtime environments.
+\item  Does a category have ``limit'' objects, like suprema or infima?  For
+  instance, you probably know from calculus that there limits in \(\R\): for
+  example, the sequence $\frac{1}{2}, \frac{1}{4}, \frac{1}{8},
+  \frac{1}{16}\cdots$ approaches 0 in the limit.  A very interesting question is:
+  which categories ``have limits'', in the sense that such sequences always
+  converge to some object in the category?
+
+  An example of a situation where there is no limit is the sequence in
+  \cref{eq:env-seq}.  The set of environments grows and grows, and since there
+  is no notion of a ``greatest environment'', there is no limit to this
+  sequence.
+\item
+  Given two categories, is there a notion of ``monotone map'' between them?
+\end{itemize}
+
+Each of the above observations is foreshadowing a notion of a ``universal construction''
+in a category, which we will explore in the following lectures.
+
+\subsection{Categories as algebras}
+
+Whereas preorders are like multigraphs where there is at most one \emph{edge}
+between any two vertices,
+the opposite extreme is a multigraph with exactly one \emph{vertex},
+so that all edges are self-loops:
+% https://q.uiver.app/#q=WzAsMSxbMCwwLCJcXGJ1bGxldCJdLFswLDBdLFswLDAsIiIsMCx7InJhZGl1cyI6MX1dLFswLDAsIiIsMCx7InJhZGl1cyI6NX1dXQ==
+\begin{equation}
+\begin{aligned}
+\begin{tikzcd}
+	\star
+	\arrow[from=1-1, to=1-1, loop, in=55, out=125, distance=10mm]
+	\arrow[from=1-1, to=1-1, loop, in=60, out=120, distance=5mm]
+	\arrow[from=1-1, to=1-1, loop, in=50, out=130, distance=15mm]
+\end{tikzcd}
+\end{aligned}
+\end{equation}
+Categories of this shape form our final class of important example:
+a special kind of algebraic structure called a \emph{monoid}.
+\begin{definition}[monoid]
+  A monoid is a tuple \((X,\bullet,e)\)
+  where \(\bullet\) is a binary operation on \(X\)
+  (a function \(X \times X \to X\))
+  that is associative (\(x\bullet (y\bullet z) = (x\bullet y) \bullet z\))
+  and has \(e\) as a unit (\(x\bullet e = x\) and \(e\bullet x = x\)).
+\end{definition}
+A simple example of a monoid is \((\N,+,0)\),
+the monoid of natural numbers under addition.
+This forms a monoid because addition of natural numbers is associative
+and has zero as a unit.
+
+An example that is closer to PL
+comes from the semantics of imperative programs.
+It is common to interpret an imperative program
+as a function \(S \to S\), where \(S\) is a set of
+memory states.
+For example, the program
+\[
+  x := x + 1;
+\]
+can be interpreted
+as a function that sends a memory state \(s\)
+to a new memory state \(s'\) in which
+the value of \(x\) has been incremented by \(1\).
+The functions \(S \to S\) form a monoid
+\((S\to S,\bullet,\mathsf{id})\),
+where the monoid operation is given by \(f \bullet g = g \circ f\)
+(note the reversal!),
+corresponding to the sequencing of the programs \(f\) and \(g\),
+and the identity element is the identity function on \(S\),
+corresponding to the empty program that does nothing.
+
+\begin{construction} \label{prop:every-monoid-is-a-category}
+  Every monoid can be turned into a category.
+\end{construction}
+\begin{proof}
+  For any monoid \((X,\bullet,e)\) there is a category
+  \[
+    \mathsf{mon}(X,\bullet,e) = (O,M,\dom,\cod,\circ,\idt)
+  \]
+  where
+  \begin{itemize}
+  \item \(O = \{\star\}\), a singleton set with a single dedicated element \(\star\).
+    \marginnote{Technically set theory does not contain stars in it.
+    But this is no matter.
+    The symbol \(\star\) can be interpreted as any object of
+    your choice---all that matters
+    is that \(O\) is a singleton set.
+    For instance, one could set \(\star =
+    \varnothing\).
+    }
+  \item \(M = X\)
+  \item \(\dom(M) = \star\)
+  \item \(\cod(M) = \star\)
+  \item Composition is defined by \(x \circ y = x \bullet y\)
+  \item \(\idt_\star = e\)
+  \end{itemize}
+  The category laws follow from the associativity of \((\bullet)\)
+  and that it has \(e\) as a unit.
+\end{proof}
+\begin{note}
+  It is very important that the set of objects \(O\) is a singleton set \(\{\star\}\).
+  A natural thought one might have is that the set of objects should be the set \(X\) of elements of the monoid.
+  But this in fact does not work: what would be the morphisms?
+
+  There is actually a good reason why the set of objects is the seemingly-arbitrary singleton set \(\{\star\}\) in this construction.
+  It comes from the fact that a monoid is what is called a \emph{single-sorted} algebraic structure; hence \(\{\star\}\)
+  is a set with a single element.
+\end{note}
+The intuitive import of
+Proposition~\ref{prop:every-monoid-is-a-category} is that
+every category can be thought of as a kind of algebraic structure,
+where composition is like ``multiplication''
+and identity morphisms are like ``multiplicative units''.
+
+The algebraic perspective leads to questions like:
+given an equation between morphisms containing some unknowns,
+are there zero, one, or infinitely many solutions?
+When can I ``cancel'' a morphism from both sides of an equation (e.g., from \(fg = fh\) deduce \(g=h\),
+or from \(fh = gh\) deduce \(f=g\))?
+When does a morphism have an ``inverse''?
+When can a morphism \(f\) be ``factored'' into two pieces, \(f = gh\)?
+
+\section{Putting intuitions to the test}
+
+We conclude this section by illustrating each of the three perspectives
+on categories on the following
+\textbf{categorification}\footnote{The idea of ``categorification'' is to 
+cast a notion one is familiar with -- like ``subset inclusion'' into 
+the language of objects and morphisms. This is a very important idea 
+in category theory because it allows one to take familiar concepts 
+and apply them to unfamiliar categories.} of
+a basic concept from set theory: subset inclusion.
+\begin{proposition} \label{prop:subset-leq-iff-triangle}
+Suppose \(U\) and \(V\) are subsets of a finite set \(X\).
+Then \(U \subseteq V\) if and only if
+there exists a dashed \(\FinSet\)-morphism \(f\)
+such that \(f \circ v = u\),
+where \(u\) and \(v\) are the \(\FinSet\)-morphisms
+corresponding to the inclusion functions \(U \to X\) and \(V \to X\)
+respectively:
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQAmclVqMWbAGrdeIDNjwEiARlKrx9Zq0QgAGt3EwoAc3hFQAMwBOEALZIyIHBCSiXdLAzY4vP6m0pPSYQagY6ACMYBgAFfmUhEBssUwALHDlrO0dEdRc3RA8-b19-MIkdNhoskFsHJ2pXJHySnz1IMFZwrC62KDo4NJMKoN06oy4gA
+\begin{tikzcd}
+U \arrow[rd, "u"', tail] \arrow[rr, "f", dashed] &   & V \arrow[ld, "v", tail] \\
+                                                 & X &
+\end{tikzcd}
+\end{equation}
+\end{proposition}
+You will prove Proposition~\ref{prop:subset-leq-iff-triangle} in the homework.
+As preparation,
+let's appreciate what it is saying: a basic set theoretic
+property \(U\subseteq V\) about finite subsets
+can be recast in terms of a purely category-theoretic property
+about \(\FinSet\).
+This categorification takes roughly two steps.
+The first step is to express the subsets \(U\) and \(V\)
+as morphisms \(u\) and \(v\).
+The second step is to express \(U\subseteq V\)
+as a property of the morphpisms \(u\) and \(v\).
+Let's try to get some intuition for what this property is saying
+from each of the perspectives we've developed so far.
+\begin{itemize}
+\item Graphically, it says that the morphisms \(u\) and \(v\)
+  fit into a triangle with \(f\) that is ``filled in''.
+\item Order-theoretically, it says that the morphism \(u\) is somehow
+  ``less than or equal to'' \(v\), by virtue of there being a dashed morphism
+  \(f\) witnessing this order relationship.
+\item Algebraically, it says that the equation \(u = f \circ v\)
+  has a solution in the unknown \(f\).
+\end{itemize}
+Let's see each of these in action on the following proof.
+\begin{proposition}
+  If \(U\subseteq V\) and \(V \subseteq W\) then \(U\subseteq W\).
+\end{proposition}
+Each perspective lends itself to a different proof strategy.
+\begin{itemize}
+\item Graphically, you paste two filled in triangles to get a bigger filled in triangle.
+\item Order-theoretically, you use the fact that inequalities are transitive.
+\item Algebraically, you use that \(u = fv = fgw\) provides a solution to \(u = hw\).
+\end{itemize}
+
+%% \item Refinement corresponds to solvability of an equation that looks like a square.
+%%   Suppose you have a subset \(U\) of a finite set \(X\),
+%%   a subset \(V\) of a finite set \(Y\),
+%%   and a function \(f : X \to Y\).
+%%   Let \(u : U \rightarrowtail X\) and \(v : V \rightarrowtail Y\) be the relevant inclusions.
+
+%%   Suppose \(f\) satisfies the property that,
+%%   for all \(x \in U\), it holds that \(f(x) \in V\).
+%%   This can be expressed as saying that the equation
+%%   \(fu = vg\) is \emph{solvable} in the unknown \(g\).
+%%   Diagramatically:
+%%   \[
+%%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQBGclVqMWbAGrdeIDNjwEiZYePrNWiEAA05fJYKKj11TVJ0BNbuJhQA5vCKgAZgCcIAWyRkQOCCQAJmocOiwGNjCIkHNJbRAmWJAGOgAjGAYABX5lIRB3LAcACxwDEA9vJFF-QMQAZlDwyJ1oyLitNhpyyp9EPwDqjssQBx7PPpDapEaJTp1XZNSM7NzjHUKSsq4KLiA
+%% \begin{tikzcd}
+%% U \arrow[d, "u"', tail] \arrow[r, "g"] & V \arrow[d, "v", tail] \\
+%% X \arrow[r, "f"']                      & Y
+%% \end{tikzcd}
+%%   \]
+%%   This situation actually comes up quite a lot in PL,
+%%   as we will see when we discuss logical relations.
+
+%%   (By the way, the solution \(g\), if it exists, must be the \emph{only} solution to this equation,
+%%   as if one finds \(g\) and \(g'\) such that \(fu = vg\) and \(fu = vg'\), then \(vg=fu=vg'\),
+%%   and left-cancellativity of \(v\) implies \(g = g'\).)
+
+\subsection{Some fun exercises}
+
+\begin{itemize}
+\item Explicitly write down the monoid \((\N,+,0)\) as a category.
+\item Solve the equation \(c \circ (x := x + 1) = (x := x + 2)\) for \(c\).
+  Can you find any other solutions?
+\item Try to come up with an English description of what it means for an Imp command to be ``left'' or ``right'' cancellable
+\item Prove Proposition~\ref{prop:subset-leq-iff-triangle}.
+\item Show that the functions \(u,v\) in Proposition~\ref{prop:subset-leq-iff-triangle}
+  are left-cancellable as morphisms of \(\FinSet\).
+\end{itemize}

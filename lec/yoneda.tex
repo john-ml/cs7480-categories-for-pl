@@ -1,0 +1,29 @@
+\chapter{Yoneda}
+
+\begin{itemize}
+\item Universal properties help justify a construction,
+  but are pretty bad for making use of it.
+  (For example: try to prove associativity of products using the universal property alone.)
+  The Yoneda lemma and associated reasoning principles are more useful for this.
+\item Functors form a category where morphisms are natural transformations \begin{itemize}
+    \item Natural transformations as homotopies between diagrams
+      (the \(C\to D^\to\) example revisited)
+    \item Natural transformations as polymorphic maps
+  \end{itemize}
+\item Definition of Yoneda embedding
+\item Restatement of universal properties from previous week in terms of Yoneda embedding
+(e.g., for products, \(\yo(a\times b) \cong \yo(a)\times \yo(b)\).)
+\item Yoneda embedding full and faithful. Use this to quickly prove some basic facts:
+  associativity and commutativity of sums and products, distributivity of products over sums,
+  ...
+  These imply type isomorphisms in STLC and Set, entailments of propositional logic.
+\item Yoneda preserves limits.
+  This gives a quick proof that all limits can be constructed from products and equalizers.
+  From this we can compute limits in STLC (it won't have all of them
+  but it will have some).
+\end{itemize}
+
+\todo: \begin{itemize}
+\item Slice over c is category of elements of yo c
+\end{itemize}
+

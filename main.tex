@@ -1,0 +1,67 @@
+\documentclass{tufte-book}
+
+% \usepackage{palatino, fullpage}
+% \addbibresource{lib/bib.bib}
+% \newcommand\citet[1]{\textcite{#1}}
+\newcommand\jl{{\color{red}JL: }}
+\newcommand\sh[1]{{\color{red}SH: #1}}
+
+
+\usepackage{amsmath,amsthm}
+\input{lib/preamble.tex}
+
+\title{Category Theory for\\Programming Languages}
+\author{John M. Li and Steven Holtzen}
+
+\makeatletter
+\renewcommand{\maketitlepage}{%
+\begingroup%
+\setlength{\parindent}{0pt}
+
+{\fontsize{24}{24}\selectfont\textit{\@author}\par}
+
+\vspace{1.75in}{\fontsize{28}{28}\selectfont\@title\par}
+
+\vspace{0.5in}{\fontsize{14}{14}\selectfont\textsf{\smallcaps{\@date}}\par}
+
+\vfill{\fontsize{14}{14}\selectfont\textit{\@publisher}\par}
+
+\thispagestyle{empty}
+\endgroup
+}
+\makeatother
+
+\titlecontents{part}%
+    [0pt]% distance from left margin
+    {\addvspace{0.25\baselineskip}}% above (global formatting of entry)
+    {\allcaps{Part~\thecontentslabel}\allcaps}% before w/ label (label = ``Part I'')
+    {\allcaps{Part~\thecontentslabel}\allcaps}% before w/o label
+    {}% filler and page (leaders and page num)
+    [\vspace*{0.5\baselineskip}]% after
+
+\titlecontents{chapter}%
+    [4em]% distance from left margin
+    {}% above (global formatting of entry)
+    {\contentslabel{2em}\textit}% before w/ label (label = ``Chapter 1'')
+    {\hspace{0em}\textit}% before w/o label
+    {\qquad\thecontentspage}% filler and page (leaders and page num)
+    [\vspace*{0.5\baselineskip}]% after
+%%%% End additional code by Kevin Godby
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\input{lec/categories.tex}
+\input{lec/universal-constructions.tex}
+
+\input{lec/yoneda.tex}
+\input{lec/adjoints.tex}
+
+\bibliographystyle{plain}
+\bibliography{lib/bib}
+
+\end{document}
