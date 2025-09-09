@@ -424,22 +424,24 @@ under substitution/precomposition:
 
 \section{Exponentials}
 
+\newcommand\ev{\mathsf{ev}}
+
 \begin{definition}
   \sloppy
   Let \(X,Y\) be objects of a category \(\calC\) with products.
   An \emph{exponential from \(X\) to \(Y\)}
-  is a tuple \((E,\mathsf{ev})\)
+  is a tuple \((E,\ev)\)
   where \(E\) is an object of \(\calC\)
   and
-  \(\mathsf{ev}\) is a morphism \(E\times X \to Y\)
+  \(\ev\) is a morphism \(E\times X \to Y\)
   satisfying the following \emph{universal property}:
   for all morphisms \(f : \Gamma \times X \to Y\),
   there exists a unique morphism \(\lambda_f : \Gamma \to E\)
-  such that \(\mathsf{ev} \circ (\lambda_f \times \mathsf{id}_X) = f\).
+  such that \(\ev \circ (\lambda_f \times \mathsf{id}_X) = f\).
 \end{definition}
 How to get here from STLC?
 
-Introduction and elimination
+\noindent Introduction and elimination
 \begin{mathpar}
 \inferrule*{\Gamma, x \ofty A \vdash M : B}{\Gamma \vdash \pllam{x}{M} : A \plto B}
 \and
@@ -450,7 +452,8 @@ Introduction and elimination
     }
     {\Gamma \vdash \plapp{M}{N} : B}
 \end{mathpar}
-Beta and eta rules
+
+\noindent Beta and eta rules
 \begin{mathpar}
 \inferrule*
     {
@@ -458,8 +461,113 @@ Beta and eta rules
       \\
       \Gamma \vdash N : A
     }
-    {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv \todo}
+    {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv M[N/x] : B}
+\and
+\inferrule*
+    {\Gamma \vdash M : A \to B}
+    {\Gamma \vdash M \equiv \pllam{x}{\plapp{M}{x}} : A \to B}
 \end{mathpar}
+
+\noindent Introduction and elimination, categorically
+\begin{mathpar}
+  \inferrule*
+    {\Gamma \times A \xlongrightarrow{f} B}
+    {\Gamma \xlongrightarrow{\lambda_f} B^A }
+  \and
+  \inferrule*
+    {~}
+    {B^A \times A \xlongrightarrow{\ev} B}
+\end{mathpar}
+Note that from the second rule one can derive the more familiar-looking
+\begin{mathpar}
+  \inferrule*
+    {\Gamma \xlongrightarrow{f} B^A
+      \\
+     \Gamma \xlongrightarrow{g} A
+    }
+    {\Gamma \xlongrightarrow{\angled{f,g}} B^A \times A \xlongrightarrow{\ev} B}
+\end{mathpar}
+
+\noindent The left-hand side of the beta rule
+\begin{mathpar}
+  \inferrule*
+    {
+      \inferrule*
+          {\inferrule*
+            {\Gamma \times A \xlongrightarrow{f} B}
+            {\Gamma \xlongrightarrow{\lambda f} B^A}
+          \\
+          {\Gamma \xlongrightarrow{g} A}
+          }
+          {\Gamma \xlongrightarrow{\angled{\lambda f, g}} B^A \times A}
+      \\
+      \inferrule*{~}{B^A\times A \xlongrightarrow{\ev} B}
+    }
+    {\Gamma \xlongrightarrow{\mathsf{ev}\,\circ\,\angled{\lambda f, g}} B}
+\end{mathpar}
+
+\noindent The right-hand side of the beta rule
+\begin{mathpar}
+  \inferrule*
+    {
+      \inferrule*
+        {\Gamma \xlongrightarrow{g} A}
+        {\Gamma \xlongrightarrow{\angled{\idt_\Gamma, g}} \Gamma \times A}
+      \\
+      \Gamma \times A \xlongrightarrow{f} B
+    }
+    {\Gamma \xlongrightarrow{f\,\circ\,\angled{\idt_\Gamma, g}} B}
+\end{mathpar}
+The reading of the beta rule: for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\),
+\begin{equation}
+  \ev \circ \angled{\lambda f, g}
+  =
+  f \circ \angled{\idt_\Gamma, g}
+\end{equation}
+
+\noindent The left-hand side of the eta rule
+\begin{mathpar}
+  \Gamma \xlongrightarrow{f} B^A
+\end{mathpar}
+\noindent The right-hand side of the eta rule
+\begin{mathpar}
+  \inferrule*
+    {
+      \inferrule*
+        {
+          \inferrule*
+            {\Gamma \xlongrightarrow{f} B^A}
+            {\Gamma \times A \xlongrightarrow{f \,\circ\, \pi_1} B^A}
+          \\
+          \inferrule*{~}{\Gamma \times A \xlongrightarrow{\pi_2} A}
+        }
+        {\Gamma \times A \xlongrightarrow{\ev \,\circ\, \angled{f\,\circ\, \pi_1, \pi_2}} B}
+    }
+    {\Gamma \xlongrightarrow{\lambda(\ev \,\circ\, \angled{f\,\circ\,\pi_1,\pi_2})} B^A}
+\end{mathpar}
+The reading of the eta rule: for all \(f : \Gamma \to B^A\),
+\begin{equation}
+  f = \lambda(\ev \circ \angled{f\circ \pi_1, \pi_2})
+\end{equation}
+Putting it all together, an exponential from \(A\) to \(B\)
+consists of
+\begin{itemize}
+\item An object \(B^A\)
+\item A morphism \(\ev : B^A \times A \to B\)
+\item For each object \(\Gamma\) and morphism \(f : \Gamma \times A \to B\),
+  a morphism \(\lambda f : \Gamma \to B^A\)
+\end{itemize}
+such that
+\begin{itemize}
+\item
+  \(\ev \circ \angled{\lambda f, g}
+  =
+  f \circ \angled{\idt_\Gamma, g}\)
+ for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\)
+\item
+  \(f = \lambda(\ev \circ \angled{f\circ \pi_1, \pi_2})\)
+  for all \(f : \Gamma \to B^A\)
+\end{itemize}
 
 % - Give standard rules for function types
 % - Golf rules using substitution
