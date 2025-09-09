@@ -1,29 +1,350 @@
-\chapter{Yoneda}
+\chapter{Yoneda I}
+
+\noindent In set theory, functions enjoy the following nice properties.
+\begin{enumerate}
+\item Extensional equality: two functions \(f,g : X \to Y\)
+  are equal if and only if \(f(x) = g(x)\) for all elements \(x\) of \(X\).
+\item Elementwise definition:
+  to define a function \(f : X \to Y\),
+  it suffices give a relation,
+  called the \emph{graph of \(f\)},
+  such that each element \(X\)
+  is related exactly one element of \(Y\).
+\end{enumerate}
+The presence of elements makes functions much easier to work with.
+For instance, compare the proof \(X \times (Y \times Z) \cong (X\times Y) \times Z\)
+as sets with the abstract proof for an arbitrary category with products.
+
+In this chapter we will see how to recover a similar kind of element-wise reasoning
+style that works in an arbitrary category.
+While objects of categories don't have elements,
+they do have \emph{generalized elements},
+which bring much of the benefits of elements in set theory
+to working in arbitrary categories.
+
+The starting point for this generalization is the following
+proposition, which recasts ``element of a (finite) set'' into categorical language.
+\begin{proposition}[Elements in \(\FinSet\)]
+  Let \(X\) be an object of \(\FinSet\).
+  Elements of \(X\) are in bijection
+  with morphisms of \(\FinSet\)
+  from \(1\) to \(X\).
+\end{proposition}
+In light of this proposition, properties (1) and (2)
+above translate into the following statements about \(\FinSet\):
+\begin{itemize}
+\item Extensional equality:
+  Two morphisms \(f,g : X \to Y\)
+  in \(\FinSet\) are equal if and only if \(f \circ x = g \circ x\)
+  for all morphisms \(x : 1 \to X\).
+\item Elementwise definition:
+  to define a morphism \(f : X \to Y\)
+  of \(\FinSet\),
+  it suffices to give a relation \(R\)
+  such that each
+  morphism \(1 \to X\)
+  is related to exactly one morphism \(1 \to Y\).
+\end{itemize}
+
+
+\section{From sets to categories}
+
+How to generalize the above situation to an arbitrary category?
+An arbitrary category might not have a terminal object \(1\).
+Even if they do, it's not guaranteed that functions can be
+defined and tested for equality simply via morphisms \(1 \to X\).
+
+The trick is to replace the special object \(1\)
+with a \emph{quantification over all possible objects}.
+Compare the statement of extensionality for \(\FinSet\)
+above with the following proposition, which holds in any category:
+
+\begin{proposition}[Generalized extensionality] \label{prop:generalized-extensionality}
+  Let \(f,g : X \to Y\) be two morphisms in a category \(\calC\).
+  Suppose that \(f \circ x = g \circ x\) for all objects \(\Gamma\)
+  and all morphisms \(x : \Gamma \to X\).
+  Then \(f = g\).
+\end{proposition}
+\begin{proof}
+  Letting \(\Gamma = X\) and \(x = \idt_X\) gives \(f \circ \idt_X = g \circ \idt_X\).
+  Simplifying yields \(f = g\).
+\end{proof}
+
+\begin{definition}[Generalized element]
+  Let \(X\) and \(\Gamma\) be objects of a category \(\calC\).
+  A \emph{generalized element of \(X\) at stage \(\Gamma\)}
+  is a morphism \(x : \Gamma \to X\).
+  The set of generalized elements of \(X\) at stage \(\Gamma\)
+  will be written \(\genelt{X}{\Gamma}\).
+\end{definition}
+
+In this new language, Proposition~\ref{prop:generalized-extensionality}
+says that two morphisms of a category are equal if
+they act the same on all generalized elements.
+
+Generalizing the principle of elementwise definition
+is trickier. Since the single object \(1\) has been replaced by a quantification over
+all objects \(\Gamma\), the notion of ``function'' as graph
+needs to be adjusted similarly.
+
+\begin{definition}[Generalized function]
+  Let \(X,Y\) be objects of a category \(\calC\).
+  A \emph{generalized function} \(\varphi\) from \(X\) to \(Y\)
+  is a family of functions
+  \(\varphi_\Gamma \subseteq \genelt{X}{\Gamma} \to \genelt{Y}{\Gamma}\)
+  indexed by objects \(\Gamma\) of \(\calC\)
+  that respects ``change of stage''
+  in the sense that for all \(p : \Gamma' \to \Gamma\)
+  and all \(x \in \genelt{X}{\Gamma}\)
+  it holds that \(\varphi_\Gamma(x\circ p) = \varphi_\gamma(x)\circ p\).
+\end{definition}
+
+\begin{proposition}[Generalized elementwise definition]
+  \label{prop:generalized-elementwise-definition}
+  Let \(X,Y\) be objects of a category \(\calC\).
+  Let \(\varphi\) be a generalized function from \(X\) to \(Y\).
+  There exists a morphism \(f : X \to Y\)
+  such that \(\varphi_\Gamma(x) = f \circ x\)
+  for all objects \(\Gamma\) and all \(x \in \genelt{X}{\Gamma}\).
+\end{proposition}
+
+\begin{proposition}
+  \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
+  in any category \(\calC\) with products.
+\end{proposition}
+\begin{proof}
+  Let \(\varphi\) be a family of functions
+  from generalized elements of \(X \times (Y\times Z)\)
+  to generalized elements of \((X\times Y) \times Z\)
+  defined as follows:
+  \[
+  \varphi_\Gamma\angled{x,\angled{y,z}}
+  =\angled{\angled{x,y},z}
+  \text{ for all \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\)}
+  \]
+  This function respects change of stage:
+  \begin{align}
+    \varphi_\Gamma\angled{x,\angled{y,z}}\circ p
+    &= \angled{\angled{x,y},z}\circ p\\
+    &= \angled{\angled{x\circ p,y\circ p},z \circ p}\\
+    &= \varphi_\Gamma\angled{x\circ p,\angled{y\circ p,z\circ p}}\\
+    &= \varphi_\Gamma(\angled{x,\angled{y,z}}\circ p).
+  \end{align}
+  Hence \(\varphi\) is a generalized function from \(X \times (Y\times Z)\)
+  to \((X\times Y) \times Z\) and,
+  by generalized elementwise definition,
+  there exists a morphism \(f : X \times (Y\times Z) \to (X\times Y) \times Z\),
+  such that \(f\circ \angled{x,\angled{y,z}}
+  = \varphi_\Gamma\angled{x,\angled{y,z}}
+  = \angled{\angled{x,y},z}\)
+  for all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\).
+
+  Similarly, we can define a morphism \(g\) going the other way,
+  in terms of the following generalized function \(\psi\):
+  \[
+  \psi_\Gamma\angled{\angled{x,y},z} = \angled{x,\angled{y,z}}.
+  \]
+
+  Now for
+  all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\),
+  it holds that
+  \begin{align}
+    (f\circ g)\circ \angled{\angled{x,y},z}
+    &= f\circ (g\circ \angled{\angled{x,y},z}) \\
+    &= f\circ (\psi_\Gamma\angled{\angled{x,y},z}) \\
+    &= f\circ \angled{x,\angled{y,z}} \\
+    &= \varphi_\Gamma\angled{x,\angled{y,z}} \\
+    &= \angled{\angled{x,y},z} \\
+    &= \idt_{(X\times Y) \times Z} \circ \angled{\angled{x,y},z}
+  \end{align}
+  so \(f\circ g = \idt_{(X\times Y) \times Z}\)
+  by generalized extensionality.
+
+  An analogous argument gives \(g \circ f = \idt_{X\times (Y\times Z)}\).
+  Hence \(f\) and \(g\) form an isomorphism
+  between \(X \times (Y\times Z)\) and \((X\times Y) \times Z\).
+\end{proof}
+Note the similarity between this proof and the standard set-theoretic
+argument that \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
+when \(X,Y,Z\) are sets.
+The key differences in this more general setting are (1)
+the quantification over stages \(\Gamma\)
+and (2) the checks that generalized functions respect change of stage.
+
+If you want to learn more about this perspective, check out
+Tom Leinster's ``\href{https://webhomes.maths.ed.ac.uk/~tl/elements.pdf}{Doing without diagrams}''.
+
+\chapter{Yoneda II: indexed set theory and representability}
+
+Throughout this section we will work with an arbitrary catetgory \(\calC\).
+
+\begin{definition}
+  A \emph{\(\calC\)-indexed set}
+  consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
+  along with ``substitution functions'' \(Pf : PY \to PX\)
+  for each morphism \(f : X \to Y\) in \(C\).
+  Given an element \(y \in PY\)
+  and a morphism \(f : X \to Y\),
+  the element \((Pf)(y)\) will be written \(y \cdot_P f\)
+  and called the ``substitution of \(y\) by \(f\)''.
+  Every \(\calC\)-indexed set \(P\)
+  must satisfy the following laws:
+  \begin{itemize}
+  \item Identity: \(x \cdot_P \idt_X = x\) for all objects \(X\) and \(x \in PX\)
+  \item Composition: \(z \cdot_P (f\circ g) = z \cdot_P f \cdot_P g\)
+    for all objects \(f : Y \to Z\) and \(g : X \to Y\) and \(z \in PZ\).
+  \end{itemize}
+\end{definition}
+
+\begin{example}
+  Recall that \(\mathsf{STLC}\) is a category
+  whose objects are types and whose morphisms \(A \to B\)
+  are terms \(x : A \vdash M : B\) quotiented by \(\beta\eta\)-equivalence.
+  For each type \(A\),
+  the following defines a \(\mathsf{STLC}\)-indexed set \(\mathsf{Tm}(A)\):
+  \begin{align}
+  \mathsf{Tm}(B)(A) &= \text{the set of morphisms \(A\to B\)} \\
+  \mathsf{Tm}(B)(N : A'\to A)
+  &= (x\ofty A \vdash M : B) \mapsto (x'\ofty A' \vdash M[N/x] : B)
+  \end{align}
+\end{example}
+This example is a special case of a canonical kind of \(\calC\)-indexed set.
+\begin{definition}
+  The \emph{representable \(\calC\)-indexed set at \(X\)}
+  is written \(\yo X\) and defined by
+  \begin{align}
+    (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
+    (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
+  \end{align}
+\end{definition}
+
+\begin{definition}
+  \sloppy
+  Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
+  A \emph{\(\calC\)-indexed function}
+  from \(P\) to \(Q\),
+  written \(\alpha : P \Rightarrow Q\),
+  is a family of functions \(\alpha_X : PX \to QX\)
+  that ``respects substitution''
+  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
+\end{definition}
 
 \begin{itemize}
-\item Universal properties help justify a construction,
-  but are pretty bad for making use of it.
-  (For example: try to prove associativity of products using the universal property alone.)
-  The Yoneda lemma and associated reasoning principles are more useful for this.
-\item Functors form a category where morphisms are natural transformations \begin{itemize}
-    \item Natural transformations as homotopies between diagrams
-      (the \(C\to D^\to\) example revisited)
-    \item Natural transformations as polymorphic maps
-  \end{itemize}
-\item Definition of Yoneda embedding
-\item Restatement of universal properties from previous week in terms of Yoneda embedding
-(e.g., for products, \(\yo(a\times b) \cong \yo(a)\times \yo(b)\).)
-\item Yoneda embedding full and faithful. Use this to quickly prove some basic facts:
-  associativity and commutativity of sums and products, distributivity of products over sums,
-  ...
-  These imply type isomorphisms in STLC and Set, entailments of propositional logic.
-\item Yoneda preserves limits.
-  This gives a quick proof that all limits can be constructed from products and equalizers.
-  From this we can compute limits in STLC (it won't have all of them
-  but it will have some).
+\item \(\calC\)-indexed functions can be composed:
+  the composition of \(\alpha : Q \Rightarrow R\)
+  and \(\beta: P \Rightarrow Q\),
+  written \(\alpha\circ\beta : P \Rightarrow R\),
+  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
+\item For each \(\calC\)-indexed set \(P\),
+  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
+  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+\end{itemize}
+By now you may have noticed that \(\calC\)-indexed sets and functions
+look like they ought to form a category. More on this later.
+
+\begin{definition}
+  Two \(\calC\)-indexed sets \(P,Q\)
+  are \emph{isomorphic}
+if there are \(\calC\)-indexed functions \(\alpha : P \Rightarrow Q\)
+and \(\beta : Q \Rightarrow P\)
+such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
+\end{definition}
+
+\begin{definition}
+  A \(\calC\)-indexed set \(P\) is \emph{representable}
+  if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
+  for some object \(X\) of \(\calC\).
+\end{definition}
+
+\chapter{Yoneda III: universal constructions, elements, and properties}
+
+\begin{definition}
+  \sloppy
+  Given two \(\calC\)-indexed sets \(P\) and \(Q\),
+  their \emph{product} \(P\times Q\)
+  is the \(\calC\)-indexed set defined by
+  \((P\times Q)(X) = P(X)\times Q(X)\),
+  with substitution defined by
+  \((x,y)\cdot_{P\times Q} p = (x\cdot_P p, y\cdot_Q p)\).
+\end{definition}
+
+\begin{proposition}
+  Let \(X\) and \(Y\) be two objects of a category \(\calC\).
+  An object \(P\) is a product of \(X\) and \(Y\)
+  if and only if \(\yo P\) is isomorphic to \(\yo X \times \yo Y\).
+\end{proposition}
+
+\begin{definition}
+  Given two objects \(X\) and \(Y\) of a category \(\calC\),
+  there is a \(\calC\)-indexed set of \emph{closures},
+  written \(\mathsf{Clos}(X,Y)\),
+  defined by \(\mathsf{Clos}(X,Y)(\Gamma) = \calC(\Gamma\times X, Y)\),
+  with substitution defined by
+  \[
+    \mathsf{Clos}(X,Y)(s : \Gamma'\to \Gamma)(f : \Gamma\times X \to Y)
+    = \angled{\gamma',x} \mapsto f \circ \angled{s\circ \gamma', x}
+  \]
+  on generalized elements.
+\end{definition}
+
+\begin{proposition}
+  Let \(X\) and \(Y\) be two objects of a category \(\calC\).
+  An object \(E\) is the exponential \(Y^X\)
+  if and only if \(\yo E\) is isomorphic to \(\mathsf{Clos}(X,Y)\).
+\end{proposition}
+
+\begin{proposition}
+  Suppose the \(\calC\)-indexed set \(P\) is represented
+  by the object \(X\).
+  Then there exists an element \(u \in PX\),
+  called the \emph{\(P\)-universal element},
+  which satisfies the following \emph{universal property}:
+  for any object \(\Gamma\) and any element \(g \in P\Gamma\),
+  there exists a unique morphism \(\hat g : \Gamma \to X\)
+  such that \(g = u \cdot_P \hat g\).
+\end{proposition}
+
+\begin{itemize}
+\item In the case of the product, with \(\yo P \cong \yo X \times \yo Y\),
+  the universal element is an element \(u \in \calC(P,X) \times \calC(P,Y)\),
+  which is a pair of morphisms \(P\to X, P\to Y\).
+  The universal property of this pair is that any other pair \(\Gamma \to X,\Gamma\to Y\)
+  factors uniquely through it---precisely the universal property of products
+\item In the case of exponents, with \(\yo E \cong \calC(A\times(-),B)\),
+  the universal element is an element \(u \in \calC(A \times E,B)\),
+  which is a morphism \(A \times E \to B\).
+  The universal property of this morphism is that any other morphism
+  \(A \times \Gamma \to B\)
+  factors uniquely through it---precisely the universal property of exponents.
 \end{itemize}
 
-\todo: \begin{itemize}
-\item Slice over c is category of elements of yo c
-\end{itemize}
+\chapter{Yoneda IV}
 
+%% - Grothendieck universes
+%% - The category Set
+%% - Functors; opposite categories; C-indexed sets as functors
+%% - Natural transformations; C-indexed functions as natural transformations
+%% - The Yoneda lemma (without showing naturality in P,c)
+
+%% \begin{itemize}
+%% \item Functors form a category where morphisms are natural transformations \begin{itemize}
+%%     \item Natural transformations as homotopies between diagrams
+%%       (the \(C\to D^\to\) example revisited)
+%%     \item Natural transformations as polymorphic maps
+%%   \end{itemize}
+%% \item Definition of Yoneda embedding
+%% \item Restatement of universal properties from previous week in terms of Yoneda embedding
+%% (e.g., for products, \(\yo(a\times b) \cong \yo(a)\times \yo(b)\).)
+%% \item Yoneda embedding full and faithful. Use this to quickly prove some basic facts:
+%%   associativity and commutativity of sums and products, distributivity of products over sums,
+%%   ...
+%%   These imply type isomorphisms in STLC and Set, entailments of propositional logic.
+%% \item Yoneda preserves limits.
+%%   This gives a quick proof that all limits can be constructed from products and equalizers.
+%%   From this we can compute limits in STLC (it won't have all of them
+%%   but it will have some).
+%% \end{itemize}
+
+%% \todo: \begin{itemize}
+%% \item Slice over c is category of elements of yo c
+%% \end{itemize}
