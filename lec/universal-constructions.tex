@@ -381,15 +381,63 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
 
 \chapter{Universal Constructions II}
 
-% Brief interlude: substitution
-% - The syntax of (parallel) substitutions
-% - Using products to interpret substitutions
-% - Substitution as precomposition
-% - All semantic interpretation functions are stable under substitution
-%   - Example: pair formation and projection are stable
+\section{Brief interlude: substitution}
 
-% Exponentials
-% - Textbook definition of exponentials. How to get here from STLC?
+Wellformedness rules
+\[
+s ::= (M,\dots)
+\]
+\[
+\fbox{\(s : \Gamma \longrightarrow \Gamma'\)}
+\]
+\begin{mathpar}
+\inferrule
+    {\Gamma \vdash M : A
+      \\\dots}
+    {(M,\dots) : \Gamma \longrightarrow x\ofty A,\dots}
+\end{mathpar}
+The following rule is admissible:
+\begin{mathpar}
+  \inferrule{\Gamma \vdash M : A \\ s : \Gamma'\longrightarrow\Gamma}
+            {\Gamma' \vdash M[s] : A}
+\end{mathpar}
+Semantically,
+\[
+\text{if \(s : \Gamma\longrightarrow\Gamma'\)
+then \(\llbr{s} : \llbr{\Gamma} \to \llbr{\Gamma'}\)}
+\]
+\footnote{The dreaded ``substitution lemma'' that all mechanizers hate}
+\[
+\llbr{M[s]} = \llbr{M} \circ \llbr{s}
+\]
+All semantic interpretation functions must be stable
+under substitution/precomposition:
+\begin{align*}
+  \plpair{M}{N}[s] &= \plpair{M[s]}{N[s]}
+  &
+  \angled{f,g} \circ p &= \angled{f\circ p,g\circ p}
+  \\
+  \plfst{M}[s] &= \plfst{M[s]}
+  &
+  (\pi_1 \circ f) \circ p &= \pi_1 \circ (f \circ p)
+\end{align*}
+
+\section{Exponentials}
+
+\begin{definition}
+  \sloppy
+  Let \(X,Y\) be objects of a category \(\calC\) with products.
+  An \emph{exponential from \(X\) to \(Y\)}
+  is a tuple \((E,\mathsf{ev})\)
+  where \(E\) is an object of \(\calC\)
+  and
+  \(\mathsf{ev}\) is a morphism \(E\times X \to Y\)
+  satisfying the following \emph{universal property}:
+  for all morphisms \(f : \Gamma \times X \to Y\),
+  there exists a unique morphism \(\lambda_f : \Gamma \to E\)
+  such that \(\mathsf{ev} \circ (\lambda_f \times \mathsf{id}_X) = f\).
+\end{definition}
+How to get here from STLC?
 % - Give standard rules for function types
 % - Golf rules using substitution
 % - Reverse engineer textbook definition
