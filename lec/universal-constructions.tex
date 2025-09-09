@@ -438,6 +438,29 @@ under substitution/precomposition:
   such that \(\mathsf{ev} \circ (\lambda_f \times \mathsf{id}_X) = f\).
 \end{definition}
 How to get here from STLC?
+
+Introduction and elimination
+\begin{mathpar}
+\inferrule*{\Gamma, x \ofty A \vdash M : B}{\Gamma \vdash \pllam{x}{M} : A \plto B}
+\and
+\inferrule*
+    {\Gamma\vdash M : A \plto B
+      \\
+    \Gamma \vdash N : A
+    }
+    {\Gamma \vdash \plapp{M}{N} : B}
+\end{mathpar}
+Beta and eta rules
+\begin{mathpar}
+\inferrule*
+    {
+      \Gamma, x\ofty A\vdash M : B
+      \\
+      \Gamma \vdash N : A
+    }
+    {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv \todo}
+\end{mathpar}
+
 % - Give standard rules for function types
 % - Golf rules using substitution
 % - Reverse engineer textbook definition
