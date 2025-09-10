@@ -700,11 +700,19 @@ different ones are used by \citep{mac1998categories}.}
   \item $M$ is a set whose elements are called ``morphisms''
   \item $\mathsf{dom} : M\to O$
   \item $\mathsf{cod} : M \to O$
-  \item $\mathsf{id} : O\to \{f \in M \mid \mathsf{dom}(f) = \mathsf{cod}(f)\}$
+  \item $\mathsf{id} : O\to M$
   \item $\mathsf{comp} : \{(f,g) \in M \times M \mid \mathsf{dom}(f) = \mathsf{cod}(g)\} \to M$
   \end{itemize}
   such that
   \begin{itemize}[noitemsep]
+  \item For all \(f\) and \(g\) in \(M\) such that \(\mathsf{dom}(f) = \mathsf{cod}(g)\)
+    it holds that
+    \[
+    \mathsf{dom}(\mathsf{comp}(f,g)) = \mathsf{dom}(g)
+    \quad\text{and}\quad
+    \mathsf{cod}(\mathsf{comp}(f,g)) = \mathsf{cod}(f)
+    \]
+  \item For all \(X\) in \(O\) it holds that \(\mathsf{dom}(\mathsf{id}_X) = \mathsf{cod}(\mathsf{id}_X) = X\)
   \item For all $f,g,h$ in $M$ such that
   $\mathsf{dom}(f) = \mathsf{cod}(g)$ and\\
   $\mathsf{dom}(g) = \mathsf{cod}(h)$, it holds that
@@ -801,7 +809,9 @@ Do not confuse the internal picture of a category with its picture: the internal
 picture ``peers inside objects'', and will not generalize to all kinds of categories.
 This internal picture visualizes how the map $f$ behaves. A crucial 
 piece information that this internal picture conveys is when two morphisms 
-in \(\FinSet\) are equal: it is when they are \emph{extensionally equal}. 
+in \(\FinSet\) are equal: it is when they are \emph{extensionally equal}.
+
+\todo: internal picture of \(\mathsf{not} \circ \mathsf{not} = \mathsf{id}\)
 
 
 \section{Gaining intuition for categories}
@@ -1072,6 +1082,24 @@ corresponding to the sequencing of the programs \(f\) and \(g\),
 and the identity element is the identity function on \(S\),
 corresponding to the empty program that does nothing.
 
+Algebraic identities capture program rewrites for this imperative language.
+For example, if \(f\) is the interpretation of \(x := 0\)
+and \(g\) is the interpretation of \(y := 1\),
+and \(x\) and \(y\) are distinct program variables,
+then the program equation
+\begin{equation}
+  \left(\begin{aligned}
+    &x := 0 \\
+    &y := 1
+  \end{aligned}\right)
+  \equiv
+  \left(\begin{aligned}
+    &y := 1 \\
+    &x := 0
+  \end{aligned}\right)
+\end{equation}
+can be expressed as the algebraic identity \(g \circ f = f \circ g\).
+
 \begin{construction} \label{prop:every-monoid-is-a-category}
   Every monoid can be turned into a category.
 \end{construction}
@@ -1168,6 +1196,34 @@ from each of the perspectives we've developed so far.
 \item Order-theoretically, it says that the morphism \(u\) is somehow
   ``less than or equal to'' \(v\), by virtue of there being a dashed morphism
   \(f\) witnessing this order relationship.
+
+  We can make this formal as follows.
+  For any finite set \(X\), one can construct a category \(\mathsf{Sub}(X)\).
+  The objects of this category are tuples \((U,u)\) where \(U\) is a subset of \(X\)
+  and \(u\) is the function \(U \to X\) defined by \(u(x) = x\);
+  i.e., \(u\) is the canonical inclusion function of \(U\) into \(X\).
+  The morphisms of this category are, roughly speaking,
+  pictures of the following shape:
+  \[
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQBGUsKq1GLNgA1uvEBmx4CRAEzkJ9Zq0QgAatwkwoAc3hFQAMwBOEALZIyIHBCSjJOtkxDUGdACMYBgAFfhUhEBssUwALHHlrO0dEDRc3RA9taT0aRJBbBydqVyQ07N0Coy4gA
+\begin{tikzcd}
+U \arrow[rd, "u"'] \arrow[rr, "f"] &   & V \arrow[ld, "v"] \\
+                                   & X &
+\end{tikzcd}
+  \]
+  Formally, a morphism is a tuple \((U,u,f,V,v)\)
+  where \(U\) and \(V\) are subsets of \(X\),
+  \(u : U \to X\) and \(v : V \to X\) are the canonical inclusions,
+  and \(f\) is a function \(U \to V\)
+  such that \(v \circ f = u\).
+  Each morphism \((U,u,f,V,v)\) has domain \((U,u)\)
+  and codomain \((V,v)\).
+
+  Now Proposition~\ref{prop:subset-leq-iff-triangle}
+  says that \(U\subseteq V\) if and only if there is a morphism from \((U,u)\)
+  to \((V,v)\) in the category \(\mathsf{Sub}(X)\),
+  witnessing the fact that \((U,u)\) is ``less than or equal to'' \((V,v)\).
+
 \item Algebraically, it says that the equation \(u = f \circ v\)
   has a solution in the unknown \(f\).
 \end{itemize}
@@ -1178,8 +1234,9 @@ Let's see each of these in action on the following proof.
 Each perspective lends itself to a different proof strategy.
 \begin{itemize}
 \item Graphically, you paste two filled in triangles to get a bigger filled in triangle.
-\item Order-theoretically, you use the fact that inequalities are transitive.
-\item Algebraically, you use that \(u = fv = fgw\) provides a solution to \(u = hw\).
+\item Order-theoretically, you use the fact that \(\mathsf{Sub}(X)\), as a category,
+  has composition.
+\item Algebraically, you use that \(u = vf = wvg\) provides a solution to \(u = wh\).
 \end{itemize}
 
 %% \item Refinement corresponds to solvability of an equation that looks like a square.
