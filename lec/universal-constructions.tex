@@ -45,10 +45,11 @@ to be ``$\plUnit$-like'':
 
 These two properties can be packaged up into a nice concise definition:
 
-\begin{definition}[Terminal object]
+\begin{definition}[Terminal object] 
+  Let $T$ be an object in a category $\calC$. 
   An object $T$ in $\calC$ is called a terminal object
   if, for every other object $A$ in $\calC$ there exists a unique 
-  morphism $A \xrightarrow{f} T$. Graphically,
+  morphism $A \xrightarrow{\langle \rangle} T$. Graphically,
 
   \begin{center}
 % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbACrdxMKAHN4RUADMAThAC2SMiBwQkokAyxhWiEHAhmoIagzoAjGAwAK-PATYMYanAcJZksQAB0wmAAPLDgcOABCOS4gA
@@ -57,6 +58,28 @@ These two properties can be packaged up into a nice concise definition:
   \end{tikzcd}
 \end{center}
 \end{definition}
+
+Let's pause to remark on the three categorical interpretations 
+of terminal objects $T$:
+\begin{itemize}
+  \item Graphically, an object is terminal if (1) there is an arrow from 
+  every other object to it, and (2) it ``thins all parallel
+  arrows'', meaning that if we have a situation like the following for 
+  and morphisms $X \xrightarrow{f} T, X \xrightarrow{g} T$:
+  \begin{align*}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRABUQBfU9TXfIRRkAjFVqMWbABrdxMKAHN4RUADMAThAC2SEdRwQkZEACMYYKEgC0AZhMM65hgAV+eAmw1ZFACxwg1PTMrIggity8IJo6egZGiCbmlkj21I7ObtgeQiAMMGoBQZKh0XJcQA
+\begin{tikzcd}
+  T                                                       \\
+  X \arrow[u, "g"', bend right] \arrow[u, "f", bend left]
+  \end{tikzcd},
+  \end{align*}
+  then we know that $f = g$.
+  \item The order-theoretic perspective is that the terminal object 
+  is the ``greatest object'' in the category.
+  \item The algebraic perspective yields the natural equations:
+  for any morphism from $A \xrightarrow{f} T$, it is the case 
+  that $f = \langle \rangle$.
+\end{itemize}
 
 We say a category \textbf{has terminal objects} if there is an object in the
 category that is a terminal object. This is our first example of a 
@@ -280,11 +303,16 @@ dashed arrow that fills in all the triangles in the following picture.
 \end{tikzcd}
 \end{equation}
 
-\section{Products in the poset category}
+\section{Products in a category that is a poset}
+Category of natural numbers ordered by divisibility 
 Let's see an interesting example of showing that a particular category has 
 products.
 
-\section{Products as Terminal Objects}
+\section{Initial object \& duality}
+
+\section{Coproducts}
+
+\section{Products as Terminal Objects ($\star$)}
 
 The diagrammatic form suggests a
 a order-based intuition for products:
@@ -383,9 +411,21 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
   and terminal objects are unique up to unique isomorphism.
 \end{proof}
 
-\section{Coproducts and duality}
+
 
 \chapter{Universal Constructions II}
+
+\begin{itemize}
+  \item Today's lecture: we give a categorical interpretation to $\lambda x . e$
+  \item Translating a derivation into morphisms and composition (through the lens of substitution)
+  \item Reverse engineer a definition for exponential
+  \item make connection to closures
+  \item finset is ccc 
+  \item open subsets of the plane is ccc
+  \item three perspectives on exponential 
+  \item distributivity (foreshadows left adjoints preserving colimits), ``high school algebra calculations 
+  are true about products and coproducts''
+\end{itemize}
 
 \section{Brief interlude: substitution}
 
@@ -428,6 +468,8 @@ under substitution/precomposition:
   (\pi_1 \circ f) \circ p &= \pi_1 \circ (f \circ p)
 \end{align*}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exponentials}
 
 \newcommand\ev{\mathsf{ev}}
