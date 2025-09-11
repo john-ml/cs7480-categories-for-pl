@@ -478,14 +478,28 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
 
 \begin{itemize}
   \item Today's lecture: we give a categorical interpretation to $\lambda x . e$
-  \item Translating a derivation into morphisms and composition (through the lens of substitution)
-  \item Reverse engineer a definition for exponential
-  \item make connection to closures
-  \item finset is ccc 
-  \item open subsets of the plane is ccc
-  \item three perspectives on exponential 
-  \item distributivity (foreshadows left adjoints preserving colimits), ``high school algebra calculations 
-  are true about products and coproducts''
+  \item First, a more detailed look at how to translate terms into categorical combinators
+    \begin{itemize}
+      \item Recap of products: each term formation rule becomes an operation on morphisms;
+        each equational law becomes an equality of composites.
+      \item Subtle point: weakening as precomposition by structural maps
+    \end{itemize}
+  \item Intro, elim, beta, eta rules for function types
+  \item Definition of exponential. Backtranslate the two algebraic laws into beta and eta
+  \item The definition we gave is algebraic. The other two perspectives yield:
+    \begin{itemize}
+    \item Graphical: the triangle commutes
+    \item Order-theoretic: exponential as largest code pointer (formally:
+            terminal in a category of code pointers)
+    \end{itemize}
+  \item Examples
+    \begin{itemize}
+    \item Exponentials in FinSet are function spaces
+    \item Exponentials in open subsets of the plane are a funny thing (remember:
+      largest code pointer)
+    \end{itemize}
+  \item Distributivity (foreshadows left adjoints preserving colimits),
+    ``high school algebra laws''
 \end{itemize}
 
 \section{Brief interlude: substitution}
@@ -533,20 +547,21 @@ under substitution/precomposition:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exponentials}
 
-\newcommand\ev{\mathsf{ev}}
+\newcommand\app{\mathsf{app}}
+\newcommand\lam{\lambda}
 
 \begin{definition}
   \sloppy
   Let \(X,Y\) be objects of a category \(\calC\) with products.
   An \emph{exponential from \(X\) to \(Y\)}
-  is a tuple \((E,\ev)\)
+  is a tuple \((E,\app)\)
   where \(E\) is an object of \(\calC\)
   and
-  \(\ev\) is a morphism \(E\times X \to Y\)
+  \(\app\) is a morphism \(E\times X \to Y\)
   satisfying the following \emph{universal property}:
   for all morphisms \(f : \Gamma \times X \to Y\),
-  there exists a unique morphism \(\lambda_f : \Gamma \to E\)
-  such that \(\ev \circ (\lambda_f \times \mathsf{id}_X) = f\).
+  there exists a unique morphism \(\lam f : \Gamma \to E\)
+  such that \(\app \circ (\lambda_f \times \mathsf{id}_X) = f\).
 \end{definition}
 How to get here from STLC?
 
@@ -585,7 +600,7 @@ How to get here from STLC?
   \and
   \inferrule*
     {~}
-    {B^A \times A \xlongrightarrow{\ev} B}
+    {B^A \times A \xlongrightarrow{\app} B}
 \end{mathpar}
 Note that from the second rule one can derive the more familiar-looking
 \begin{mathpar}
@@ -594,7 +609,7 @@ Note that from the second rule one can derive the more familiar-looking
       \\
      \Gamma \xlongrightarrow{g} A
     }
-    {\Gamma \xlongrightarrow{\angled{f,g}} B^A \times A \xlongrightarrow{\ev} B}
+    {\Gamma \xlongrightarrow{\angled{f,g}} B^A \times A \xlongrightarrow{\app} B}
 \end{mathpar}
 
 \noindent The left-hand side of the beta rule
@@ -610,7 +625,7 @@ Note that from the second rule one can derive the more familiar-looking
           }
           {\Gamma \xlongrightarrow{\angled{\lambda f, g}} B^A \times A}
       \\
-      \inferrule*{~}{B^A\times A \xlongrightarrow{\ev} B}
+      \inferrule*{~}{B^A\times A \xlongrightarrow{\app} B}
     }
     {\Gamma \xlongrightarrow{\mathsf{ev}\,\circ\,\angled{\lambda f, g}} B}
 \end{mathpar}
@@ -629,7 +644,7 @@ Note that from the second rule one can derive the more familiar-looking
 \end{mathpar}
 The reading of the beta rule: for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\),
 \begin{equation}
-  \ev \circ \angled{\lambda f, g}
+  \app \circ \angled{\lambda f, g}
   =
   f \circ \angled{\idt_\Gamma, g}
 \end{equation}
@@ -650,31 +665,31 @@ The reading of the beta rule: for all \(f:\Gamma\times A \to B\) and \(g:\Gamma 
           \\
           \inferrule*{~}{\Gamma \times A \xlongrightarrow{\pi_2} A}
         }
-        {\Gamma \times A \xlongrightarrow{\ev \,\circ\, \angled{f\,\circ\, \pi_1, \pi_2}} B}
+        {\Gamma \times A \xlongrightarrow{\app \,\circ\, \angled{f\,\circ\, \pi_1, \pi_2}} B}
     }
-    {\Gamma \xlongrightarrow{\lambda(\ev \,\circ\, \angled{f\,\circ\,\pi_1,\pi_2})} B^A}
+    {\Gamma \xlongrightarrow{\lambda(\app \,\circ\, \angled{f\,\circ\,\pi_1,\pi_2})} B^A}
 \end{mathpar}
 The reading of the eta rule: for all \(f : \Gamma \to B^A\),
 \begin{equation}
-  f = \lambda(\ev \circ \angled{f\circ \pi_1, \pi_2})
+  f = \lambda(\app \circ \angled{f\circ \pi_1, \pi_2})
 \end{equation}
 Putting it all together, an exponential from \(A\) to \(B\)
 consists of
 \begin{itemize}
 \item An object \(B^A\)
-\item A morphism \(\ev : B^A \times A \to B\)
+\item A morphism \(\app : B^A \times A \to B\)
 \item For each object \(\Gamma\) and morphism \(f : \Gamma \times A \to B\),
   a morphism \(\lambda f : \Gamma \to B^A\)
 \end{itemize}
 such that
 \begin{itemize}
 \item
-  \(\ev \circ \angled{\lambda f, g}
+  \(\app \circ \angled{\lambda f, g}
   =
   f \circ \angled{\idt_\Gamma, g}\)
  for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\)
 \item
-  \(f = \lambda(\ev \circ \angled{f\circ \pi_1, \pi_2})\)
+  \(f = \lambda(\app \circ \angled{f\circ \pi_1, \pi_2})\)
   for all \(f : \Gamma \to B^A\)
 \end{itemize}
 
