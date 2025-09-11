@@ -192,50 +192,109 @@ in this sense, and hence free of non-canonical choices.
 % this means that one object can be greater than another in more than one way.
 
 \section{Products}
-Next we want to interpret product types $\dbracket{A \times B}$.
+Next we want to interpret product types $A \times B$. As before with the 
+unit type, the typing rules for products forces the existence of certain morphisms,
+and the equational theory of products forces equalities of certain morphisms.
+The  introduction rule that describes how to create new products is:
+\begin{mathpar}
+\inferrule
+    {\Gamma\vdash M : A
+      \\
+    \Gamma\vdash N : B
+    }
+    {\Gamma \vdash \plpair{M}{N} : A \pltimes B}~(\textsc{T-Pair})
+\end{mathpar}
+The elimination rules that break apart products are:
+\begin{mathpar}
+\inferrule
+    {\Gamma\vdash M : A \pltimes B}
+    {\Gamma \vdash \plfst{M} : A}~(\textsc{T-Fst})
+\and
+\inferrule
+    {\Gamma\vdash M : A \pltimes B}
+    {\Gamma \vdash \plsnd{M} : B}~(\textsc{T-Snd})
+\end{mathpar}
 
-Introduction rules
+These rules imply the existence of several morphisms that characterize 
+what it means for for a special object $\dbracket{A \times B}$ to be a 
+product. Reading off from the rules:
+\begin{itemize}
+  \item The \textsc{T-Pair} rules says that if there are 
+  two morphisms $\dbracket{\Gamma} \mor{\dbracket{M}} \dbracket{A}$ and 
+  $\dbracket{\Gamma} \mor{\dbracket{N}} \dbracket{B}$, 
+  then there is a morphism $\dbracket{\Gamma} \mor{\dbracket{\langle M, N \rangle}} 
+  \dbracket{A \times B}$.
+  \item The \textsc{T-Fst} rule says that if there is a morphism 
+  $\dbracket{\Gamma} \mor{\dbracket{M}} 
+  \dbracket{A \times B}$, then there is a 
+  morphism $\dbracket{\Gamma} \mor{\dbracket{\plfst{M}}} \dbracket{A}$.
+  \item The \textsc{T-Snd} rule says that if there is a morphism 
+  $\dbracket{\Gamma} \mor{\dbracket{M}} 
+  \dbracket{A \times B}$, then there is a 
+  morphism $\dbracket{\Gamma} \mor{\dbracket{\plsnd{M}}} \dbracket{B}$.
+\end{itemize}
+
+We can package these morphisms up into the following diagram:
+
+\begin{equation}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQAdDgcXoFs+9EAF9S6TLnyEUZYtTpNW7AIIACLnj7xVAIRFiQGbHgJFypAEzyGLNohDL9441KIXL1xXZB7h8mFAA5vBEoABmAE4QfEjmIDgQSGQKtuxcjPRggYwwqgCypKoAclwRmdm5TiCR0Uk0CUjuIBkARjCMAAoSJtIgEViBABY4IDQ2SvZhcCOi4VExiMkNiADMNK3tXS6m9jlhI2Ne7HBgUFU1C3HLTW2nSAC0K3Hj3nnn87H1ias0t2erzyO9iKIkowiAA
+\begin{tikzcd}[column sep = huge]
+  & \Gamma \arrow[d, "{\dbracket{\langle M, N\rangle }}"] \arrow[ldd, "\dbracket{M}" description, bend right] \arrow[rdd, "\dbracket{N}" description, bend left] &   \\
+  & \dbracket{A \times B} \arrow[ld, "\dbracket{\plfst{\langle M, N\rangle }}"' description] \arrow[rd, "\dbracket{\plsnd{\langle M, N\rangle }}" description]                                                     &   \\
+\dbracket{A} &                                                                                                     & \dbracket{B}
+\end{tikzcd}
+\label{cd:prod1}
+\end{equation}
+
+Next, the equational theory of products will assert certain equalities of
+morphisms. We begin with the \emph{$\beta$-rules} that give the equational 
+behavior of elimination after introduction:
+% (elim after intros sometimes called \(\beta\) rules)
 \begin{mathpar}
-\inferrule*
+\inferrule
     {\Gamma\vdash M : A
       \\
     \Gamma\vdash N : B
     }
-    {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
-\end{mathpar}
-Elimination rules
-\begin{mathpar}
-\inferrule*
-    {\Gamma\vdash M : A \pltimes B}
-    {\Gamma \vdash \plfst{M} : A}
+    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}~(\beta_1)
 \and
-\inferrule*
-    {\Gamma\vdash M : A \pltimes B}
-    {\Gamma \vdash \plsnd{M} : B}
-\end{mathpar}
-Equational theory part 1: elim after intro (sometimes called \(\beta\) rules)
-\begin{mathpar}
-\inferrule*
+\inferrule
     {\Gamma\vdash M : A
       \\
     \Gamma\vdash N : B
     }
-    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}
-\and
-\inferrule*
-    {\Gamma\vdash M : A
-      \\
-    \Gamma\vdash N : B
-    }
-    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv N : B}
+    {\Gamma \vdash \plsnd{\plpair{M}{N}} \equiv N : B}~(\beta_2)
 \end{mathpar}
-Equational theory part 2: intro after elim (sometimes called \(\eta\) rules)
+Translating these equations into morphism equalities:
+\begin{itemize}
+  \item $\beta_1$ enforces that $\dbracket{M} = 
+  \dbracket{\plfst{\langle M, N \rangle}} \circ \dbracket{\langle M, N \rangle}$ 
+  in (\ref{cd:prod1})
+  \item $\beta_2$ enforces that $\dbracket{N} = 
+  \dbracket{\plsnd{\langle M, N \rangle}} \circ \dbracket{\langle M, N \rangle}$ 
+  in (\ref{cd:prod1})
+\end{itemize}
+
+Hence, the $\beta$-rules together enforce that the diagram in \ref{cd:prod1} commutes.
+Next, we consider the second part of the equational theory of products
+that describes the behavior of introduction after elimination, sometimes called the \emph{\(\eta\)-rules}:
 \begin{mathpar}
-\inferrule*
+\inferrule
     {\Gamma\vdash M : A \pltimes B
     }
-    {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} : A \pltimes B}
+    {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} : A \pltimes B}~(\eta)
 \end{mathpar}
+
+This law says asserts the extensional equality of any two pair-formation
+operations.  Translated into morphisms, it says that any morphism of the form
+$\dbracket{\Gamma} \mor{\dbracket{M}} \dbracket{A \times B}$ is is equal to a
+canonical morphism $\dbracket{\Gamma} \mor{\dbracket{\langle \plfst{M},
+\plsnd{M} \rangle}} \dbracket{A \times B}$.  Put another way: there is a unique
+morphism $\dbracket{\Gamma} \mor{} \dbracket{A \times B}$.
+
+\subsection{Packaging up intuition into a definition}
+Now, as in the case of terminal objects, we can give a more generic description of 
+products that isn't so specific to the case of equational theories of programs:
 
 \begin{definition}[Product]
   Let \(A\) and \(B\) be two objects of a category \(\calC\).
@@ -309,10 +368,12 @@ Let's see an interesting example of showing that a particular category has
 products.
 
 \section{Initial object \& duality}
+The categorical picture can push you towards new ideas you may not have thought of.
 
 \section{Coproducts}
 
-\section{Products as Terminal Objects ($\star$)}
+\section{Products as Terminal Objects ($*$)}
+\marginnote{Sections marked with $*$ are optional and won't be covered in class.}
 
 The diagrammatic form suggests a
 a order-based intuition for products:
