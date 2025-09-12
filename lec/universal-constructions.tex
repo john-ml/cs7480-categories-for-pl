@@ -259,14 +259,14 @@ behavior of elimination after introduction:
       \\
     \Gamma\vdash N : B
     }
-    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}~(\beta_1)
+    {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}~(\beta^{\pltimes}_1)
 \and
 \inferrule
     {\Gamma\vdash M : A
       \\
     \Gamma\vdash N : B
     }
-    {\Gamma \vdash \plsnd{\plpair{M}{N}} \equiv N : B}~(\beta_2)
+    {\Gamma \vdash \plsnd{\plpair{M}{N}} \equiv N : B}~(\beta^{\pltimes}_2)
 \end{mathpar}
 Translating these equations into morphism equalities:
 \begin{itemize}
@@ -285,7 +285,7 @@ that describes the behavior of introduction after elimination, sometimes called 
 \inferrule
     {\Gamma\vdash M : A \pltimes B
     }
-    {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} : A \pltimes B}~(\eta)
+    {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} : A \pltimes B}~(\eta^{\pltimes})
 \end{mathpar}
 
 This law says asserts the extensional equality of any two pair-formation
@@ -514,34 +514,111 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
 
 \chapter{Universal Constructions II}
 
+Let us recall the rules for a language with function types.
+First, we have the rule for making terms of function type:
+\begin{mathpar}
+\inferrule*
+    {\Gamma, x \ofty A \vdash M : B}
+    {\Gamma \vdash \pllam{x}{M} : A \plto B}
+    ~(\textsc{T-Lam})
+\end{mathpar}
+Next, we have the elimination rule for using terms of function type:
+\begin{mathpar}
+\inferrule*
+    {\Gamma\vdash M : A \plto B
+      \\
+    \Gamma \vdash N : A
+    }
+    {\Gamma \vdash \plapp{M}{N} : B}
+    ~(\textsc{T-App})
+\end{mathpar}
+Finally, we have the \(\beta\) and \(\eta\) laws,
+which state that applying a function corresponds to
+substitution and that every term of function type is equivalent
+to a \(\lambda\)-expression.
+\begin{mathpar}
+\inferrule*
+    {
+      \Gamma, x\ofty A\vdash M : B
+      \\
+      \Gamma \vdash N : A
+    }
+    {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv M[N/x] : B}
+    ~(\beta^{\plto})
+\and
+\inferrule*
+    {\Gamma \vdash M : A \to B}
+    {\Gamma \vdash M \equiv \pllam{x}{\plapp{M}{x}} : A \to B}
+    ~(\eta^{\plto})
+\end{mathpar}
+
+In category theory, this language feature is captured by
+the concept of an \emph{exponential object}.
+\newcommand\app{\mathsf{app}}
+\newcommand\lam{\lambda}
+\begin{definition}
+  \sloppy
+  Let \(X\) and \(Y\) be objects of a category \(\calC\) with products.
+  An \emph{exponential of \(X\) by \(Y\)}
+  is a pair \((E,\app)\) consisting of
+  an object \(E\) of \(\calC\)
+  and a morphism
+  \(\app : E\times X \to Y\)
+  such that the following universal property holds:
+  for all morphisms \(f : \Gamma \times X \to Y\),
+  there exists a unique morphism \(\lam f : \Gamma \to E\)
+  such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
+\end{definition}
 \begin{itemize}
-  \item Today's lecture: we give a categorical interpretation to $\lambda x . e$
-  \item First, a more detailed look at how to translate terms into categorical combinators
+  \item How does this definition capture the familiar rules for function types?
+  \item The object \(E\) models the function space \(X \to Y\).
+  \item \(\app\) corresponds to function application:
+    \(f\ofty E, x\ofty X \vdash f\plapp x : Y\).
+  \item The universal property models \textsc{T-Lam}.
+  \item What to make of the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)?
+\end{itemize}
+
+\begin{itemize}
+  \item To understand, we need to take a slightly more detailed look at how to
+    translate terms into categorical combinators.
+  \item Recap of products: each term formation rule becomes an operation on morphisms.
+    Typing derivations can be translated into categorical combinators this way.
+    Example: fst (x, y)
+  \item Each equational law becomes an equality of composites.
+    Example: fst (x, y) = x.
+  \item Subtle point: weakening as precomposition by structural maps.
+    Example: suppose M is well typed under Gamma; interpret M under Gamma,x:A.
+  \item Armed with this knowledge, let's try and backtranslate
+    \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)
+    into familiar language.
+\end{itemize}
+
+
+
+\begin{itemize}
+  \item Recall the three perspectives:
     \begin{itemize}
-      \item Recap of products: each term formation rule becomes an operation on morphisms;
-        each equational law becomes an equality of composites.
-      \item Subtle point: weakening as precomposition by structural maps
-    \end{itemize}
-  \item Intro, elim, beta, eta rules for function types
-  \item Definition of exponential. Backtranslate the two algebraic laws into beta and eta
-  \item The definition we gave is algebraic. The other two perspectives yield:
-    \begin{itemize}
+    \item Algebraic: beta and eta rules as equations
     \item Graphical: the triangle commutes
     \item Order-theoretic: exponential as largest code pointer (formally:
             terminal in a category of code pointers)
     \end{itemize}
+\end{itemize}
+\todo
+
+\begin{itemize}
   \item Examples
     \begin{itemize}
     \item Exponentials in FinSet are function spaces
     \item Exponentials in open subsets of the plane are a funny thing (remember:
       largest code pointer)
     \end{itemize}
-  \item Distributivity (foreshadows left adjoints preserving colimits),
-    ``high school algebra laws''
 \end{itemize}
+\todo
 
-\section{Brief interlude: substitution}
-
+\begin{itemize}
+  \item What's really going on? Brief interlude: getting formal about categorical semantics
+\end{itemize}
 Wellformedness rules
 \[
 s ::= (M,\dots)
@@ -581,155 +658,14 @@ under substitution/precomposition:
   (\pi_1 \circ f) \circ p &= \pi_1 \circ (f \circ p)
 \end{align*}
 
+\begin{itemize}
+  \item Distributivity, ``high school algebra laws''
+\end{itemize}
+\todo
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Exponentials}
 
-\newcommand\app{\mathsf{app}}
-\newcommand\lam{\lambda}
-
-\begin{definition}
-  \sloppy
-  Let \(X,Y\) be objects of a category \(\calC\) with products.
-  An \emph{exponential from \(X\) to \(Y\)}
-  is a tuple \((E,\app)\)
-  where \(E\) is an object of \(\calC\)
-  and
-  \(\app\) is a morphism \(E\times X \to Y\)
-  satisfying the following \emph{universal property}:
-  for all morphisms \(f : \Gamma \times X \to Y\),
-  there exists a unique morphism \(\lam f : \Gamma \to E\)
-  such that \(\app \circ (\lambda_f \times \mathsf{id}_X) = f\).
-\end{definition}
-How to get here from STLC?
-
-\noindent Introduction and elimination
-\begin{mathpar}
-\inferrule*{\Gamma, x \ofty A \vdash M : B}{\Gamma \vdash \pllam{x}{M} : A \plto B}
-\and
-\inferrule*
-    {\Gamma\vdash M : A \plto B
-      \\
-    \Gamma \vdash N : A
-    }
-    {\Gamma \vdash \plapp{M}{N} : B}
-\end{mathpar}
-
-\noindent Beta and eta rules
-\begin{mathpar}
-\inferrule*
-    {
-      \Gamma, x\ofty A\vdash M : B
-      \\
-      \Gamma \vdash N : A
-    }
-    {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv M[N/x] : B}
-\and
-\inferrule*
-    {\Gamma \vdash M : A \to B}
-    {\Gamma \vdash M \equiv \pllam{x}{\plapp{M}{x}} : A \to B}
-\end{mathpar}
-
-\noindent Introduction and elimination, categorically
-\begin{mathpar}
-  \inferrule*
-    {\Gamma \times A \xlongrightarrow{f} B}
-    {\Gamma \xlongrightarrow{\lambda_f} B^A }
-  \and
-  \inferrule*
-    {~}
-    {B^A \times A \xlongrightarrow{\app} B}
-\end{mathpar}
-Note that from the second rule one can derive the more familiar-looking
-\begin{mathpar}
-  \inferrule*
-    {\Gamma \xlongrightarrow{f} B^A
-      \\
-     \Gamma \xlongrightarrow{g} A
-    }
-    {\Gamma \xlongrightarrow{\angled{f,g}} B^A \times A \xlongrightarrow{\app} B}
-\end{mathpar}
-
-\noindent The left-hand side of the beta rule
-\begin{mathpar}
-  \inferrule*
-    {
-      \inferrule*
-          {\inferrule*
-            {\Gamma \times A \xlongrightarrow{f} B}
-            {\Gamma \xlongrightarrow{\lambda f} B^A}
-          \\
-          {\Gamma \xlongrightarrow{g} A}
-          }
-          {\Gamma \xlongrightarrow{\angled{\lambda f, g}} B^A \times A}
-      \\
-      \inferrule*{~}{B^A\times A \xlongrightarrow{\app} B}
-    }
-    {\Gamma \xlongrightarrow{\mathsf{ev}\,\circ\,\angled{\lambda f, g}} B}
-\end{mathpar}
-
-\noindent The right-hand side of the beta rule
-\begin{mathpar}
-  \inferrule*
-    {
-      \inferrule*
-        {\Gamma \xlongrightarrow{g} A}
-        {\Gamma \xlongrightarrow{\angled{\idt_\Gamma, g}} \Gamma \times A}
-      \\
-      \Gamma \times A \xlongrightarrow{f} B
-    }
-    {\Gamma \xlongrightarrow{f\,\circ\,\angled{\idt_\Gamma, g}} B}
-\end{mathpar}
-The reading of the beta rule: for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\),
-\begin{equation}
-  \app \circ \angled{\lambda f, g}
-  =
-  f \circ \angled{\idt_\Gamma, g}
-\end{equation}
-
-\noindent The left-hand side of the eta rule
-\begin{mathpar}
-  \Gamma \xlongrightarrow{f} B^A
-\end{mathpar}
-\noindent The right-hand side of the eta rule
-\begin{mathpar}
-  \inferrule*
-    {
-      \inferrule*
-        {
-          \inferrule*
-            {\Gamma \xlongrightarrow{f} B^A}
-            {\Gamma \times A \xlongrightarrow{f \,\circ\, \pi_1} B^A}
-          \\
-          \inferrule*{~}{\Gamma \times A \xlongrightarrow{\pi_2} A}
-        }
-        {\Gamma \times A \xlongrightarrow{\app \,\circ\, \angled{f\,\circ\, \pi_1, \pi_2}} B}
-    }
-    {\Gamma \xlongrightarrow{\lambda(\app \,\circ\, \angled{f\,\circ\,\pi_1,\pi_2})} B^A}
-\end{mathpar}
-The reading of the eta rule: for all \(f : \Gamma \to B^A\),
-\begin{equation}
-  f = \lambda(\app \circ \angled{f\circ \pi_1, \pi_2})
-\end{equation}
-Putting it all together, an exponential from \(A\) to \(B\)
-consists of
-\begin{itemize}
-\item An object \(B^A\)
-\item A morphism \(\app : B^A \times A \to B\)
-\item For each object \(\Gamma\) and morphism \(f : \Gamma \times A \to B\),
-  a morphism \(\lambda f : \Gamma \to B^A\)
-\end{itemize}
-such that
-\begin{itemize}
-\item
-  \(\app \circ \angled{\lambda f, g}
-  =
-  f \circ \angled{\idt_\Gamma, g}\)
- for all \(f:\Gamma\times A \to B\) and \(g:\Gamma \to A\)
-\item
-  \(f = \lambda(\app \circ \angled{f\circ \pi_1, \pi_2})\)
-  for all \(f : \Gamma \to B^A\)
-\end{itemize}
 
 % - Give standard rules for function types
 % - Golf rules using substitution
