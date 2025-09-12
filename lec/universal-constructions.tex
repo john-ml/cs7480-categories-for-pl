@@ -569,8 +569,20 @@ the concept of an \emph{exponential object}.
   there exists a unique morphism \(\lam f : \Gamma \to E\)
   such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
 \end{definition}
+
+Note that the morphism \(\app\)
+has a domain defined by a product,
+and the universal property of \((E,\app)\)
+is stated in terms of the morphism \(\angled{\lam f \circ \pi_1,\pi_2}\),
+whose existence depends on the existence of products.
+In this way, the definition of exponential objects
+requires products in \(\calC\) as a prerequisite.%
+\footnote{There are actually tricks to define
+the notion of ``function object'' categorically
+without reference to products, but that will have to wait until after Yoneda IV.}
+
+\noindent How does this definition capture the familiar rules for function types?
 \begin{itemize}
-  \item How does this definition capture the familiar rules for function types?
   \item The object \(E\) models the function space \(X \to Y\).
   \item \(\app\) corresponds to function application:
     \(f\ofty E, x\ofty X \vdash f\plapp x : Y\).
@@ -578,9 +590,9 @@ the concept of an \emph{exponential object}.
   \item What to make of the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)?
 \end{itemize}
 
-\begin{itemize}
-  \item To understand, we need to take a slightly more detailed look at how to
+\noindent To understand, we need to take a slightly more detailed look at how to
     translate terms into categorical combinators.
+\begin{itemize}
   \item Recap of products: each term formation rule becomes an operation on morphisms.
     Typing derivations can be translated into categorical combinators this way.
     Example: fst (x, y)
@@ -588,12 +600,12 @@ the concept of an \emph{exponential object}.
     Example: fst (x, y) = x.
   \item Subtle point: weakening as precomposition by structural maps.
     Example: suppose M is well typed under Gamma; interpret M under Gamma,x:A.
-  \item Armed with this knowledge, let's try and backtranslate
-    \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)
-    into familiar language.
 \end{itemize}
 
-
+Armed with this knowledge, let's try and backtranslate
+    \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)
+    into familiar language.
+\todo
 
 \begin{itemize}
   \item Recall the three perspectives:
