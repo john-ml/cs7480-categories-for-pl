@@ -395,8 +395,19 @@ and $16$. Let's consider the three possible interpretations of
 the product of $12$ and $16$ -- let's call it $X$ -- to understand what it means here:\marginnote{In what way 
 is this behaving like an intersection?}
 \begin{itemize}
-  \item The graph-theoretic picture places the product
-  in the following diagram for some other object $Y$:
+  \item The graph-theoretic picture places the product in a diagram. 
+  Suppose there is some natural number $Y$ such that $Y \preceq 12$ and $Y \preceq 16$.
+  Then, the graphical depiction of the product $X$ 
+  asserts the existence of a unique morphism $Y \to X$:
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoAmAXVJADcBDAGwFcYkQBGckAX1PUy58hFOQrU6TVuw4A2XvxAZseAkQ6kOEhizaIQADQUCVw9aWLapekAE1eEmFADm8IqABmAJwgBbJADMNDgQSGIgjFhgNlAQODhOxiDefoHBoYhkIABGMGBQSAC0AcR8nj7+iEEgIUgaOXkFVaWKKZXhtZllyRVh6XU8lDxAA
+\begin{tikzcd}
+  & Y \arrow[d, dotted] \arrow[ldd, bend right] \arrow[rdd, bend left] &    \\
+  & X \arrow[ld] \arrow[rd]                                            &    \\
+12 &                                                                    & 16
+\end{tikzcd}
+\end{center}
+
   \item The order theoretic interpretation tells us that 
   $X$ is the greatest element that is less than both $12$
   and $16$ in the partial order -- i.e., it is the 
@@ -405,10 +416,52 @@ is this behaving like an intersection?}
   greatest common divisor.
 \end{itemize}
 
+\section{Initial objects \& duality}
+The categorical perspective can push you towards new ideas you may not have
+thought of. Here's an example of this: given a category $\calC$, thought of as a
+graph, one can do a natural thing: \emph{flip the direction of all arrows in the
+opposite direction}. This new category is called the \textbf{opposite category},
+and is written $\calC^\text{op}$.
+Relationships between properties of $\calC$ and properties of its opposite 
+category $\calC^\text{op}$ are broadly referred to as \textbf{dualities}.
 
+Dualities can be a source of free ideas. For instance, let's consider the
+dual notion of a terminal object where we flip the direction of the arrows:
 
-\section{Initial object \& duality}
-The categorical picture can push you towards new ideas you may not have thought of.
+\begin{definition}[Initial object] 
+  \sloppy
+  Let $I$ be an object in a category $\calC$. 
+  An object $I$ in $\calC$ is called an initial object
+  if, for every other object $A$ in $\calC$ there exists a unique 
+  morphism $I \xrightarrow{} C$. Graphically,
+
+  \begin{center}
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbACrdxMKAHN4RUADMAThAC2SMiBwQkokAyxhWiEHAhmoIagzoAjGAwAK-PATYMYanAcJZksQAB0wmAAPLDgcOABCOS4gA
+\begin{tikzcd}
+  I \arrow[r, "\exists!"] & A
+  \end{tikzcd}
+\end{center}
+\end{definition}
+
+Note that an object that is terminal in $\calC$ must be initial 
+in $\calC^\text{op}$ and vice versa: this is what characterizes 
+the terminal object as dual to the initial object. 
+
+Now that we have a ``free'' universal construction, it might be 
+natural to ask: \emph{is there an interesting type that this 
+special initial object corresponds to}? Indeed there is: the 
+initial object corresponds to the $\plVoid$ type that 
+has no inhabitants. It has the following typing rules:
+
+\begin{mathpar}
+\inferrule{M : \plVoid}{\Gamma \vdash \texttt{absurd}~M : A}
+\end{mathpar}
+
+Intuitively, the $\plVoid$ type represents logical absurdity or 
+``invalid program state''.
+Some programming languages have a construct for working with 
+void types and absurdity: Haskell has the void, which is 
+eliminated with \texttt{absurd}.
 
 \section{Products as Terminal Objects ($*$)}
 \marginnote{Sections marked with $*$ are optional and won't be covered in class.}
