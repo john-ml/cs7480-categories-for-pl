@@ -227,11 +227,14 @@ product. Reading off from the rules:
   \item The \textsc{T-Fst} rule says that if there is a morphism 
   $\dbracket{\Gamma} \mor{\dbracket{M}} 
   \dbracket{A \times B}$, then there is a 
-  morphism $\dbracket{\Gamma} \mor{\dbracket{\plfst{M}}} \dbracket{A}$.
+  morphism $\dbracket{\Gamma} \mor{\dbracket{\plfst{-}}} \dbracket{A}$.\footnote{Note:
+  We are naming these morphisms \emph{suggestively}. The typing rules only enforce 
+  the \emph{existence} of certain morphisms: they don't tell us anything about 
+  how they behave.}
   \item The \textsc{T-Snd} rule says that if there is a morphism 
   $\dbracket{\Gamma} \mor{\dbracket{M}} 
   \dbracket{A \times B}$, then there is a 
-  morphism $\dbracket{\Gamma} \mor{\dbracket{\plsnd{M}}} \dbracket{B}$.
+  morphism $\dbracket{\Gamma} \mor{\dbracket{\plsnd{-}}} \dbracket{B}$.
 \end{itemize}
 
 We can package these morphisms up into the following diagram:
@@ -239,8 +242,8 @@ We can package these morphisms up into the following diagram:
 \begin{equation}
  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQAdDgcXoFs+9EAF9S6TLnyEUZYtTpNW7AIIACLnj7xVAIRFiQGbHgJFypAEzyGLNohDL9441KIXL1xXZB7h8mFAA5vBEoABmAE4QfEjmIDgQSGQKtuxcjPRggYwwqgCypKoAclwRmdm5TiCR0Uk0CUjuIBkARjCMAAoSJtIgEViBABY4IDQ2SvZhcCOi4VExiMkNiADMNK3tXS6m9jlhI2Ne7HBgUFU1C3HLTW2nSAC0K3Hj3nnn87H1ias0t2erzyO9iKIkowiAA
 \begin{tikzcd}[column sep = huge]
-  & \Gamma \arrow[d, "{\dbracket{\langle M, N\rangle }}"] \arrow[ldd, "\dbracket{M}" description, bend right] \arrow[rdd, "\dbracket{N}" description, bend left] &   \\
-  & \dbracket{A \times B} \arrow[ld, "\dbracket{\plfst{\langle M, N\rangle }}"' description] \arrow[rd, "\dbracket{\plsnd{\langle M, N\rangle }}" description]                                                     &   \\
+  & \dbracket{\Gamma} \arrow[d, "{\dbracket{\langle M, N\rangle }}"] \arrow[ldd, "\dbracket{M}" description, bend right] \arrow[rdd, "\dbracket{N}" description, bend left] &   \\
+  & \dbracket{A \times B} \arrow[ld, "\dbracket{\plfst{-}}"' description] \arrow[rd, "\dbracket{\plsnd{-}}" description]                                                     &   \\
 \dbracket{A} &                                                                                                     & \dbracket{B}
 \end{tikzcd}
 \label{cd:prod1}
@@ -268,10 +271,10 @@ behavior of elimination after introduction:
 Translating these equations into morphism equalities:
 \begin{itemize}
   \item $\beta_1$ enforces that $\dbracket{M} = 
-  \dbracket{\plfst{\langle M, N \rangle}} \circ \dbracket{\langle M, N \rangle}$ 
+  \dbracket{\plfst{-}} \circ \dbracket{\langle M, N \rangle}$ 
   in (\ref{cd:prod1})
   \item $\beta_2$ enforces that $\dbracket{N} = 
-  \dbracket{\plsnd{\langle M, N \rangle}} \circ \dbracket{\langle M, N \rangle}$ 
+  \dbracket{\plsnd{-}} \circ \dbracket{\langle M, N \rangle}$ 
   in (\ref{cd:prod1})
 \end{itemize}
 
@@ -299,13 +302,13 @@ products that isn't so specific to the case of equational theories of programs:
 \begin{definition}[Product]
   Let \(A\) and \(B\) be two objects of a category \(\calC\).
   A \emph{product of \(A\) and \(B\)}
-  is a tuple \((P,p,q)\)
+  is a tuple \((P,\pi_A,\pi_B)\)
   where
   \begin{itemize}
   \item \(P\) is an object of \(\calC\).
-  \item \(p\) is a morphism from \(P\) to \(A\),
+  \item \(\pi_A\) is a morphism from \(P\) to \(A\),
     called the \emph{projection onto \(A\)}.
-  \item \(q\) is a morphism from \(P\) to \(B\),
+  \item \(\pi_B\) is a morphism from \(P\) to \(B\),
     called the \emph{projection onto \(B\)}.
   \end{itemize}
   such that
@@ -315,41 +318,41 @@ products that isn't so specific to the case of equational theories of programs:
     there exists a morphism \(\angled{f,g} : \Gamma \to P\)
     such that the following equations hold:
     \begin{align}
-      p \circ \angled{f,g} = f \\
-      q \circ \angled{f,g} = g
+      \pi_A \circ \angled{f,g} = f \\
+      \pi_B \circ \angled{f,g} = g
     \end{align}
   \item The following equation holds for any morphism \(h : \Gamma \to P\).
     \begin{align}
-      h = \angled{p \circ h, q \circ h}
+      h = \angled{\pi_A \circ h, \pi_B \circ h}
     \end{align}
   \end{itemize}
 \end{definition}
 
 \begin{proposition}
   Let \(A\) and \(B\) be finite sets.
-  The tuple \((A \times B, p, q)\)
+  The tuple \((A \times B, \pi_A, \pi_B)\)
   is a product in \(\FinSet\),
-  where \(p\) is the morphism \((A\times B,\pi_A,B)\)
-  and \(q\) is the morphism \((A \times B,\pi_B,B)\).
+  where \(\pi_A\) is the morphism \((A\times B,\pi_A, A)\)
+  and \(\pi_B\) is the morphism \((A \times B,\pi_B,B)\).
 \end{proposition}
 
 \begin{proposition}
   Let \(A\) and \(B\) be two objects of a category \(\calC\).
-  A tuple \((P,p,q)\) is a product of \(A\) and \(B\)
+  A tuple \((P,\pi_A,\pi_B)\) is a product of \(A\) and \(B\)
   if and only if the following \textbf{universal property}
   holds:
   for any object \(\Gamma\) and any two morphisms \(f : \Gamma \to A\)
   and \(g : \Gamma \to B\),
   there exists a unique morphism \(h : \Gamma \to P\)
-  such that \(p \circ h = f\) and \(q \circ h = g\).
+  such that \(\pi_A \circ h = f\) and \(\pi_B \circ h = g\).
 \end{proposition}
 
 Algebraically, the universal property can be formulated as saying
   the following system of equations has exactly one solution
   in the unknown \(h : \Gamma \to P\).
   \begin{align}
-    p \circ h = f \\
-    q \circ h = g
+    \pi_A \circ h = f \\
+    \pi_B \circ h = g
   \end{align}
 Diagramatically, it can be formulated as saying there exists a unique
 dashed arrow that fills in all the triangles in the following picture.
@@ -357,20 +360,55 @@ dashed arrow that fills in all the triangles in the following picture.
 % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQAdDgcXoFs+9EAF9S6TLnyEU5CtTpNW7AAoixIDNjwEiAJlLF5DFm0QgAgmvFape0rqOLTIAEIj5MKAHN4RUADMAJwg+JDIQHAgkfQUTdn8QGgAjGDAoJABmYlEA4NDEcMikWRBGLDBnKHo4AAtPRNilMxqrECCQsJoixAyaYyaQLwbGehTGZQltaRBArC8anAaUtKQAWiyctrzirqjEGP7nNGHRmHHJ2zNZ+cXN9vyS7t7G5wBHd2EgA
 \begin{tikzcd}
                                                                                         &                                    & A \\
-\Gamma \arrow[rru, "f", bend left] \arrow[r, "h", dashed] \arrow[rrd, "g"', bend right] & P \arrow[ru, "p"'] \arrow[rd, "q"] &   \\
+\Gamma \arrow[rru, "f", bend left] \arrow[r, "h", dashed] \arrow[rrd, "g"', bend right] & P \arrow[ru, "\pi_A"'] \arrow[rd, "\pi_B"] &   \\
                                                                                         &                                    & B
 \end{tikzcd}
 \end{equation}
 
-\section{Products in a category that is a poset}
-Category of natural numbers ordered by divisibility 
-Let's see an interesting example of showing that a particular category has 
-products.
+Finally, as is the case with terminal objects, we say a category \textbf{has
+products} if for any two objects $A$ and $B$ in a category there exists an 
+object $A \times B$ satisfying the universal property of objects.
+
+\section{Products in a category that is a preorder}
+Universal properties serve as a powerful tool for identifying analogies between
+mathematical objects. The essence of a product is made clear by
+(\ref{cd:prod1}): it is a means for placing two pieces of data ``side by side,''
+along with ways of extracting those two pieces of data after they've been
+packaged up without losing any information about those pieces of data.  When
+viewed through the lens of universal properties, we start to see how general
+this idea of taking a product of two pieces of data can be.
+
+Let's see an example of a category that has an interesting and somewhat 
+surprising example of products: the category of natural numbers 
+ordered by divisibility. Natural numbers ordered by divisibility forms 
+a preorder visualized by the following Hasse diagram:
+
+\begin{center}
+  \includegraphics[width=100px]{fig/divisor_lattice.png}
+\end{center}
+
+The set $(\mathbb{N}, \preceq)$ forms a preorder. So,
+what do products look like in $(\mathbb{N}, \preceq)$ considered 
+as a category?
+Let's consider the concrete instance of the product of $12$ 
+and $16$. Let's consider the three possible interpretations of 
+the product of $12$ and $16$ -- let's call it $X$ -- to understand what it means here:\marginnote{In what way 
+is this behaving like an intersection?}
+\begin{itemize}
+  \item The graph-theoretic picture places the product
+  in the following diagram for some other object $Y$:
+  \item The order theoretic interpretation tells us that 
+  $X$ is the greatest element that is less than both $12$
+  and $16$ in the partial order -- i.e., it is the 
+  greatest lower bound. In the case of this particular 
+  partial order, this object has a special name: it is the 
+  greatest common divisor.
+\end{itemize}
+
+
 
 \section{Initial object \& duality}
 The categorical picture can push you towards new ideas you may not have thought of.
-
-\section{Coproducts}
 
 \section{Products as Terminal Objects ($*$)}
 \marginnote{Sections marked with $*$ are optional and won't be covered in class.}
