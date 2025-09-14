@@ -48,15 +48,15 @@ These two properties can be packaged up into a nice concise definition:
 \begin{definition}[Terminal object] 
   Let $T$ be an object in a category $\calC$. 
   An object $T$ in $\calC$ is called a terminal object
-  if, for every other object $A$ in $\calC$ there exists a unique 
-  morphism $A \xrightarrow{\langle \rangle} T$. Graphically,
-
-  \begin{center}
-% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbACrdxMKAHN4RUADMAThAC2SMiBwQkokAyxhWiEHAhmoIagzoAjGAwAK-PATYMYanAcJZksQAB0wmAAPLDgcOABCOS4gA
-\begin{tikzcd}
-  A \arrow[r, "\exists!"] & T
-  \end{tikzcd}
-\end{center}
+  if
+  \begin{itemize}
+  \item
+    for every object \(\Gamma\) in \(\calC\)
+    there is a morphism \(\Gamma \xrightarrow{\angled{}} T\);
+  \item
+    for every morphism \(\Gamma \xrightarrow{f} T\)
+    it holds that \(f = \angled{}\).
+  \end{itemize}
 \end{definition}
 
 Let's pause to remark on the three categorical interpretations 
@@ -74,11 +74,19 @@ of terminal objects $T$:
   \end{tikzcd},
   \end{align*}
   then we know that $f = g$.
+  In other words, there is a unique morphism \(\Gamma \to T\) for every \(\Gamma\):
+  \begin{center}
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbACrdxMKAHN4RUADMAThAC2SMiBwQkokAyxhWiEHAhmoIagzoAjGAwAK-PATYMYanAcJZksQAB0wmAAPLDgcOABCOS4gA
+\begin{tikzcd}
+  A \arrow[r, "\exists!"] & T
+  \end{tikzcd}
+\end{center}
   \item The order-theoretic perspective is that the terminal object 
   is the ``greatest object'' in the category.
-  \item The algebraic perspective yields the natural equations:
-  for any morphism from $A \xrightarrow{f} T$, it is the case 
-  that $f = \langle \rangle$.
+  \item The algebraic perspective
+    says that, for every object \(\Gamma\),
+    the equation \(f = f\) has a unique solution
+    in the unknown \( \Gamma \xrightarrow{f} T\).
 \end{itemize}
 
 We say a category \textbf{has terminal objects} if there is an object in the
@@ -364,6 +372,16 @@ dashed arrow that fills in all the triangles in the following picture.
                                                                                         &                                    & B
 \end{tikzcd}
 \end{equation}
+Order-theoretically, a product of \(A\) and \(B\) is the ``greatest diagram'' of
+the following shape, where the question marks are filled in with concrete objects and morphisms of \(\calC\):
+\[
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQB+EAX1PU1z5CKcqWLU6TVuwCCPPiAzY8BIgCYxEhizaIQAIR4SYUAObwioAGYAnCAFskokDghIykney41G9AEYwjAAKAirCIDZYpgAWOPLWdo6Izq5IGp7SelzclNxAA
+\begin{tikzcd}
+  & ? \arrow[ld, "?"'] \arrow[rd, "?"] &   \\
+A &                                    & B
+\end{tikzcd}
+\]
+We will make this perspective more precise in Section~\ref{sec:products-as-terminal-objects}.
 
 Finally, as is the case with terminal objects, we say a category \textbf{has
 products} if for any two objects $A$ and $B$ in a category there exists an 
@@ -465,6 +483,7 @@ eliminated with \texttt{absurd}.
 
 \section{Products as Terminal Objects ($*$)}
 \marginnote{Sections marked with $*$ are optional and won't be covered in class.}
+\label{sec:products-as-terminal-objects}
 
 The diagrammatic form suggests a
 a order-based intuition for products:
