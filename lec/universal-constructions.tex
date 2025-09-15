@@ -45,7 +45,7 @@ to be ``$\plUnit$-like'':
 
 These two properties can be packaged up into a nice concise definition:
 
-\begin{definition}[Terminal object] 
+\begin{definition}[Terminal object]  \label{def:terminal-object}
   Let $T$ be an object in a category $\calC$. 
   An object $T$ in $\calC$ is called a terminal object
   if
@@ -301,15 +301,13 @@ operations.  Translated into morphisms, it says that any morphism of the form
 $\dbracket{\Gamma} \mor{\dbracket{M}} \dbracket{A \times B}$ is is equal to a
 canonical morphism $\dbracket{\Gamma} \mor{\dbracket{\langle \plfst{M},
 \plsnd{M} \rangle}} \dbracket{A \times B}$.  Put another way: there is a unique
-morphism $\dbracket{\Gamma} \mor{} \dbracket{A \times B}$.
-\sh{discuss how this enforces uniqueness, it requires a bit of calculation}
-\todo{John}
+morphism $\dbracket{\Gamma} \mor{} \dbracket{A \times B}$ amking the above diagram commute.
 
 \subsection{Packaging up intuition into a definition}
 Now, as in the case of terminal objects, we can give a more generic description of 
 products that isn't so specific to the case of equational theories of programs:
 
-\begin{definition}[Product]
+\begin{definition}[Product] \label{def:product}
   Let \(A\) and \(B\) be two objects of a category \(\calC\).
   A \emph{product of \(A\) and \(B\)}
   is a tuple \((P,\pi_A,\pi_B)\)
@@ -356,6 +354,27 @@ products that isn't so specific to the case of equational theories of programs:
   there exists a unique morphism \(h : \Gamma \to P\)
   such that \(\pi_A \circ h = f\) and \(\pi_B \circ h = g\).
 \end{proposition}
+\begin{proof}
+  Suppose \((P,\pi_A,\pi_B)\) is a product of \(A\) and \(B\).
+  By definition of product, we have for any \(\Gamma\) and morphisms \(f : \Gamma \to A\)
+  and \(g : \Gamma \to B\)
+  that the morphism \(\angled{f,g} : \Gamma \to P\)
+  satisfies \(\pi_A \circ \angled{f,g} = f\)
+  and \(\pi_A \circ \angled{f,g} = g\).
+  This morphism is the unique such, because
+  if any morphism \(h : \Gamma \to P\)
+  satisfies \(\pi_A \circ h = f\) and \(\pi_B \circ h = g\)
+  then it must be that
+  \begin{equation}
+    h = \angled{\pi_A \circ h, \pi_B \circ h} = \angled{f,g}.
+  \end{equation}
+  Conversely, if \((P,\pi_A,\pi_B)\) is any tuple satisfying
+  the above universal property,
+  then one can define \(\angled{-,-}\)
+  as the function that sends each pair of morphisms \(f : \Gamma \to A\)
+  and \(g : \Gamma\to B\)
+to the unique \(h\) such that \(\pi_A \circ h = f\) and \(\pi_A \circ h = g\).
+\end{proof}
 
 Algebraically, the universal property can be formulated as saying
   the following system of equations has exactly one solution
@@ -436,6 +455,155 @@ is this behaving like an intersection?}
   greatest common divisor.
 \end{itemize}
 
+\section{Getting comfortable working with products}
+
+\begin{proposition}
+  Let \(\calC\) be a category with products and a terminal object.
+  Then \(1 \times A \cong A\) for any object \(A\) of \(\calC\).
+\end{proposition}
+
+\begin{proposition} \label{prop:products-commutative}
+  Let \(\calC\) be a category with products.
+  Then \(A\times B \cong B \times A\)
+  for any objects \(A,B\) of \(\calC\).
+\end{proposition}
+
+\begin{definition}
+  Let \(A,B,C\) be objects of a category \(\calC\).
+  A \emph{ternary product} of \(A,B,C\)
+  is a tuple \((P,\pi_A,\pi_B,\pi_C)\)
+  where \(\pi_A : P\to A\) and \(\pi_B : P \to B\)
+  and \(\pi_C : P \to C\)
+  and the following universal property holds:
+  for any object \(\Gamma\)
+  and morphisms \(f : \Gamma \to A\)
+  and \(g : \Gamma \to B\) and \(h : \Gamma \to C\),
+  there exists a unique morphism \(k : \Gamma \to P\)
+  such that \(\pi_A \circ k = f\)
+  and \(\pi_B \circ k = g\) and \(\pi_C \circ k = h\).
+\end{definition}
+
+\begin{proposition}
+  Let \(A,B,C\) be objects in a category \(\calC\) with products.
+  The tuple \((A\times (B\times C), \pi_A, \pi_B \circ \pi_{B\times C}, \pi_C \circ \pi_{B\times C})\)
+  is a ternary product of \(A,B,C\).
+\end{proposition}
+
+\begin{definition} \label{def:finite-products}
+  A category has \textbf{finite products}
+  if it has products~(Def~\ref{def:product}) and a terminal object~(Def~\ref{def:terminal-object}).
+\end{definition}
+
+\section{Interpreting a calculator language in a category}
+
+Recall the language \textsc{Calc} from Chapter~\ref{sec:semantics-of-programs}.
+\begin{gather}
+  \begin{aligned}
+  M,N &::= \pllet{x}{M}{N} \mid x \mid \plunit{} \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
+  A,B &::= A \times B \mid \plUnit
+  \end{aligned}
+  \tag{\textsc{Calc}}
+  \label{lang:calc}
+\end{gather}
+We have been slowly and informally building a dictionary between
+syntactic operations and categorical ones.
+First there is the way that each judgment is interpreted.
+\begin{itemize}
+\item Types are objects
+\item Contexts are products
+\item Terms are morphisms
+\end{itemize}
+Then there is the way each term former is interpreted,
+in terms of the canonical operations on products and terminal objects.
+\begin{itemize}
+\item Fst, snd, tupling + laws
+\item Unit + laws
+\end{itemize}
+Finally there is the way that structural operations are interpreted.
+\begin{itemize}
+\item Variable lookup is projection
+\item Weakening is precomposition
+\item Let-binding is (multi)composition
+\end{itemize}
+Taken together, these constructions establish the following.
+\begin{theorem} \label{thm:calc-products}
+  \textsc{Calc} can be interpreted in any category with finite products~(Def~\ref{def:finite-products}).
+\end{theorem}
+
+From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
+is a toy programming language.
+But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory:
+it provides a language for working inside of an arbitrary category with finite products.
+
+For instance, consider Proposition~\ref{prop:products-commutative} again,
+which showed that products are commutative.
+The proof we gave involved showing that a fairly elaborate diagram commutes.
+We now redo the proof using Theorem~\ref{thm:calc-products}:
+\begin{proposition}
+  Let \(\calC\) be a category with products.
+  Then \(X\times Y \cong Y \times X\)
+  for any objects \(X,Y\) of \(\calC\).
+\end{proposition}
+\begin{proof}
+  Extend the grammar of \textsc{Calc} types with new base types
+  \[
+  A ::= \dots \mid \plkw{X} \mid \plkw{Y}.
+  \]
+  Interpret these new types as the objects \(X\) and \(Y\) of the category \(\calC\):
+  \begin{align*}
+    \llbr{\plkw{X}} &= X \\
+    \llbr{\plkw{Y}} &= Y
+  \end{align*}
+  Now define \(p \ofty \plkw{X} \pltimes \plkw{Y} \vdash M : \plkw{Y} \pltimes \plkw{X}\) by
+  \(
+  M := \plpair{\plsnd{p}}{\plfst{p}}
+  \)
+  and similarly define
+  \(q \ofty \plkw{Y} \pltimes \plkw{X} \vdash N : \plkw{X} \pltimes \plkw{Y}\) by
+  \(N := \plpair{\plsnd{q}}{\plfst{q}}\).
+  By Theorem~\ref{thm:calc-products},
+  we have morphisms \(\llbr{M} : X \times Y \to Y \times X\)
+  and \(\llbr{N} : Y \times X \to X \times Y\).
+  Simple equational reasoning then shows that
+  \begin{align}
+    p\ofty\plkw{X}\pltimes\plkw{Y} \vdash N[M/q] &\equiv p : \plkw{X}\pltimes\plkw{Y}
+    \\
+    q\ofty\plkw{Y}\pltimes\plkw{X} \vdash M[N/p] &\equiv q : \plkw{Y}\pltimes\plkw{X}
+  \end{align}
+  which by Theorem~\ref{thm:calc-products}
+  implies \(\llbr{N} \circ \llbr{M} = \idt_{X\times Y}\)
+  and \(\llbr{M} \circ \llbr{N} = \idt_{Y\times X}\)
+  as needed to show \(X \times Y \cong Y \times X\).
+\end{proof}
+
+Formally, we say that any category \(\calC\) with finite products has an \textbf{internal language},
+and that this language can be used to do work ``internal to \(\calC\)''.
+
+\begin{definition}
+  Let \(\calC\) be a category with finite products.
+  The \textbf{internal language} of \(\calC\) is
+  the extension to \textsc{Calc}
+  that adds one primitive type \(\plkw{X}\) for each object \(X\) of \(\calC\)
+  and one term former \(\plkw{f}(M)\) for each morphism \(X \xrightarrow{f} Y\),
+  with typing rule
+  \begin{mathpar}
+    \inferrule*
+      {\Gamma \vdash M : \plkw{X}}
+      {\Gamma \vdash \plkw{f}(M) : \plkw{Y}}
+  \end{mathpar}
+\end{definition}
+
+\begin{proposition}
+  Any category \(\calC\) with finite products
+  is a model of its own internal language in the evident way.
+\end{proposition}
+
+Internal languages are what formally make categories behave like ``metalanguages''
+for PL. Metalanguage features correspond to additional structure:
+as we progress through the course, we will encounter universal constructions
+that model richer languages with features such as records, pattern matching and structural recursion,
+higher-order functions, and refinement types.
+
 \section{Initial objects \& duality}
 The categorical perspective can push you towards new ideas you may not have
 thought of. Here's an example of this: given a category $\calC$, thought of as a
@@ -483,12 +651,6 @@ Some programming languages have a construct for working with
 void types and absurdity: Haskell has the void, which is 
 eliminated with \texttt{absurd}.
 
-
-\section{Interpreting a calculator language in a category}
-\todo{John}
-
-\section{Extracting a language from a category}
-\todo{John}
 
 
 \section{Products as Terminal Objects ($*$)}
