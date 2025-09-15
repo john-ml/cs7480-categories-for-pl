@@ -33,11 +33,11 @@ proposition, which recasts ``element of a (finite) set'' into categorical langua
 In light of this proposition, properties (1) and (2)
 above translate into the following statements about \(\FinSet\):
 \begin{itemize}
-\item Extensional equality:
+\item \textbf{(Property 1)} Extensional equality:
   Two morphisms \(f,g : X \to Y\)
   in \(\FinSet\) are equal if and only if \(f \circ x = g \circ x\)
   for all morphisms \(x : 1 \to X\).
-\item Elementwise definition:
+\item \textbf{(Property 2)} Elementwise definition:
   to define a morphism \(f : X \to Y\)
   of \(\FinSet\),
   it suffices to give a relation \(R\)
@@ -46,8 +46,15 @@ above translate into the following statements about \(\FinSet\):
   is related to exactly one morphism \(1 \to Y\).
 \end{itemize}
 
+\sh{Let's slow down and give some concrete examples of 
+``reasoning pointwise'' in finset. Give an example of 
+this element-wise definition.}
+
+\sh{define the notion of ``testing'' objects in a 
+category by considering morphisms into them}
 
 \section{From sets to categories}
+\sh{Transition systems, canonical loop and canonical edge}
 
 How to generalize the above situation to an arbitrary category?
 An arbitrary category might not have a terminal object \(1\).
@@ -82,7 +89,7 @@ In this new language, Proposition~\ref{prop:generalized-extensionality}
 says that two morphisms of a category are equal if
 they act the same on all generalized elements.
 
-Generalizing the principle of elementwise definition
+Generalizing the principle of property 2, the elementwise definition,
 is trickier. Since the single object \(1\) has been replaced by a quantification over
 all objects \(\Gamma\), the notion of ``function'' as graph
 needs to be adjusted similarly.
