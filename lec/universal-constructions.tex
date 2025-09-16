@@ -456,9 +456,73 @@ is this behaving like an intersection?}
 \end{itemize}
 
 \section{Getting comfortable working with products}
-Let's get some practice proving some basic general facts about products.
-First, here is a theorem with a familiar shape, if one thinks of 
-products like the familiar notion of product of integers and terminal 
+
+Though we arrived at the definition of product through the \(\beta\)
+and \(\eta\) laws for product types,
+the universal property is taken as primary
+as it is the one the generalizes to other type formers.
+This property has three crucial parts.
+Let \(\Gamma,A,B\) be objects and \(f : \Gamma \to A\)
+and \(g : \Gamma \to B\). Then the following three facts hold:
+\begin{enumerate}
+\item There exists a morphism \(h : \Gamma \to P\).
+\item The morphism \(h\) satisfies \(\pi_1 \circ h = f\) and \(\pi_2 \circ h = g\).
+\item The morphism \(h\) is the \emph{unique} morphism satisfying property (2).
+  This is made precise as follows:
+  if any morphism \(h' : \Gamma \to P\) satisfies \(\pi_1 \circ h = f\)
+  and \(\pi_2 \circ h = g\), then \(h' = h\).
+\end{enumerate}
+Taken together, these three bullet points say that
+the special morphism \(h\) is \emph{defined by}
+the property that \(\pi_1 \circ h = f\) and \(\pi_2 \circ h = g\).
+A lot of proofs involving this universal property
+perform equational reasoning
+on the special morphisms \(h\).
+Here is an example:
+\begin{proposition}
+  The following holds for all \(p : X \to Y\)
+  and \(f : Y \to Z\) and \(g : Y \to W\)
+  and products \((P,\pi_1,\pi_2)\) of \(Z\) and \(W\).
+  \begin{align*}
+  &(\text{the unique \(h\) such that \(\pi_1\circ h = f\) and \(\pi_2 \circ h = g\)})
+  \circ p
+  \\
+  &= (\text{the unique \(h\) such that \(\pi_1 \circ h = f \circ p\)
+  and \(\pi_2 \circ h = g \circ p\)})
+  \end{align*}
+\end{proposition}
+Another example:
+\begin{proposition}
+  Let \((P,\pi_1,\pi_2)\) be a product of \(A\) and \(B\)
+  in a category \(\calC\).
+  Then
+  \[
+  (\text{the unique \(h\) such that \(\pi_1\circ h = \pi_1\)
+  and \(\pi_2 \circ h = \pi_2\)})
+  = \idt_{P}
+  \]
+\end{proposition}
+It gets a little tiresome to write ``the unique \(h\) such that \(\pi_1 \circ h = f\)
+and \(\pi_2 \circ h = g\)'' everywhere.
+So category theorists use a convenient notational abbreviation
+for this: the angle-bracked expression \(\angled{f,g}\).
+With this notation, the above propositions read as the following
+algebraic identities:
+\begin{align}
+  \angled{\pi_1,\pi_2} &= \idt \\
+  \angled{f,g}\circ p &= \angled{f\circ p, g \circ p}
+\end{align}
+
+These algebraic identities can then be used to prove more elaborate facts about products.
+
+\begin{proposition} \label{prop:products-commutative}
+  Let \(\calC\) be a category with products.
+  Then \(A\times B \cong B \times A\)
+  for any objects \(A,B\) of \(\calC\).
+\end{proposition}
+
+Next, here is a theorem with a familiar shape, if one thinks of
+products like the familiar notion of product of integers and terminal
 objects as behaving like the product unit:
 
 \begin{proposition}
@@ -466,16 +530,16 @@ objects as behaving like the product unit:
   Then \(1 \times A \cong A\) for any object \(A\) of \(\calC\).
 \end{proposition}
 \begin{proof}
-  To show an isomorphism of objects, we need to show there exist 
+  To show an isomorphism of objects, we need to show there exist
   morphisms $f$ and $g$:
   \begin{center}
   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIbSGoGOgcGAAV+PAI2IyxtAAscbl4QY1MbaitzagcnVw9A4JgwiMFo2ISAiW82A24KLiA
 \begin{tikzcd}
   A \arrow[r, "g"', bend right] & 1 \times A \arrow[l, "f"', bend right]
-  \end{tikzcd} 
+  \end{tikzcd}
   \end{center}
-  such that $f \circ g = \id_A$ and $g \circ f = \id_{1 \times A}$. 
-  Now pause: what morphisms $f$ and $g$ should we search for so that this is true? There's 
+  such that $f \circ g = \id_A$ and $g \circ f = \id_{1 \times A}$.
+  Now pause: what morphisms $f$ and $g$ should we search for so that this is true? There's
   really only one choice, which we can see by looking at the types of these morphisms:
   \begin{center}
     % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIBQzowbQYYeTkAoJCwo0DgmFIFJTocAAs4A2AsKC4AfXYFGMjWagCHBgAFfjwCNiMsbRScbl4QY1MbaitzagcnVw8SujLK7GqhEDqGpuovKV8FNCw87gouIA
@@ -484,12 +548,12 @@ objects as behaving like the product unit:
   \end{tikzcd}
   \end{center}
 
-  So, we need to use the universal properties of product and terminal objects to 
+  So, we need to use the universal properties of product and terminal objects to
   construct these morphisms and show that they satisfy the necessary equations.
-  This guides us to the following commuting diagram:\footnote{Note how we use 
-  the fact that $\mathbf{1}$ is terminal to fill in the leftmost leg of the diagram, 
+  This guides us to the following commuting diagram:\footnote{Note how we use
+  the fact that $\mathbf{1}$ is terminal to fill in the leftmost leg of the diagram,
   and the fact that $1 \times A$ is a product to fill in $\pi_1$ and $\pi_A$.}
- 
+
   \begin{center}
    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1btiPPiAzY8BImPGSGLNok7z+yoUTLFN0nSGIACADo28AW3hWu3STCgBzeEVAAzACcIByRREBwIJABmGi0ZXTtGejBPRhhbGySUtIyA5NSYUgyHehwACzg-YCwobgB9Dlz8tJAaRiwwCygIHBwPfRBA4OiaCKQyECSAIxhGAAUBFWFJmD8cVqltdjs0LDq5Xn8gkMQY8MjEdU34kB291wUhk7CxxAmZsCgkAFoosLiLIlmuk7Hlsmw2vQZvNFkZdAEsJ4yutDoNjqFRhcrh8vqd-uZtjYSuVKtVag0eJRuEA
 \begin{tikzcd}
@@ -501,18 +565,11 @@ objects as behaving like the product unit:
 
   Reading equations off this diagram, we have:
   \begin{align}
-    \id_A = \pi_A \circ \langle \langle \rangle, \id_A \rangle 
-  \end{align} 
-  This is one half of our required isomorphism. 
+    \id_A = \pi_A \circ \langle \langle \rangle, \id_A \rangle
+  \end{align}
+  This is one half of our required isomorphism.
 
 \end{proof}
-
-
-\begin{proposition} \label{prop:products-commutative}
-  Let \(\calC\) be a category with products.
-  Then \(A\times B \cong B \times A\)
-  for any objects \(A,B\) of \(\calC\).
-\end{proposition}
 
 \begin{definition}[Ternary product]
   Let \(A,B,C\) be objects of a category \(\calC\).
