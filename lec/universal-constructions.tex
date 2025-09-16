@@ -496,7 +496,7 @@ is this behaving like an intersection?}
 
 \section{Interpreting a calculator language in a category}
 
-Recall the language \textsc{Calc} from Chapter~\ref{sec:semantics-of-programs}.
+Recall the language \textsc{Calc} from \Cref{sec:semantics-of-programs}.
 \begin{gather}
   \begin{aligned}
   M,N &::= \pllet{x}{M}{N} \mid x \mid \plunit{} \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
@@ -507,7 +507,7 @@ Recall the language \textsc{Calc} from Chapter~\ref{sec:semantics-of-programs}.
 \end{gather}
 We have been slowly and informally building a dictionary between
 syntactic operations and categorical ones.
-First there is the way that each judgment is interpreted.
+First there is the way that each judgment is interpreted:
 \begin{itemize}
 \item Types are objects
 \item Contexts are products
@@ -515,30 +515,30 @@ First there is the way that each judgment is interpreted.
 \item Equations are equalities of morphisms
 \end{itemize}
 Then there is the way each term former is interpreted,
-in terms of the canonical operations on products and terminal objects.
+in terms of the canonical operations on products and terminal objects:
 \begin{itemize}
 \item Fst, snd, tupling + laws
 \item Unit + laws
 \end{itemize}
-Finally there is the way that structural operations are interpreted.
+Finally there is the way that structural operations are interpreted:
 \begin{itemize}
 \item Variable lookup is projection
 \item Let-binding is (multi)composition
 \end{itemize}
-Taken together, these constructions establish the following.
+Taken together, these constructions establish the following:
 \begin{theorem} \label{thm:calc-products}
-  \textsc{Calc} can be interpreted in any category with finite products~(Def~\ref{def:finite-products}).
+  \textsc{Calc} can be interpreted in any category with finite products~(\cref{def:finite-products}).
 \end{theorem}
 The final thing to note about this interpretation is that it assigns categorically natural interpretations
 to substitution. In the case where the context has exactly one variable,
 \begin{itemize}
-\item The variable rule is the identity
-\item Substitution is composition
+\item The variable rule is the identity.
+\item Substitution is composition.
 \end{itemize}
 In the general case:
 \begin{itemize}
-\item Weakening is precomposition by a projection
-\item Parallel substitution is precomposition
+\item Weakening is precomposition by a projection.
+\item Parallel substitution is precomposition.
 \end{itemize}
 
 From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
