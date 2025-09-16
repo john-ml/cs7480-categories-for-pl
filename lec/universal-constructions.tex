@@ -456,11 +456,57 @@ is this behaving like an intersection?}
 \end{itemize}
 
 \section{Getting comfortable working with products}
+Let's get some practice proving some basic general facts about products.
+First, here is a theorem with a familiar shape, if one thinks of 
+products like the familiar notion of product of integers and terminal 
+objects as behaving like the product unit:
 
 \begin{proposition}
   Let \(\calC\) be a category with products and a terminal object.
   Then \(1 \times A \cong A\) for any object \(A\) of \(\calC\).
 \end{proposition}
+\begin{proof}
+  To show an isomorphism of objects, we need to show there exist 
+  morphisms $f$ and $g$:
+  \begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIbSGoGOgcGAAV+PAI2IyxtAAscbl4QY1MbaitzagcnVw9A4JgwiMFo2ISAiW82A24KLiA
+\begin{tikzcd}
+  A \arrow[r, "g"', bend right] & 1 \times A \arrow[l, "f"', bend right]
+  \end{tikzcd} 
+  \end{center}
+  such that $f \circ g = \id_A$ and $g \circ f = \id_{1 \times A}$. 
+  Now pause: what morphisms $f$ and $g$ should we search for so that this is true? There's 
+  really only one choice, which we can see by looking at the types of these morphisms:
+  \begin{center}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIBQzowbQYYeTkAoJCwo0DgmFIFJTocAAs4A2AsKC4AfXYFGMjWagCHBgAFfjwCNiMsbRScbl4QY1MbaitzagcnVw8SujLK7GqhEDqGpuovKV8FNCw87gouIA
+\begin{tikzcd}
+  A \arrow[r, "{\langle \langle \rangle,\mathsf{id}_A\rangle}"', bend right] & 1 \times A \arrow[l, "\pi_A"', bend right]
+  \end{tikzcd}
+  \end{center}
+
+  So, we need to use the universal properties of product and terminal objects to 
+  construct these morphisms and show that they satisfy the necessary equations.
+  This guides us to the following commuting diagram:\footnote{Note how we use 
+  the fact that $\mathbf{1}$ is terminal to fill in the leftmost leg of the diagram, 
+  and the fact that $1 \times A$ is a product to fill in $\pi_1$ and $\pi_A$.}
+ 
+  \begin{center}
+   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1btiPPiAzY8BImPGSGLNok7z+yoUTLFN0nSGIACADo28AW3hWu3STCgBzeEVAAzACcIByRREBwIJABmGi0ZXTtGejBPRhhbGySUtIyA5NSYUgyHehwACzg-YCwobgB9Dlz8tJAaRiwwCygIHBwPfRBA4OiaCKQyECSAIxhGAAUBFWFJmD8cVqltdjs0LDq5Xn8gkMQY8MjEdU34kB291wUhk7CxxAmZsCgkAFoosLiLIlmuk7Hlsmw2vQZvNFkZdAEsJ4yutDoNjqFRhcrh8vqd-uZtjYSuVKtVag0eJRuEA
+\begin{tikzcd}
+  & A \arrow[d, "{\langle \langle \rangle, \mathsf{id}_A \rangle}", dotted] \arrow[ldd, "\langle \rangle"', bend right] \arrow[rdd, "\mathsf{id}_A", bend left] &   \\
+  & 1 \times A \arrow[ld, "\pi_1"] \arrow[rd, "\pi_A"]                                                                                                          &   \\
+1 &                                                                                                                                                             & A
+\end{tikzcd}
+  \end{center}
+
+  Reading equations off this diagram, we have:
+  \begin{align}
+    \id_A = \pi_A \circ \langle \langle \rangle, \id_A \rangle 
+  \end{align} 
+  This is one half of our required isomorphism. 
+
+\end{proof}
+
 
 \begin{proposition} \label{prop:products-commutative}
   Let \(\calC\) be a category with products.
@@ -468,7 +514,7 @@ is this behaving like an intersection?}
   for any objects \(A,B\) of \(\calC\).
 \end{proposition}
 
-\begin{definition}
+\begin{definition}[Ternary product]
   Let \(A,B,C\) be objects of a category \(\calC\).
   A \emph{ternary product} of \(A,B,C\)
   is a tuple \((P,\pi_A,\pi_B,\pi_C)\)
@@ -489,7 +535,7 @@ is this behaving like an intersection?}
   is a ternary product of \(A,B,C\).
 \end{proposition}
 
-\begin{definition} \label{def:finite-products}
+\begin{definition}[Finite products] \label{def:finite-products}
   A category has \textbf{finite products}
   if it has products~(Def~\ref{def:product}) and a terminal object~(Def~\ref{def:terminal-object}).
 \end{definition}
@@ -598,7 +644,7 @@ with \emph{all} objects in \(\calC\), and also all morphisms.
 This extension to \textsc{Calc} is known
 as the \textbf{internal language}
 of \(\calC\), and programming in it is known as ``working internal to \(\calC\)''.
-\begin{definition}
+\begin{definition}[Internal language]
   Let \(\calC\) be a category with finite products.
   The \textbf{internal language} of \(\calC\) is
   the extension to \textsc{Calc}
@@ -695,7 +741,7 @@ showing that any other tuple of the same shape is
 ``less than or equal'' to it by virtue of the existence of
 the dashed morphism.
 
-\begin{definition}[category of rooted spans]
+\begin{definition}[Category of rooted spans]
   \sloppy
   Let \(A\) and \(B\) be objects of a category \(\calC\).
 The category of \emph{spans in \(\calC\) rooted at \(A\) and \(B\)},
