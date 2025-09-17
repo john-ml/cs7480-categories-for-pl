@@ -272,6 +272,9 @@
   involves showing that, for any term \(M\),
   the denotations of all typing derivations
   for \(M\) are equal~\citep{reynolds1991coherence}.
+  In our case \textsc{Calc} satisfies the property that every term has at most one typing derivation
+  when each bound variable is annotated with its type,
+  so we won't worry too much about this.
 
   We have now seen how to interpret the types,
   typing contexts, and typing derivations of \textsc{Calc}.
@@ -426,6 +429,237 @@
     You are now two thirds of the way through the proof of Theorem~\ref{thm:calc-products}.}
 
   All that's left is \textsc{Let-Sub}---the rule stating that let-binding is equivalent to substitution.
+  Validating this rule boils down to showing the following:
+  \begin{lemma} \label{lem:let-is-subst}
+    For all contexts \(\Gamma\), types \(A\),
+    and terms \(M\) and \(N\)
+    such that \(\Gamma \vdash M : A\)
+    and \(\Gamma,x\ofty A \vdash N : B\),
+    it holds that
+    \(\llbr{N[M/x]} = \llbr{N} \circ \angled{\idt_{\llbr{\Gamma}},\llbr{M}}\).
+  \end{lemma}
+  This lemma essentially relates
+  the syntactic operation of substituting
+  of \(M\) into \(N\)
+  with the semantic operation
+  of composing the morphism \(\llbr{N}\) with \(\angled{\idt_{\llbr{\Gamma}},\llbr{M}}\).
 
-  This concludes the proof of Theorem~\ref{thm:calc-products}.
+  A natural proof strategy to try here is to proceed by induction on (a typing derivation for) \(N\),
+  as the substitution operation \(N[M/x]\) is defined recursively on it.
+  But this approach runs into a problem: the induction hypothesis one gets is not
+  strong enough.
+  The problematic case is when \(N = (\pllet{x'}{N_1}{N_2})\).
+  In this case, we have that
+  \begin{enumerate}
+  \item \(\Gamma,x\ofty A \vdash N_1 : A'\) for some type \(A'\)
+  \item \(\Gamma,x\ofty A,x'\ofty A' \vdash N_2 : B\)
+  \end{enumerate}
+  and the goal is to show that
+  \begin{equation}
+    \llbr{(\pllet{x'}{N_1}{N_2})[M/x]} = \llbr{\pllet{x'}{N_1}{N_2}} \circ \angled{\idt_{\llbr{\Gamma}},\llbr{M}}.
+  \end{equation}
+  By the definition of substitution, we have that
+  \[
+  (\pllet{x'}{N_1}{N_2})[M/x] = (\pllet{x'}{N_1[M/x]}{N_2[M/x]}).
+  \]
+  At first glance, this equation looks awfully provable from the above assumptions,
+  by applying the induction hypothesis to
+  the terms \(N_1[M/x]\) and \(N_2[M/x]\) and then performing some algebraic manipulations.
+  But a closer look will reveal that \(N_2[M/x]\) actually does not fit the shape required
+  for the induction hypothesis to apply.
+  This is because our induction hypothesis only applies to substitutions of \(M\)
+  into terms well-typed in context \(\Gamma,x\ofty A\).
+  On the other hand, \(N_2[M/x]\) is a substitution
+  of \(\Gamma \vdash M : A\) into \(\Gamma,x\ofty A,{\color{red}x'\ofty A'} \vdash N_2 : B\).
+  This extra red entry in the typing context does not match the shape of our induction hypothesis.
+
+  What has happened here is that the statement of Lemma~\ref{lem:let-is-subst}
+  applies only to terms of the form \(N[M/x]\) where \(x\) is the right-most variable
+  in the typing context used to type \(N\). But while performing the substitution \(N[M/x]\),
+  we will recursively substitute \(M\) into subterms where \(x\) is \emph{not} the right-most variable
+  anymore, due to the presence of let-bindings.
+  Thus there is a mismatch between the recursive structure of the substitution function
+  and the shape of our inductive argument.
+
+  We can remedy this by strengthening Lemma~\ref{lem:let-is-subst}
+  to the following statement, which applies to terms \(N[M/x]\) where \(x\) may occur anywhere in the context.
+  \begin{lemma} \label{lem:let-is-sub-stronger}
+    For all contexts \(\Gamma\) and \(\Delta\), types \(A\),
+    and terms \(M\) and \(N\)
+    such that \(\Gamma \vdash M : A\)
+    and \(\Gamma,x\ofty A,\Delta \vdash N : B\),
+    it holds that
+    \(\llbr{N[M/x]} = \llbr{N} \circ \angled{\pi_{\llbr{\Gamma}},\llbr{M} \circ \pi_{\llbr{\Gamma}},\pi_{\llbr{\Delta}}}\).
+  \end{lemma}
+  The statement of Lemma~\ref{lem:let-is-sub-stronger} requires some clarification.
+
+  First, it involves morphisms
+   \(\llbr{\Gamma,\Delta} \xrightarrow{\pi_{\llbr{\Gamma}}} \llbr{\Gamma} \)
+  and
+   \(\llbr{\Gamma,\Delta} \xrightarrow{\pi_{\llbr{\Delta}}} \llbr{\Delta}\).
+  These morphisms are defined by the following fact, which can be proved
+  by induction on \(\Delta\): for all \(\Gamma\) and \(\Delta\)
+  it holds that \(\llbr{\Gamma,\Delta}\) is a product of \(\llbr{\Gamma}\) and \(\llbr{\Delta}\).
+  The morphisms \(\pi_{\llbr{\Gamma}}\) and \(\pi_{\llbr{\Delta}}\) are the projections
+  out of this product.
+
+  Second, we have used a ternary angle-bracket operator
+  to form the morphism \(\angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ\pi_{\llbr{\Gamma}},\pi_{\llbr{\Delta}}}\).
+  This notation is justified by the following fact, which also can be proved by induction on \(\Delta\):
+  for all \(\Gamma\) and \(A\) and \(\Delta\) it holds that \(\llbr{\Gamma,x\ofty A,\Delta}\)
+  is a ternary product of \(\llbr{\Gamma}\), \(\llbr{A}\), and \(\llbr{\Delta}\).
+  The ternary angle-bracket then denotes the unique morphism
+  given by the universal property of this ternary product.
+
+  We are now ready to prove Lemma~\ref{lem:let-is-sub-stronger}.
+
+  \begin{proof}[Proof of Lemma~\ref{lem:let-is-sub-stronger}]
+    By induction on the derivation of \(\Gamma,x\ofty A,\Delta\vdash N : A\).
+    We start with the trickiest case:
+    \begin{itemize}
+    \item Suppose \(N = (\pllet{x'}{N_1}{N_2})\) for some \(\Gamma,x\ofty A,\Delta\vdash N_1 : A'\)
+      and some \(\Gamma,x\ofty A,\Delta,x'\ofty A' \vdash N_2 : B\).
+      Then both the left- and right-hand sides of the desired equation simplify to the same expression.
+      On the one hand we have
+      \begin{align*}
+        &\llbr{(\pllet{x'}{N_1}{N_2})[M/x]}
+        \\
+        &=
+        \llbr{\pllet{x'}{N_1[M/x]}{N_2[M/x]}}
+        \\
+        &=
+        \llbr{N_2[M/x]} \circ \angled{\pi_{\llbr{\Gamma,x\ofty A,\Delta}}, \llbr{N_1[M/x]}}
+        \\
+        &\stackrel{\text{IH}}=
+        (\llbr{N_2} \circ \angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ \pi_{\llbr{\Gamma}},\pi_{\llbr{\Delta,x'\ofty A'}}})
+        \circ \angled{\idt_{\llbr{\Gamma,x\ofty A,\Delta}}, \llbr{N_1[M/x]}}
+        \\
+        &\stackrel{\text{IH}}=
+        (\llbr{N_2} \circ \angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ \pi_{\llbr{\Gamma}},\pi_{\llbr{\Delta,x'\ofty A'}}})
+        \circ p
+        \\
+        &\qquad\text{where \(p =\) }
+        \angled{\idt_{\llbr{\Gamma,x\ofty A,\Delta}},
+          \llbr{N_1} \circ
+          \angled{
+            \pi_{\llbr{\Gamma}},
+            \llbr{M} \circ \pi_{\llbr{\Gamma}},
+            \pi_{\llbr{\Delta}}
+            }}
+        \\
+        &=
+        (\llbr{N_2} \circ \angled{\pi_{\llbr{\Gamma}} \circ p,\llbr{M}\circ \pi_{\llbr{\Gamma}} \circ p,\pi_{\llbr{\Delta,x'\ofty A''}} \circ p})
+        \\
+        &=
+        (\llbr{N_2} \circ \angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ \pi_{\llbr{\Gamma}},\pi_{\llbr{\Delta,x'\ofty A'}} \circ p})
+        \\
+        &=
+        (\llbr{N_2} \circ
+        \angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ \pi_{\llbr{\Gamma}},\angled{\pi_{\llbr{\Delta}}, \llbr{N_1}
+          \circ \angled{
+            \pi_{\llbr{\Gamma}},
+            \llbr{M} \circ \pi_{\llbr{\Gamma}},
+            \pi_{\llbr{\Delta}}
+            }}}
+      \end{align*}
+      and on the other hand we have
+      \begin{align*}
+        &\llbr{\pllet{x'}{N_1}{N_2}} \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}
+        \\
+        &=\llbr{N_2} \circ \angled{\idt_{\llbr{\Gamma,x\ofty A,\Delta}}, \llbr{N_1}} \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}
+        \\
+        &=\llbr{N_2} \circ \angled{\angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}, \llbr{N_1}\circ\angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}}.
+      \end{align*}
+      The equality of these two morphisms boils down to the equality of
+      \[
+\angled{\pi_{\llbr{\Gamma}},\llbr{M}\circ \pi_{\llbr{\Gamma}},\angled{\pi_{\llbr{\Delta}}, \llbr{N_1}
+          \circ \angled{
+            \pi_{\llbr{\Gamma}},
+            \llbr{M} \circ \pi_{\llbr{\Gamma}},
+            \pi_{\llbr{\Delta}}
+            }}}
+      \]
+      and
+      \[
+\angled{\angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}, \llbr{N_1}\circ\angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}}.
+      \]
+      This equality follows from a uniqueness argument:
+      both of these morphisms are the unique \(f : \llbr{\Gamma,\Delta} \to \llbr{\Gamma,x\ofty A,\Delta,x'\ofty A'}\)
+      satisfying the following four properties:
+      \begin{enumerate}
+        \item \(\pi_{\llbr{\Gamma}} \circ f = \pi_{\llbr{\Gamma}}\)
+        \item \(\pi_{\llbr{A}} \circ f = \llbr{M} \circ \pi_{\llbr{\Gamma}}\)
+        \item \(\pi_{\llbr{\Delta}} \circ f = \llbr{M} \circ \pi_{\llbr{\Delta}}\)
+        \item \(\pi_{\llbr{A'}} \circ f =  \llbr{N_1}\circ\angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}\)
+      \end{enumerate}
+      This completes the proof of
+      the case \(N = (\pllet{x'}{N_1}{N_2})\).
+    \end{itemize}
+    The other cases are much easier.
+    \begin{itemize}
+    \item Suppose \(N = \plunit\). Then
+      \begin{align*}
+        \llbr{\plunit[M/x]} &= \llbr{\plunit} = \angled{}
+        = \angled{} \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M}\circ\pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}} \\
+        &= \llbr{\plunit} \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M}\circ\pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}.
+      \end{align*}
+    \item Suppose \(N = \plfst{N'}\) for some \(\Gamma,x\ofty A,\Delta \vdash \plfst{N'}\).
+      Then
+      \begin{align*}
+        \llbr{(\plfst{N'})[M/x]}
+        &= \llbr{\plfst{(N'[M/x])}}
+        = \pi_1 \circ \llbr{N'[M/x]} \\
+        &\stackrel{\text{IH}}=
+        \pi_1 \circ \llbr{N'} \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M}\circ\pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}} \\
+        &= \llbr{\plfst{N'}} \circ\angled{\pi_{\llbr{\Gamma}}, \llbr{M}\circ\pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}.
+      \end{align*}
+    \item Case \(N = \plsnd{N'}\) is similar.
+    \item Suppose \(N = \plpair{N_1}{N_2}\) for some \(B,N_1,N_2\) such that \(B = B_1\pltimes B_2\) and
+      \(\Gamma,x\ofty A,\Delta \vdash N_1 : B_1\)
+      and \(\Gamma,x\ofty A,\Delta \vdash N_2 : B_2\).
+      Then
+      \begin{align*}
+        &\llbr{\plpair{N_1}{N_2}[M/x]}
+        \\
+        &=
+        \llbr{\plpair{N_1[M/x]}{N_2[M/x]}}
+        \\
+        &=
+        \angled{\llbr{N_1[M/x]},\llbr{N_2[M/x]}}
+        \\
+        &\stackrel{\text{IH}}=
+        \angled{\llbr{N_1}\circ p,\llbr{N_2} \circ p}
+        \text{ where \(p =\) }\angled{\pi_{\llbr{\Gamma}},
+          \llbr{\Gamma \vdash M : A}\circ\pi_{\llbr{\Gamma}},
+          \pi_{\llbr{\Delta}}}
+        \\
+        &= \angled{\llbr{N_1},\llbr{N_2}} \circ p\\
+        &= \llbr{\plpair{N_1}{N_2}} \circ p
+      \end{align*}
+    \item Suppose \(N = x\).
+      For this case, it will be helpful to disambiguate the ambient typing context under which a term is interpreted:
+      \begin{align*}
+        &\llbr{\Gamma,\Delta \vdash x[M/x] : A} \\
+        &= \llbr{\Gamma,\Delta \vdash M : A} \\
+        &\stackrel{(*)}= \llbr{\Gamma \vdash M : A} \circ \pi_{\llbr{\Gamma}} \\
+        &= \pi_x \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}
+      \end{align*}
+      The step marked \((*)\) can be proved as a separate lemma, by induction on typing derivations.
+    \item Suppose \(N = x'\) for some \(x' \ne x\) such that \(\Gamma,x\ofty A,\Delta \vdash x' : A'\).
+      Then
+      \begin{align*}
+        &\llbr{\Gamma,\Delta \vdash x'[M/x] : A'} \\
+        &= \llbr{\Gamma, \Delta  \vdash x' : A'}\\
+        &= \pi_{x'} \\
+        &= \llbr{\Gamma,x\ofty A,\Delta \vdash x' : A'}
+        \circ \angled{\pi_{\llbr{\Gamma}}, \llbr{M} \circ \pi_{\llbr{\Gamma}}, \pi_{\llbr{\Delta}}}.
+      \end{align*}
+    \end{itemize}
+    This closes the induction, completing the proof of Lemma~\ref{lem:let-is-sub-stronger}.
+  \end{proof}
+
+  Lemma~\ref{lem:let-is-subst} now follows as a corollary, by setting \(\Delta = \ctxemp\).
+  This in turn establishes the validity of the equational rule \textsc{Let-Sub},
+  which completes the interpretation of all of the equational axioms of \textsc{Calc}
+  and hence concludes the proof of Theorem~\ref{thm:calc-products}.
 \end{proof}
