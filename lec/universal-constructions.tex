@@ -802,11 +802,15 @@ The only goal of this chapter is to prove the following.
 %% \item Parallel substitution is precomposition.
 %% \end{itemize}
 
+Whew! That was quite a long proof.
+You may be wondering: what have we gained by spending so much energy on proving
+Theorem~\ref{thm:calc-products}?
+
 From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
 is a toy programming language.
-But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory:
-it makes proving things about categories with finite products
-as easy as programming in \textsc{Calc}.
+But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory.
+This is because it provides a convenient language for working with an arbitrary
+category that has finite products.
 
 For instance, consider Proposition~\ref{prop:products-commutative} again,
 which showed that products are commutative.
@@ -873,7 +877,11 @@ of \(\calC\), and programming in it is known as ``working internal to \(\calC\)'
         {\Gamma \vdash M : \plkw{X}}
         {\Gamma \vdash \plkw{f}(M) : \plkw{Y}}
     \end{mathpar}
-  \item The equational law \(\inferrule*{~}{\Gamma \vdash \plkw{id}(M) \equiv M : \plkw{X}}\).
+  \item For each object \(X\) of \(\calC\), an equational law:
+    \begin{mathpar}
+      \inferrule*{\Gamma \vdash M : \plkw{X}}{\Gamma \vdash \plkw{id}(M) \equiv M : \plkw{X}}
+    \end{mathpar}
+    Here \(\plkw{id}\) denotes the term former corresponding to \(\idt_X\).
   \item For all morphisms \(f : Y \to Z\) and \(g : X \to Y\) and \(h : X \to Z\) in \(\calC\) such that \(f \circ g = h\),
     an equational law:
     \begin{mathpar}

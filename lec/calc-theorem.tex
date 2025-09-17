@@ -4,7 +4,7 @@
   that maps each of the judgments of \textsc{Calc}
   into \(\calC\):
   \begin{itemize}
-  \item Types \(A\) will become \(\llbr{A}\) of \(\calC\).
+  \item Types \(A\) will become objects \(\llbr{A}\) of \(\calC\).
   \item Contexts \(\Gamma\) will become objects \(\llbr{\Gamma}\) of \(\calC\).
   \item Derivations of \(\Gamma \vdash M : A\) will become
     morphisms \(\llbr{\Gamma} \xlongrightarrow{\llbr{M}} \llbr{A}\).
@@ -258,6 +258,8 @@
     \llbr{\pllet{x}{M}{N}} &=
       \llbr{N} \circ \angled{\idt_{\llbr{\Gamma}},\llbr{M}}
   \end{align*}
+  This kind of equational definition is what you will typically encounter in a paper
+  that uses categorical semantics.\footnote{%
   In some cases it is desirable
   to have an interpretation function that operates
   directly on terms,
@@ -276,6 +278,7 @@
   In our case \textsc{Calc} satisfies the property that every term has at most one typing derivation
   when each bound variable is annotated with its type,
   so we won't worry too much about this.
+}
 
   We have now seen how to interpret the types,
   typing contexts, and typing derivations of \textsc{Calc}.
@@ -376,7 +379,7 @@
   \end{enumerate}
   Let us tackle each of these groups one by one.
 
-  These rules in group (1) are easy to interpret:
+  The rules in group (1) are easy to interpret:
     they correspond directly to the reflexivity,
     symmetry, and transitivity of equality of morphisms.
     For instance,
