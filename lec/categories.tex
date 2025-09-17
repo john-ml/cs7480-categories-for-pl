@@ -172,7 +172,7 @@ with let-bindings, pairs, and the unit value:
 \end{gather}
 
 \ref{lang:calc} has  a very simple type system that ensures well-formedness of programs.
-The \emph{typing context} $\Gamma$ is a set of variables; we denote the empty context as $\bullet$. The relation $\Gamma \vdash M : A$ 
+The \emph{typing context} $\Gamma$ is a set of variables; we denote the empty context as $\ctxemp$. The relation $\Gamma \vdash M : A$
 says that ``the term $M$ is well-typed using context $\Gamma$''. We can then define 
 this relation inductively on terms:
 \begin{mathpar}
@@ -212,7 +212,7 @@ Now, how can we prove this reordering is valid? We need to give a
 formal semantics to \textsc{Calc} programs, and prove that the 
 semantics of these two programs is the same.
 
-\section{A Denotational Semantics for \textsc{Calc}}
+\section{A Denotational Semantics for \textsc{Calc}} \label{sec:calc-in-finset}
 The first step in designing a semantics is to choose a \textbf{metalanguage} for
 stating these semantics.  The metalanguage should be a formal language that
 unambiguous to describe and use, because its meaning will be taken for granted
@@ -226,10 +226,10 @@ We use the \textbf{semantic bracket} $\dbracket{-}$ to define these semantics.
 
 To give a semantics of \textsc{Calc} programs, it is first useful to give a
 semantics of types and contexts.  Types will be interpreted as sets:
-\begin{align*}
+\begin{align} \label{eqn:calc-types-in-finset}
   \dbracket{\plUnit} &= \{\star\} \\
   \dbracket{\plpair{A}{B}} &= \dbracket{A} \times \dbracket{B}
-\end{align*}
+\end{align}
 
 The symbol $\{\star\}$ is the set containing a single element. The symbol
 $\dbracket{A} \times \dbracket{B}$ denotes the Cartesian product of two sets.
@@ -240,7 +240,7 @@ Next, we can give a semantic interpretation of contexts. The semantics of
 contexts is also a set, which is defined inductively 
 again using Cartesian products:
 \begin{align*}
-  \dbracket{\bullet} = \{\star\},
+  \dbracket{\ctxemp} = \{\star\},
   \qquad\qquad
   \dbracket{\Gamma, x : A} =  \dbracket{\Gamma} \times \dbracket{A}
 \end{align*}

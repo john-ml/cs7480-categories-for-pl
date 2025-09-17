@@ -1,0 +1,431 @@
+\begin{proof}
+  Let \(\calC\) be a category with products and a terminal object.
+  We will build an interpretation function \(\llbr{-}\)
+  that maps each of the judgments of \textsc{Calc}
+  into \(\calC\):
+  \begin{itemize}
+  \item Types \(A\) will become \(\llbr{A}\) of \(\calC\).
+  \item Contexts \(\Gamma\) will become objects \(\llbr{\Gamma}\) of \(\calC\).
+  \item Derivations of \(\Gamma \vdash M : A\) will become
+    morphisms \(\llbr{\Gamma} \xlongrightarrow{\llbr{M}} \llbr{A}\).
+  \item Derivations of \(\Gamma \vdash M \equiv N : A\) will become
+    equalities:
+    \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQAdDxxgIwCdgXAOL0AtmPoBfEFNLpMufIRQAmCtTpNW7LjwHAAgjLkLseAkXKlimhizaIQs+SAznlV0qrvbHzqU0YKABzeCJQADN+CDEkMhAcCCRrEF4YMCgkAGYE+x0nPT5BAFkTV2jY+JoklJp0zKQAWlyafP8igwA5GRpGenTGAAVFCxUQfiwQgAscFyiYuMR1ROTEbL6sMH9IbZAaaZh6LKddthr6LEZ2M-2QfsGRj0snLexYO-b2AD8uGJx6DgYLwIAAPYAATmIUiEHAAFABeLgAShMlCkQA
+\begin{tikzcd}
+                                                                                    & {} \arrow[dd, "~\rotatebox{90}{\(=\)}", phantom] &          \\
+\llbr{\Gamma} \arrow[rr, "\llbr{M}", bend left] \arrow[rr, "\llbr{N}"', bend right] &                                                  & \llbr{A} \\
+                                                                                    & {}                                               &
+\end{tikzcd}\]
+  \end{itemize}
+  Each of these will be defined by induction.\footnote{
+  Warning: this is going to take a while.
+  }
+
+  First, let us interpret \textsc{Calc} types.
+  \begin{align}
+    \llbr{\plUnit} &= 1 \\
+    \llbr{A \pltimes B} &= \llbr{A} \times \llbr{B}
+  \end{align}
+  These equations look just like
+  (\ref{eqn:calc-types-in-finset}), the interpretation
+  of types given in Section~\ref{sec:calc-in-finset}.
+  But their meaning is very different.
+  Whereas before the operator \(\times\) was used
+  to denote the Cartesian product of finite sets,
+  here it denotes the categorical
+  product of the objects \(\llbr{A}\) and \(\llbr{B}\)
+  of an arbitrary category \(\calC\).
+  Similarly, \(1\) denotes the terminal object in \(\calC\),
+  not the singleton set \(\{\star\}\).
+
+  The interpretation of \textsc{Calc} contexts is similarly straightforward.
+  The empty context is interpreted as the terminal object
+  and context extension is interpreted via product.
+  \begin{align}
+    \llbr{\ctxemp} &= 1 \\
+    \llbr{\Gamma, x\ofty A} &= \llbr{\Gamma} \times \llbr{A}
+  \end{align}
+
+  Next up we have the interpretation of typing derivations.
+  This is where things start getting interesting.
+  We have one case per typing rule. As a warm-up,
+  here is the interpretation of the typing rule for \(\plunit\).
+  \begin{align}
+    \llbr{
+      \frac
+        {~}
+        {\Gamma \vdash \plunit : \plUnit}
+    }
+    = \angled{}_{\llbr{\Gamma}}
+  \end{align}
+  In words: the interpretation of \(\plunit\)
+  with respect to typing context \(\Gamma\)
+  is the unique morphism \(\angled{}_{\llbr{\Gamma}}\)
+  from \(\llbr{\Gamma}\) to \(\llbr{\plunit}\),
+  guaranteed to exist because \(\llbr{\plunit}\)
+  is a terminal object of \(\calC\).
+
+  The interpretation of \(\plunit\) is special because its typing rule has no premises.
+  More generally, the interpretations of the other typing rules
+  will rely inductively on interpretations of premises.
+  For instance, here is the interpretation of the typing rule for \(\plfst{M}\).
+  \begin{align}
+    \llbr{
+      \displaystyle\frac
+        {\displaystyle\frac{\vdots}{{{{\Gamma \vdash M : A \pltimes B}}}}}
+        {\Gamma \vdash \plfst{M} : A}
+    }
+    = \pi_1 \circ \llbr{\frac{\vdots}{\Gamma \vdash M : A \pltimes B}}
+  \end{align}
+  \footnote{\todo: Really wish I knew how to fix the spacing here.}
+  In words: to interpret a typing derivation for \(\plfst{M}\)
+  as shown, first interpret the subderivation
+  establishing \(\Gamma \vdash M : A \pltimes B\)
+  to obtain a morphism \(\llbr{\Gamma} \xrightarrow{\llbr{M}} \llbr{A\pltimes B}\),
+  and then compose this morphism with the projection
+  \(\llbr{A\pltimes B} \xrightarrow{\pi_1} \llbr{A}\),
+  guaranteed to exist because \(\llbr{A \pltimes B}\)
+  is a product of \(\llbr{A}\) and \(\llbr{B}\).
+
+  The typing rule for \(\plsnd{M}\) is interpreted analogously.
+  \begin{align}
+    \llbr{
+      \displaystyle\frac
+        {\displaystyle\frac{\vdots}{{{{\Gamma \vdash M : A \pltimes B}}}}}
+        {\Gamma \vdash \plsnd{M} : B}
+    }
+    = \pi_2 \circ \llbr{\frac{\vdots}{\Gamma \vdash M : A \pltimes B}}
+  \end{align}
+
+  The pair formation rule is interpreted using the universal property of product.
+  \begin{align}
+    \llbr{
+      \displaystyle\frac
+        {\displaystyle\frac{\vdots}{{{{\Gamma \vdash M : A}}}}
+          \qquad
+         \displaystyle\frac{\vdots}{{{{\Gamma \vdash N : B}}}}
+        }
+        {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
+    }
+    = \left\langle
+      \llbr{\frac{\vdots}{\Gamma \vdash M: A}}
+      ,
+      \llbr{\frac{\vdots}{\Gamma \vdash N: B}}
+    \right\rangle
+  \end{align}
+
+  Finally we have the typing rules for variables and let-bindings.
+  We have saved these rules for last because they highlight some
+  interesting points regarding the categorical interpretation
+  of operations on the typing context \(\Gamma\).
+
+  First let us see how to interpret variables.
+  Because typing contexts \(\Gamma\) are interpreted as iterated products,
+  variables are interpreted as projections:
+  \begin{align}
+    \llbr{
+      \frac{(x:A)\in\Gamma}{\Gamma \vdash x : A}
+    }
+    = \pi_x
+  \end{align}
+  In words: \(\pi_x\) is the canonical projection
+  \(\llbr{\Gamma} \to \llbr{A}\)
+  that extracts the
+  ``\(x\)th component'' out of
+  the iterated product used to define \(\llbr{\Gamma}\).
+
+  You may find this intepretation of variables unsatisfying:
+  what exactly is this ``canonical'' projection,
+  and what does it mean to take the ``\(x\)th component''?
+  Here is one way to make this precise.
+  The trick is to reformulate the typing rule for variables
+  in terms of two more elementary rules:
+  \begin{mathpar}
+    \inferrule*[right=Hit]
+      {~}
+      {\Gamma,x\ofty A \vdash x : A}
+    \and
+    \inferrule*[right=Miss]
+      {\Gamma \vdash x : A}
+      {\Gamma,y\ofty B \vdash x : A}
+  \end{mathpar}
+  Together these rules can be thought of as definign
+  a procedure for checking whether a given binding \((x:A)\)
+  lives in a given typing context \(\Gamma\).
+  The rule \textsc{Hit} covers the case where \((x:A)\)
+  matches the variable right at the end of the typing context.
+  The rule \textsc{Miss} covers the case where
+  it doesn't and one has to keep looking further into \(\Gamma\).
+
+  This reformulation of the variable rule allows for a precise
+  definition of the handwavy \(\pi_x\).
+  \begin{align}
+    \llbr{
+      \frac
+        {~}
+        {\Gamma,x\ofty A \vdash x : A}
+        ~(\textsc{Hit})
+    }
+    &= \pi_2
+    \\
+    \llbr{
+      \frac
+        {\displaystyle\frac{\vdots}{\Gamma \vdash x : A}}
+        {\Gamma,y\ofty B \vdash x : A}
+        ~(\textsc{Miss})
+    }
+    &=
+    \llbr{
+      \frac{\vdots}{\Gamma \vdash x : A}
+    }
+    \circ \pi_1
+  \end{align}
+  Using these two rules,
+  we can see that \(\pi_x\) is actually a composite consisting of a string of \(\pi_1\)s followed by a \(\pi_2\),
+  with the length of this string depending on where \(x\) appears in \(\Gamma\). For instance,
+  \begin{align}
+    &\llbr{\frac{\vdots}{x\ofty A, y\ofty B, z\ofty C \vdash x : A}} \\
+    &=
+    \llbr{\frac{\vdots}{x\ofty A, y\ofty B \vdash x : A}} \circ \pi_1 \\
+    &=
+    \llbr{\frac{\vdots}{x\ofty A \vdash x : A}} \circ \pi_1 \circ \pi_1 \\
+    &=
+    \pi_2 \circ \pi_1 \circ \pi_1.
+  \end{align}
+  Note that there are two \(\pi_1\)s in this composite. This corresponds to the fact that
+  the de Bruijn index of \(x\) in the context \(x\ofty A,y\ofty B,z\ofty C\) is two.
+
+  With variables out of the way, let us now turn to let-bindings.
+  These also illustrate an interesting interaction
+  between operations on the typing context and categorical products.
+  \begin{align*}
+    &\llbr{
+      \frac
+      {
+        \displaystyle\frac{\vdots}{\Gamma\vdash M : A}
+        \qquad
+        \displaystyle\frac{\vdots}{\Gamma,x\ofty A\vdash N : B}
+      }
+      {\Gamma\vdash \pllet{x}{M}{N} : B}
+    }
+    \\
+    &=
+    \llbr{\frac{\vdots}{\Gamma,x\ofty A \vdash N : B}}
+    \circ
+    \left\langle
+    \idt_{\llbr{\Gamma}}
+    ,
+    \llbr{\frac{\vdots}{\Gamma\vdash M : A}}
+    \right\rangle
+  \end{align*}
+  Let's break this down a bit.
+  By induction, we have that
+  \(M\) denotes a morphism \(\llbr{\Gamma} \to \llbr{A}\)
+  and \(N\) denotes a morphism \(\llbr{\Gamma,x\ofty A} = \llbr{\Gamma}\times\llbr{A} \to \llbr{B}\).
+  The interpretation of \(\pllet{x}{M}{N}\)
+  composes these together. The twist is that,
+  because the variables in \(\Gamma\) are shared between \(M\)
+  and \(N\), the object \(\llbr{\Gamma}\)
+  plumbed around as well.
+  This is accomplished by the morphism
+  \(
+    \left\langle
+    \idt_{\llbr{\Gamma}}
+    ,
+    \llbr{\Gamma\vdash M : A}
+    \right\rangle\)
+    guaranteed to exist
+    by the universal property of products.
+
+  In practice, it's fairly laborious to write down
+  the interpretation function explicitly as a function
+  on derivations as we have done above.
+  So people tend to shorten the more verbose
+  \(\llbr{\dfrac{\vdots}{\Gamma\vdash M : A}}\)
+  to just
+  \(\llbr{M}\). Written this way, the foregoing discussion
+  can be summarized in terms of the following
+  equations.\footnote{%
+    You are now a third of the way through
+  the proof of Theorem~\ref{thm:calc-products}.}
+  \begin{align*}
+    \llbr{\plunit} &= \angled{} \\
+    \llbr{\plfst{M}} &= \pi_1 \circ \llbr{M} \\
+    \llbr{\plsnd{M}} &= \pi_2 \circ \llbr{M} \\
+    \llbr{\plpair{M}{N}} &= \angled{\llbr{M},\llbr{N}} \\
+    \llbr{x} &= \pi_x \\
+    \llbr{\pllet{x}{M}{N}} &=
+      \llbr{N} \circ \angled{\idt_{\llbr{\Gamma}},\llbr{M}}
+  \end{align*}
+  In some cases it is desirable
+  to have an interpretation function that operates
+  directly on terms,
+  rather than on derivations,
+  as derivations can contain extraneous information
+  not present in a term.
+  In these cases a tricky issue comes up:
+  for \(\llbr{-}\) to be a functions on terms,
+  it must be the case that
+  the denotation of a term does not depend on
+  the precise way in which it is proved to be well-typed.
+  Checking this \emph{coherence condition}
+  involves showing that, for any term \(M\),
+  the denotations of all typing derivations
+  for \(M\) are equal~\citep{reynolds1991coherence}.
+
+  We have now seen how to interpret the types,
+  typing contexts, and typing derivations of \textsc{Calc}.
+  Only one task remains: interpret derivations of
+  \(\Gamma \vdash M \equiv N : A\).
+  There are five groups of rules to interpret.
+  \begin{enumerate}
+  \item First there are the rules stating that \(\equiv\)
+    is an equivalence relation on well-typed terms.
+    \begin{mathpar}
+      \inferrule*[right=Refl]
+        {\Gamma \vdash M : A}
+        {\Gamma \vdash M \equiv M : A}
+      \and
+      \inferrule*[right=Sym]
+        {\Gamma \vdash M \equiv N : A}
+        {\Gamma \vdash N \equiv M : A}
+      \and
+      \inferrule*[right=Trans]
+        {\Gamma \vdash M \equiv N : A
+          \\
+         \Gamma \vdash N \equiv O : A
+        }
+        {\Gamma \vdash M \equiv O : A}
+    \end{mathpar}
+  \item Next there are the \emph{congruence rules},
+    so called because they state that \(\equiv\)
+    is a congruence for each of the \textsc{Calc} term formers.\footnote{%
+     In general, an equivalence relation \(\sim\) on a set \(X\)
+     is a \emph{congruence} with respect to a function
+     \(f : X \to X\) if \(x \sim x'\) implies \(f(x) \sim f(x')\).}
+    \begin{mathpar}
+      \inferrule*[right=Cong-Pair]
+        {\Gamma \vdash M \equiv M' : A
+          \\
+         \Gamma \vdash N \equiv N' : B
+        }
+        {\Gamma \vdash \plpair{M}{N} \equiv \plpair{M'}{N'} : A \pltimes B}
+      \and
+      \inferrule*[right=Cong-Fst]
+        {\Gamma \vdash M \equiv M' : A \pltimes B
+        }
+        {\Gamma \vdash \plfst{M} \equiv \plfst{M'} : A}
+      \and
+      \inferrule*[right=Cong-Snd]
+        {\Gamma \vdash M \equiv M' : A \pltimes B
+        }
+        {\Gamma \vdash \plsnd{M} \equiv \plsnd{M'} : A}
+      \and
+      \inferrule*[right=Cong-Let]
+        {\Gamma \vdash M \equiv M' : A
+          \\
+        \Gamma, x\ofty A \vdash N \equiv N' : B
+        }
+        {\Gamma \vdash (\pllet{x}{M}{N}) \equiv (\pllet{x}{M'}{N'}) : B}
+    \end{mathpar}
+  \item Then there are the \emph{\(\beta\) laws}
+    that describe what happens when one applies an introduction
+    form for a given type former followed by an elimination form.
+    \begin{mathpar}
+      \inferrule*[right=\(\beta^{\pltimes}_1\)]
+        {\Gamma \vdash M : A
+          \\
+          \Gamma \vdash N : B
+        }
+        {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M : A}
+    \and
+      \inferrule*[right=\(\beta^{\pltimes}_2\)]
+        {\Gamma \vdash M : A
+          \\
+          \Gamma \vdash N : B
+        }
+        {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv N : B}
+    \end{mathpar}
+  \item Then there are the \emph{\(\eta\) laws}
+    that describe what happens when one applies an elimination form
+    followed by an introduction form.
+    \begin{mathpar}
+      \inferrule*[right=\(\eta^{\pltimes}\)]
+        {\Gamma \vdash M : A \pltimes B}
+        {\Gamma \vdash \plpair{\plfst{M}}{\plsnd{M}} \equiv M : A \pltimes B}
+    \and
+      \inferrule*[right=\(\eta^{\plUnit}\)]
+        {\Gamma \vdash M : \plUnit
+        }
+        {\Gamma \vdash \plunit \equiv M : \plUnit}
+    \end{mathpar}
+  \item Last but not least, there is the law
+    that let-binding is equivalent to substitution.
+    \begin{mathpar}
+      \inferrule*[right=Let-Sub]
+        {\Gamma \vdash M : A
+          \\
+        \Gamma, x\ofty A \vdash N : B
+        }
+        {\Gamma \vdash (\pllet{x}{M}{N}) \equiv N[M/x] : B}
+    \end{mathpar}
+  \end{enumerate}
+  Let us tackle each of these groups one by one.
+
+  These rules in group (1) are easy to interpret:
+    they correspond directly to the reflexivity,
+    symmetry, and transitivity of equality of morphisms.
+    For instance,
+    the \textsc{Sym} rule holds because,
+    if \(\llbr{M} = \llbr{N}\) for some well-typed terms \(M\) and \(N\),
+    then also \(\llbr{N} = \llbr{M}\).\footnote{%
+    The stickler may wonder how we know that \(M\)
+    and \(N\) are well-typed here, since all we have
+    in the premise of \textsc{Sym}
+    is that \(M\equiv N\).
+    It turns out that
+    \(\equiv\) satisfies the following property:
+    if \(\Gamma \vdash M \equiv N : A\),
+    then \(\Gamma \vdash M : A\)
+    and \(\Gamma\vdash N : A\).
+    This fact can be established by induction on derivations
+    of \(\Gamma \vdash M \equiv N : A\),
+    and we won't belabor it.
+    A slicker way of maintaining this well-typedness invariant
+    throughout the definition of \(\equiv\)
+    is to make well-typedness a \emph{presupposition}
+    of the judgment \(\Gamma \vdash M \equiv N : A\)~\citep{martin1996meanings}.
+    }
+
+  The rules in group (2) are also relatively easy.
+  In each case the proof boils down to showing that
+  a given operation on morphisms respects equality.
+  For instance, the rule \textsc{Cong-Pair}
+  boils down to the following true statement:
+  if \(\llbr{M} = \llbr{M'}\)
+  and \(\llbr{N} = \llbr{N'}\)
+  then \(\angled{\llbr{M},\llbr{M'}} = \angled{\llbr{N},\llbr{N'}}\).
+  The other cases are similarly straightforward.
+
+  The rules in group (3) follow from the definition of categorical product.
+  The law \(\beta^{\pltimes}_1\) boils down to showing that
+  \(\pi_1 \circ \angled{\llbr{M},\llbr{N}} = \llbr{M}\).
+  The law \(\beta^{\pltimes}_2\) is analogous.
+
+  The rules in group (4) follow from the definitions of categorical product
+  and terminal object. First, the law \(\eta^{\plUnit}\)
+  follows from the fact that any two morphisms into a terminal object are equal.
+  The law \(\eta^{\pltimes}\) boils down to showing
+  that, for any morphism \(\llbr{M} : \llbr{\Gamma} \to \llbr{A} \times \llbr{B}\),
+  it is the case that \(\llbr{M} = \angled{\pi_1\circ \llbr{M}, \pi_2\circ\llbr{M}}\).
+  This follows from a uniqueness argument.
+  By definition, \(\angled{\pi_1\circ \llbr{M}, \pi_2\circ\llbr{M}}\)
+  is the unique morphism \(f\) satisfying \(\pi_1\circ f = \pi_1 \circ \llbr{M}\)
+  and \(\pi_2\circ f = \pi_2 \circ \llbr{N}\). But \(\llbr{M}\)
+  satisfies this same property. Hence \(\llbr{M} = f = \angled{\pi_1\circ\llbr{M}, \pi_2\circ\llbr{M}}\).\footnote{%
+    You are now two thirds of the way through the proof of Theorem~\ref{thm:calc-products}.}
+
+  All that's left is \textsc{Let-Sub}---the rule stating that let-binding is equivalent to substitution.
+
+  This concludes the proof of Theorem~\ref{thm:calc-products}.
+\end{proof}
