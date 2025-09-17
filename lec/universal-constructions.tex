@@ -598,146 +598,6 @@ objects as behaving like the product unit:
   if it has products~(Def~\ref{def:product}) and a terminal object~(Def~\ref{def:terminal-object}).
 \end{definition}
 
-\section{Interpreting a calculator language in a category}
-
-Recall the language \textsc{Calc} from \Cref{sec:semantics-of-programs}.
-\begin{gather}
-  \begin{aligned}
-  M,N &::= \pllet{x}{M}{N} \mid x \mid \plunit{} \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
-  A,B &::= A \times B \mid \plUnit
-  \end{aligned}
-  \tag{\textsc{Calc}}
-  \label{lang:calc}
-\end{gather}
-We have been slowly and informally building a dictionary between
-syntactic operations and categorical ones.
-First there is the way that each judgment is interpreted:
-\begin{itemize}
-\item Types are objects
-\item Contexts are products
-\item Terms are morphisms
-\item Equations are equalities of morphisms
-\end{itemize}
-Then there is the way each term former is interpreted,
-in terms of the canonical operations on products and terminal objects:
-\begin{itemize}
-\item Fst, snd, tupling + laws
-\item Unit + laws
-\end{itemize}
-Finally there is the way that structural operations are interpreted:
-\begin{itemize}
-\item Variable lookup is projection
-\item Let-binding is (multi)composition
-\end{itemize}
-Taken together, these constructions establish the following:
-\begin{theorem} \label{thm:calc-products}
-  \textsc{Calc} can be interpreted in any category with finite products~(\cref{def:finite-products}).
-\end{theorem}
-\input{lec/calc-theorem.tex}
-
-The final thing to note about this interpretation is that it assigns categorically natural interpretations
-to substitution. In the case where the context has exactly one variable,
-\begin{itemize}
-\item The variable rule is the identity.
-\item Substitution is composition.
-\end{itemize}
-In the general case:
-\begin{itemize}
-\item Weakening is precomposition by a projection.
-\item Parallel substitution is precomposition.
-\end{itemize}
-
-From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
-is a toy programming language.
-But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory:
-it makes proving things about categories with finite products
-as easy as programming in \textsc{Calc}.
-
-For instance, consider Proposition~\ref{prop:products-commutative} again,
-which showed that products are commutative.
-The proof we gave involved showing that a fairly elaborate diagram commutes.
-We now redo the proof using Theorem~\ref{thm:calc-products}:
-\begin{proposition} \label{prop:product-comm-using-calc}
-  Let \(\calC\) be a category with products.
-  Then \(X\times Y \cong Y \times X\)
-  for any objects \(X,Y\) of \(\calC\).
-\end{proposition}
-\begin{proof}
-  Extend the grammar of \textsc{Calc} types with new base types
-  \[
-  A ::= \dots \mid \plkw{X} \mid \plkw{Y}.
-  \]
-  Interpret these new types as the objects \(X\) and \(Y\) of the category \(\calC\):
-  \begin{align*}
-    \llbr{\plkw{X}} &= X \\
-    \llbr{\plkw{Y}} &= Y
-  \end{align*}
-  Now define \(p \ofty \plkw{X} \pltimes \plkw{Y} \vdash M : \plkw{Y} \pltimes \plkw{X}\) by
-  \(
-  M := \plpair{\plsnd{p}}{\plfst{p}}
-  \)
-  and similarly define
-  \(q \ofty \plkw{Y} \pltimes \plkw{X} \vdash N : \plkw{X} \pltimes \plkw{Y}\) by
-  \(N := \plpair{\plsnd{q}}{\plfst{q}}\).
-  By Theorem~\ref{thm:calc-products},
-  we have morphisms \(\llbr{M} : X \times Y \to Y \times X\)
-  and \(\llbr{N} : Y \times X \to X \times Y\).
-  Simple equational reasoning then shows that
-  \begin{align}
-    p\ofty\plkw{X}\pltimes\plkw{Y} \vdash N[M/q] &\equiv p : \plkw{X}\pltimes\plkw{Y}
-    \\
-    q\ofty\plkw{Y}\pltimes\plkw{X} \vdash M[N/p] &\equiv q : \plkw{Y}\pltimes\plkw{X}
-  \end{align}
-  which by Theorem~\ref{thm:calc-products}
-  implies \(\llbr{N} \circ \llbr{M} = \idt_{X\times Y}\)
-  and \(\llbr{M} \circ \llbr{N} = \idt_{Y\times X}\)
-  as needed to show \(X \times Y \cong Y \times X\).
-\end{proof}
-
-In the proof of Proposition~\ref{prop:product-comm-using-calc},
-we extended \textsc{Calc} with new base types \(\plkw{X}\) and \(\plkw{Y}\)
-to model the objects \(X\) and \(Y\) of the category \(\calC\).
-We could give \textsc{Calc} access to other objects in \(\calC\)
-by extending it further.
-Taking this idea to its extreme, we could extend \textsc{Calc}
-with \emph{all} objects in \(\calC\), and also all morphisms.
-This extension to \textsc{Calc} is known
-as the \textbf{internal language}
-of \(\calC\), and programming in it is known as ``working internal to \(\calC\)''.
-\begin{definition}[Internal language]
-  Let \(\calC\) be a category with finite products.
-  The \textbf{internal language} of \(\calC\) is
-  the extension to \textsc{Calc}
-  that adds the following:
-  \begin{itemize}
-  \item One primitive type \(\plkw{X}\) for each object \(X\) of \(\calC\).
-  \item One term former \(\plkw{f}(M)\) for each morphism \(X \xrightarrow{f} Y\),
-    with typing rule:
-    \begin{mathpar}
-      \inferrule*
-        {\Gamma \vdash M : \plkw{X}}
-        {\Gamma \vdash \plkw{f}(M) : \plkw{Y}}
-    \end{mathpar}
-  \item The equational law \(\inferrule*{~}{\Gamma \vdash \plkw{id}(M) \equiv M : \plkw{X}}\).
-  \item For all morphisms \(f : Y \to Z\) and \(g : X \to Y\) and \(h : X \to Z\) in \(\calC\) such that \(f \circ g = h\),
-    an equational law:
-    \begin{mathpar}
-      \inferrule*{\Gamma \vdash M : \plkw{X}}{\Gamma \vdash \plkw{f}(\plkw{g}(M)) \equiv \plkw{h}(M) : \plkw{Z}}
-    \end{mathpar}
-  \end{itemize}
-\end{definition}
-
-\begin{proposition}
-  Any category \(\calC\) with finite products
-  is a model of its own internal language in the evident way.
-\end{proposition}
-
-Internal languages are what formally make categories behave like ``metalanguages''
-for PL. Metalanguage features correspond to additional structure:
-as we progress through the course, we will encounter universal constructions
-that model richer languages with features such as records, pattern matching and structural recursion,
-higher-order functions, and refinement types.
-
 \section{Initial objects \& duality}
 The categorical perspective can push you towards new ideas you may not have
 thought of. Here's an example of this: given a category $\calC$, thought of as a
@@ -888,6 +748,148 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
   and terminal objects are unique up to unique isomorphism.
 \end{proof}
 
+
+
+
+\chapter{PL Interlude: First-order STLC}
+
+Recall the language \textsc{Calc} from \Cref{sec:semantics-of-programs}.
+\begin{gather}
+  \begin{aligned}
+  M,N &::= \pllet{x}{M}{N} \mid x \mid \plunit{} \mid \plpair{M}{N} \mid \plfst{M} \mid \plsnd{M} \\
+  A,B &::= A \times B \mid \plUnit
+  \end{aligned}
+  \tag{\textsc{Calc}}
+  \label{lang:calc}
+\end{gather}
+We have been slowly and informally building a dictionary between
+syntactic operations and categorical ones.
+First there is the way that each judgment is interpreted:
+\begin{itemize}
+\item Types are objects
+\item Contexts are products
+\item Terms are morphisms
+\item Equations are equalities of morphisms
+\end{itemize}
+Then there is the way each term former is interpreted,
+in terms of the canonical operations on products and terminal objects:
+\begin{itemize}
+\item Fst, snd, tupling + laws
+\item Unit + laws
+\end{itemize}
+Finally there is the way that structural operations are interpreted:
+\begin{itemize}
+\item Variable lookup is projection
+\item Let-binding is (multi)composition
+\end{itemize}
+Taken together, these constructions establish the following:
+\begin{theorem} \label{thm:calc-products}
+  \textsc{Calc} can be interpreted in any category with finite products~(\cref{def:finite-products}).
+\end{theorem}
+\input{lec/calc-theorem.tex}
+
+The final thing to note about this interpretation is that it assigns categorically natural interpretations
+to substitution. In the case where the context has exactly one variable,
+\begin{itemize}
+\item The variable rule is the identity.
+\item Substitution is composition.
+\end{itemize}
+In the general case:
+\begin{itemize}
+\item Weakening is precomposition by a projection.
+\item Parallel substitution is precomposition.
+\end{itemize}
+
+From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
+is a toy programming language.
+But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory:
+it makes proving things about categories with finite products
+as easy as programming in \textsc{Calc}.
+
+For instance, consider Proposition~\ref{prop:products-commutative} again,
+which showed that products are commutative.
+The proof we gave involved showing that a fairly elaborate diagram commutes.
+We now redo the proof using Theorem~\ref{thm:calc-products}:
+\begin{proposition} \label{prop:product-comm-using-calc}
+  Let \(\calC\) be a category with products.
+  Then \(X\times Y \cong Y \times X\)
+  for any objects \(X,Y\) of \(\calC\).
+\end{proposition}
+\begin{proof}
+  Extend the grammar of \textsc{Calc} types with new base types
+  \[
+  A ::= \dots \mid \plkw{X} \mid \plkw{Y}.
+  \]
+  Interpret these new types as the objects \(X\) and \(Y\) of the category \(\calC\):
+  \begin{align*}
+    \llbr{\plkw{X}} &= X \\
+    \llbr{\plkw{Y}} &= Y
+  \end{align*}
+  Now define \(p \ofty \plkw{X} \pltimes \plkw{Y} \vdash M : \plkw{Y} \pltimes \plkw{X}\) by
+  \(
+  M := \plpair{\plsnd{p}}{\plfst{p}}
+  \)
+  and similarly define
+  \(q \ofty \plkw{Y} \pltimes \plkw{X} \vdash N : \plkw{X} \pltimes \plkw{Y}\) by
+  \(N := \plpair{\plsnd{q}}{\plfst{q}}\).
+  By Theorem~\ref{thm:calc-products},
+  we have morphisms \(\llbr{M} : X \times Y \to Y \times X\)
+  and \(\llbr{N} : Y \times X \to X \times Y\).
+  Simple equational reasoning then shows that
+  \begin{align}
+    p\ofty\plkw{X}\pltimes\plkw{Y} \vdash N[M/q] &\equiv p : \plkw{X}\pltimes\plkw{Y}
+    \\
+    q\ofty\plkw{Y}\pltimes\plkw{X} \vdash M[N/p] &\equiv q : \plkw{Y}\pltimes\plkw{X}
+  \end{align}
+  which by Theorem~\ref{thm:calc-products}
+  implies \(\llbr{N} \circ \llbr{M} = \idt_{X\times Y}\)
+  and \(\llbr{M} \circ \llbr{N} = \idt_{Y\times X}\)
+  as needed to show \(X \times Y \cong Y \times X\).
+\end{proof}
+
+In the proof of Proposition~\ref{prop:product-comm-using-calc},
+we extended \textsc{Calc} with new base types \(\plkw{X}\) and \(\plkw{Y}\)
+to model the objects \(X\) and \(Y\) of the category \(\calC\).
+We could give \textsc{Calc} access to other objects in \(\calC\)
+by extending it further.
+Taking this idea to its extreme, we could extend \textsc{Calc}
+with \emph{all} objects in \(\calC\), and also all morphisms.
+This extension to \textsc{Calc} is known
+as the \textbf{internal language}
+of \(\calC\), and programming in it is known as ``working internal to \(\calC\)''.
+\begin{definition}[Internal language]
+  Let \(\calC\) be a category with finite products.
+  The \textbf{internal language} of \(\calC\) is
+  the extension to \textsc{Calc}
+  that adds the following:
+  \begin{itemize}
+  \item One primitive type \(\plkw{X}\) for each object \(X\) of \(\calC\).
+  \item One term former \(\plkw{f}(M)\) for each morphism \(X \xrightarrow{f} Y\),
+    with typing rule:
+    \begin{mathpar}
+      \inferrule*
+        {\Gamma \vdash M : \plkw{X}}
+        {\Gamma \vdash \plkw{f}(M) : \plkw{Y}}
+    \end{mathpar}
+  \item The equational law \(\inferrule*{~}{\Gamma \vdash \plkw{id}(M) \equiv M : \plkw{X}}\).
+  \item For all morphisms \(f : Y \to Z\) and \(g : X \to Y\) and \(h : X \to Z\) in \(\calC\) such that \(f \circ g = h\),
+    an equational law:
+    \begin{mathpar}
+      \inferrule*{\Gamma \vdash M : \plkw{X}}{\Gamma \vdash \plkw{f}(\plkw{g}(M)) \equiv \plkw{h}(M) : \plkw{Z}}
+    \end{mathpar}
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}
+  Any category \(\calC\) with finite products
+  is a model of its own internal language in the evident way.
+\end{proposition}
+
+Internal languages are what formally make categories behave like ``metalanguages''
+for PL. Metalanguage features correspond to additional structure:
+as we progress through the course, we will encounter universal constructions
+that model richer languages with features such as records, pattern matching and structural recursion,
+higher-order functions, and refinement types.
 
 
 \chapter{Universal Constructions II}
