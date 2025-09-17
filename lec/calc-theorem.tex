@@ -193,7 +193,10 @@
     \pi_2 \circ \pi_1 \circ \pi_1.
   \end{align}
   Note that there are two \(\pi_1\)s in this composite. This corresponds to the fact that
-  the de Bruijn index of \(x\) in the context \(x\ofty A,y\ofty B,z\ofty C\) is two.
+  the de Bruijn index of \(x\) in the context \(x\ofty A,y\ofty B,z\ofty C\) is two.\footnote{%
+    You are now a third of the way through
+  the proof of Theorem~\ref{thm:calc-products}.}
+
 
   With variables out of the way, let us now turn to let-bindings.
   These also illustrate an interesting interaction
@@ -245,9 +248,7 @@
   to just
   \(\llbr{M}\). Written this way, the foregoing discussion
   can be summarized in terms of the following
-  equations.\footnote{%
-    You are now a third of the way through
-  the proof of Theorem~\ref{thm:calc-products}.}
+  equations.
   \begin{align*}
     \llbr{\plunit} &= \angled{} \\
     \llbr{\plfst{M}} &= \pi_1 \circ \llbr{M} \\
@@ -425,8 +426,7 @@
   By definition, \(\angled{\pi_1\circ \llbr{M}, \pi_2\circ\llbr{M}}\)
   is the unique morphism \(f\) satisfying \(\pi_1\circ f = \pi_1 \circ \llbr{M}\)
   and \(\pi_2\circ f = \pi_2 \circ \llbr{N}\). But \(\llbr{M}\)
-  satisfies this same property. Hence \(\llbr{M} = f = \angled{\pi_1\circ\llbr{M}, \pi_2\circ\llbr{M}}\).\footnote{%
-    You are now two thirds of the way through the proof of Theorem~\ref{thm:calc-products}.}
+  satisfies this same property. Hence \(\llbr{M} = f = \angled{\pi_1\circ\llbr{M}, \pi_2\circ\llbr{M}}\).
 
   All that's left is \textsc{Let-Sub}---the rule stating that let-binding is equivalent to substitution.
   Validating this rule boils down to showing the following:
@@ -462,7 +462,8 @@
   \[
   (\pllet{x'}{N_1}{N_2})[M/x] = (\pllet{x'}{N_1[M/x]}{N_2[M/x]}).
   \]
-  At first glance, this equation looks awfully provable from the above assumptions,
+  At first glance, this equation looks awfully provable from the above assumptions,\footnote{%
+    You are now two thirds of the way through the proof of Theorem~\ref{thm:calc-products}.}
   by applying the induction hypothesis to
   the terms \(N_1[M/x]\) and \(N_2[M/x]\) and then performing some algebraic manipulations.
   But a closer look will reveal that \(N_2[M/x]\) actually does not fit the shape required
@@ -661,5 +662,7 @@
   Lemma~\ref{lem:let-is-subst} now follows as a corollary, by setting \(\Delta = \ctxemp\).
   This in turn establishes the validity of the equational rule \textsc{Let-Sub},
   which completes the interpretation of all of the equational axioms of \textsc{Calc}
-  and hence concludes the proof of Theorem~\ref{thm:calc-products}.
+  and hence concludes the proof of Theorem~\ref{thm:calc-products}.\footnote{%
+    You heard that right---Theorem~\ref{thm:calc-products} is proved.
+    You are free! Well done if you made it this far.}
 \end{proof}
