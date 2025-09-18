@@ -302,7 +302,10 @@ operations.  Translated into morphisms, it says that any morphism of the form
 $\dbracket{\Gamma} \mor{\dbracket{M}} \dbracket{A \times B}$ is is equal to a
 canonical morphism $\dbracket{\Gamma} \mor{\dbracket{\langle \plfst{M},
 \plsnd{M} \rangle}} \dbracket{A \times B}$.  Put another way: there is a unique
-morphism $\dbracket{\Gamma} \mor{} \dbracket{A \times B}$ amking the above diagram commute.
+morphism $\dbracket{\Gamma} \mor{} \dbracket{A \times B}$ making the above diagram \textbf{commute}.\footnote{Formally,
+a diagram \textbf{commutes} if every face of the diagram is ``filled in'', 
+meaning that all paths beginning and ending in the same place are equal 
+as morphisms.}
 
 \subsection{Packaging up intuition into a definition}
 Now, as in the case of terminal objects, we can give a more generic description of 
@@ -456,6 +459,10 @@ is this behaving like an intersection?}
   greatest common divisor.
 \end{itemize}
 
+Finally, similar to terminal objects, we say that a category $\calC$ \textbf{has
+products} if for any two objects $A$ and $B$ in $\calC$ there exists an 
+object $A \times B$ satisfying the universal property of products.
+
 \section{Getting comfortable working with products}
 
 Though we arrived at the definition of product through the \(\beta\)
@@ -506,7 +513,14 @@ Another example:
 It gets a little tiresome to write ``the unique \(h\) such that \(\pi_1 \circ h = f\)
 and \(\pi_2 \circ h = g\)'' everywhere.
 So category theorists use a convenient notational abbreviation
-for this: the angle-bracked expression \(\angled{f,g}\).
+for this: the angle-bracketed expression \(\angled{f,g}\).\footnote{Note that 
+this notational convention hides some data: in particular, 
+it hides the codomain of $\langle f, g \rangle$. In practice this notational convention is quite useful 
+because, as we will show later (in \cref{prop:prod-term}), products are 
+isomorphic to each other, so hiding which particular choice of 
+product object is utilized is prudent. Throughout category theory this 
+sort of careful notation can be used (and confused!) to simplify arguments, but 
+it's always important to know why a notational choice is valid.}
 With this notation, the above propositions read as the following
 algebraic identities:
 \begin{align}
@@ -514,13 +528,31 @@ algebraic identities:
   \angled{f,g}\circ p &= \angled{f\circ p, g \circ p}
 \end{align}
 
-These algebraic identities can then be used to prove more elaborate facts about products.
+These algebraic identities can then be used to prove more elaborate facts about
+products.
 
 \begin{proposition} \label{prop:products-commutative}
   Let \(\calC\) be a category with products.
   Then \(A\times B \cong B \times A\)
   for any objects \(A,B\) of \(\calC\).
 \end{proposition}
+\begin{proof}
+  Since this is our first interesting proof we will give two arguments: one diagrammatic 
+  that is from first-principles, and one that utilizes the algebraic identities we gave above.
+
+  To show an isomorphism of objects we must find two morphisms:
+  
+  \begin{center}
+   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEACAHW7wFt4nAEIgAvqXSZc+QigCM5KrUYs2wnnyyC4nduOUwoAc3hFQAMwBOEfkjIgcEJIpXNWiEBZDUARjDAoJABmYglLGztEVyd7PwCgxFDqBjp-BgAFaTwCNgYYCxwfNzVPYwMxIA
+\begin{tikzcd}
+  A \times B \arrow[r, "f", bend left] & B \times A \arrow[l, "g", bend left]
+  \end{tikzcd}
+  \end{center}
+such that $g \circ f = \id_{A \times B}, f \circ g = \id_{B \times A}$.
+We only have two ways of showing that two morphisms are equal to one 
+another: by reading equations off commuting diagrams, or by showing that 
+two morphisms satisfy the same universal property.
+\end{proof}
 
 Next, here is a theorem with a familiar shape, if one thinks of
 products like the familiar notion of product of integers and terminal
@@ -719,6 +751,7 @@ it makes precise the sense in which a product \((P,p,q)\)
 is the ``largest'' among such tuples.
 
 \begin{proposition}
+  \label{prop:prod-term}
   Let \(A\) and \(B\) be objects of a category \(\calC\).
   A tuple \((P,p,q)\) is a product of \(A\) and \(B\)
   if and only if it is a terminal object of \(\mathsf{Span}_\calC(A,B)\).
@@ -745,7 +778,7 @@ just like terminal objects are, simply because they \emph{are terminal objects}:
 \end{proposition}
 \begin{proof}
   Products are terminal objects,
-  and terminal objects are unique up to unique isomorphism.
+  and terminal objects are unique up to unique isomorphism.\footnote{Phew! What a nice short proof!}
 \end{proof}
 
 
