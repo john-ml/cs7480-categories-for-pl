@@ -598,7 +598,7 @@ chain of products:
 \begin{equation}
   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAmAXVJADcBDAGwFcYkQBBAAgB0e8AtvC4AhEAF9S6TLnyEUABlIBmanSat2HCVJAZseAkXIq1DFm0Qgxk6QblEyxMxsvXe-LELhdttvTKG8iSkCi4WWh6CwjZqMFAA5vBEoABmAE4QAkhKIDgQSGTqEVZ8aFgA+sQgNIz0AEYwjAAKgQ5W6VgJABY4OmmZ2Yi5+UgmxZqlPOUV5P0gGVlIyjSjwzTmkyB8dWAJjDAeMyZHlcQe6fR7B-OLQyt5BYhFjWBQSAC0yrmbbmWVc1qDSarXsRg6XV6t0Gy1WT3Gr3eiG+G1c7H+VWhS0QABY4bCJn8eLt9ocMWRTrMLldSVihnjHoUaIjPijCejpmcaiA6o0Wm1wSBOj0+v47kgGWsETA3ssfmipscJJRxEA
 \begin{tikzcd}[column sep = huge]
-  & A \times B \arrow[d, "{\langle \pi_1, \pi_2 \rangle}"] \arrow[lddd, "\pi_1"', bend right] \arrow[rddd, "\pi_2", bend left] &   \\
+  & A \times B \arrow[d, "{\langle \pi_2, \pi_1 \rangle}"] \arrow[lddd, "\pi_1"', bend right] \arrow[rddd, "\pi_2", bend left] &   \\
   & B \times A \arrow[d, "{\langle \pi_2, \pi_1 \rangle}"] \arrow[ldd, "\pi_2"', bend right] \arrow[rdd, "\pi_1", bend left]   &   \\
   & A \times B \arrow[ld, "\pi_1"'] \arrow[rd, "\pi_2"]                                                                        &   \\
 A &                                                                                                                            & B
@@ -915,7 +915,10 @@ We now redo the proof using Theorem~\ref{thm:calc-products}:
   for any objects \(X,Y\) of \(\calC\).
 \end{proposition}
 \begin{proof}
-  Extend the grammar of \textsc{Calc} types with new base types
+  The following argument will hold for any choice of objects 
+  $X$ and $Y$ in the category $\calC$.
+  For each such pair,
+  extend the grammar of \textsc{Calc} types with new base types:
   \[
   A ::= \dots \mid \plkw{X} \mid \plkw{Y}.
   \]
@@ -959,7 +962,7 @@ of \(\calC\), and programming in it is known as ``working internal to \(\calC\)'
 \begin{definition}[Internal language]
   Let \(\calC\) be a category with finite products.
   The \textbf{internal language} of \(\calC\) is
-  the extension to \textsc{Calc}
+  the syntactic extension to \textsc{Calc}
   that adds the following:
   \begin{itemize}
   \item One primitive type \(\plkw{X}\) for each object \(X\) of \(\calC\).
@@ -993,7 +996,6 @@ for PL. Metalanguage features correspond to additional structure:
 as we progress through the course, we will encounter universal constructions
 that model richer languages with features such as records, pattern matching and structural recursion,
 higher-order functions, and refinement types.
-
 
 \chapter{Universal Constructions II}
 
