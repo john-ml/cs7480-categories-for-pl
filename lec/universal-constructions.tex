@@ -621,45 +621,46 @@ objects as behaving like the product unit:
   Then \(1 \times A \cong A\) for any object \(A\) of \(\calC\).
 \end{proposition}
 \begin{proof}
-  To show an isomorphism of objects, we need to show there exist
-  morphisms $f$ and $g$:
-  \begin{center}
-  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIbSGoGOgcGAAV+PAI2IyxtAAscbl4QY1MbaitzagcnVw9A4JgwiMFo2ISAiW82A24KLiA
-\begin{tikzcd}
-  A \arrow[r, "g"', bend right] & 1 \times A \arrow[l, "f"', bend right]
-  \end{tikzcd}
-  \end{center}
-  such that $f \circ g = \id_A$ and $g \circ f = \id_{1 \times A}$.
-  Now pause: what morphisms $f$ and $g$ should we search for so that this is true? There's
-  really only one choice, which we can see by looking at the types of these morphisms:
-  \begin{center}
-    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIBQzowbQYYeTkAoJCwo0DgmFIFJTocAAs4A2AsKC4AfXYFGMjWagCHBgAFfjwCNiMsbRScbl4QY1MbaitzagcnVw8SujLK7GqhEDqGpuovKV8FNCw87gouIA
-\begin{tikzcd}
-  A \arrow[r, "{\langle \langle \rangle,\mathsf{id}_A\rangle}"', bend right] & 1 \times A \arrow[l, "\pi_A"', bend right]
-  \end{tikzcd}
-  \end{center}
+%   To show an isomorphism of objects, we need to show there exist
+%   morphisms $f$ and $g$:
+%   \begin{center}
+%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIbSGoGOgcGAAV+PAI2IyxtAAscbl4QY1MbaitzagcnVw9A4JgwiMFo2ISAiW82A24KLiA
+% \begin{tikzcd}
+%   A \arrow[r, "g"', bend right] & 1 \times A \arrow[l, "f"', bend right]
+%   \end{tikzcd}
+%   \end{center}
+%   such that $f \circ g = \id_A$ and $g \circ f = \id_{1 \times A}$.
+%   Now pause: what morphisms $f$ and $g$ should we search for so that this is true? There's
+%   really only one choice, which we can see by looking at the types of these morphisms:
+%   \begin{center}
+%     % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQBGclVqMWbYQAIAOnLwBbeDM5dxMKAHN4RUADMAThCVIyIHBCSiQAIxhgoSALQBmC-WatEIBQzowbQYYeTkAoJCwo0DgmFIFJTocAAs4A2AsKC4AfXYFGMjWagCHBgAFfjwCNiMsbRScbl4QY1MbaitzagcnVw8SujLK7GqhEDqGpuovKV8FNCw87gouIA
+% \begin{tikzcd}
+%   A \arrow[r, "{\langle \langle \rangle,\mathsf{id}_A\rangle}"', bend right] & 1 \times A \arrow[l, "\pi_A"', bend right]
+%   \end{tikzcd}
+%   \end{center}
 
-  So, we need to use the universal properties of product and terminal objects to
-  construct these morphisms and show that they satisfy the necessary equations.
-  This guides us to the following commuting diagram:\footnote{Note how we use
-  the fact that $\mathbf{1}$ is terminal to fill in the leftmost leg of the diagram,
-  and the fact that $1 \times A$ is a product to fill in $\pi_1$ and $\pi_A$.}
+%   So, we need to use the universal properties of product and terminal objects to
+%   construct these morphisms and show that they satisfy the necessary equations.
+%   This guides us to the following commuting diagram:\footnote{Note how we use
+%   the fact that $\mathbf{1}$ is terminal to fill in the leftmost leg of the diagram,
+%   and the fact that $1 \times A$ is a product to fill in $\pi_1$ and $\pi_A$.}
 
-  \begin{center}
-   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1btiPPiAzY8BImPGSGLNok7z+yoUTLFN0nSGIACADo28AW3hWu3STCgBzeEVAAzACcIByRREBwIJABmGi0ZXTtGejBPRhhbGySUtIyA5NSYUgyHehwACzg-YCwobgB9Dlz8tJAaRiwwCygIHBwPfRBA4OiaCKQyECSAIxhGAAUBFWFJmD8cVqltdjs0LDq5Xn8gkMQY8MjEdU34kB291wUhk7CxxAmZsCgkAFoosLiLIlmuk7Hlsmw2vQZvNFkZdAEsJ4yutDoNjqFRhcrh8vqd-uZtjYSuVKtVag0eJRuEA
-\begin{tikzcd}
-  & A \arrow[d, "{\langle \langle \rangle, \mathsf{id}_A \rangle}", dotted] \arrow[ldd, "\langle \rangle"', bend right] \arrow[rdd, "\mathsf{id}_A", bend left] &   \\
-  & 1 \times A \arrow[ld, "\pi_1"] \arrow[rd, "\pi_A"]                                                                                                          &   \\
-1 &                                                                                                                                                             & A
-\end{tikzcd}
-  \end{center}
+%   \begin{center}
+%    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqQBM1Ok1btiPPiAzY8BImPGSGLNok7z+yoUTLFN0nSGIACADo28AW3hWu3STCgBzeEVAAzACcIByRREBwIJABmGi0ZXTtGejBPRhhbGySUtIyA5NSYUgyHehwACzg-YCwobgB9Dlz8tJAaRiwwCygIHBwPfRBA4OiaCKQyECSAIxhGAAUBFWFJmD8cVqltdjs0LDq5Xn8gkMQY8MjEdU34kB291wUhk7CxxAmZsCgkAFoosLiLIlmuk7Hlsmw2vQZvNFkZdAEsJ4yutDoNjqFRhcrh8vqd-uZtjYSuVKtVag0eJRuEA
+% \begin{tikzcd}
+%   & A \arrow[d, "{\langle \langle \rangle, \mathsf{id}_A \rangle}", dotted] \arrow[ldd, "\langle \rangle"', bend right] \arrow[rdd, "\mathsf{id}_A", bend left] &   \\
+%   & 1 \times A \arrow[ld, "\pi_1"] \arrow[rd, "\pi_A"]                                                                                                          &   \\
+% 1 &                                                                                                                                                             & A
+% \end{tikzcd}
+%   \end{center}
 
-  Reading equations off this diagram, we have:
-  \begin{align}
-    \id_A = \pi_A \circ \langle \langle \rangle, \id_A \rangle
-  \end{align}
-  This is one half of our required isomorphism.
+%   Reading equations off this diagram, we have:
+%   \begin{align}
+%     \id_A = \pi_A \circ \langle \langle \rangle, \id_A \rangle
+%   \end{align}
+%   This is one half of our required isomorphism.
 
+\todo{}
 \end{proof}
 
 \begin{definition}[Ternary product]
