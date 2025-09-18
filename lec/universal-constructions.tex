@@ -524,6 +524,7 @@ it's always important to know why a notational choice is valid.}
 With this notation, the above propositions read as the following
 algebraic identities:
 \begin{align}
+  \label{eq:id_eq_tupling}
   \angled{\pi_1,\pi_2} &= \idt \\
   \angled{f,g}\circ p &= \angled{f\circ p, g \circ p}
 \end{align}
@@ -537,9 +538,7 @@ products.
   for any objects \(A,B\) of \(\calC\).
 \end{proposition}
 \begin{proof}
-  Since this is our first interesting proof we will give two arguments: one diagrammatic 
-  that is from first-principles, and one that utilizes the algebraic identities we gave above.
-
+  Since this is our first interesting proof we will a fully diagrammatic argument.
   To show an isomorphism of objects we must find two morphisms:
   
   \begin{center}
@@ -552,6 +551,65 @@ such that $g \circ f = \id_{A \times B}, f \circ g = \id_{B \times A}$.
 We only have two ways of showing that two morphisms are equal to one 
 another: by reading equations off commuting diagrams, or by showing that 
 two morphisms satisfy the same universal property.
+Let's first show that $\id_{A \times B}$ satisfies the same universal property
+as two morphisms $g \circ f$. 
+We will do this very slowly.
+Let's start with the universal property of the product $A \times B$:
+\begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBAAgB0e8AtvC4AhEAF9S6TLnyEU5UsWp0mrdhwlSQGbHgJEATEpUMWbRCDHiVMKAHN4RUADMAThAFJFIHBCRkqubsfGhYAPrEIDSM9ABGMIwACjL68iBuWPYAFjharh5eiD5+SMZB6pahEYYSlOJAA
+\begin{tikzcd}
+  & A \times B \arrow[ld, "\pi_1"'] \arrow[rd, "\pi_2"] &   \\
+A &                                                     & B
+\end{tikzcd}
+\end{center}
+The universal property for products says that, for any object $X$ of the
+category, if it has morphisms $X \to A$ and $X \to B$, then there is a unique
+morphism $X \mor{h} A \times B$ such that the diagram commutes. 
+Our proof will proceed by carefully picking different objects for $X$.
+First, we pick $X = A \times B$:
+
+\begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRAEEACAHW7wFt4nAEIgAvqXSZc+QigAMpAExVajFm3bjJIDNjwEiS5avrNWiEKIlT9somXmn1Fjjz5ZBcEeNUwoAObwRKAAZgBOEPxIiiA4EEhkauZsvGhYAPrEINQMdABGMAwACtIGciDhWAEAFjjaYZHRiLHxSMbJGpZpmUoNIBFRSADM1G0t1GZdILz8dDg1cKHAWFBiGcBcvAJCwmL9g82jcQmISYVgUEgAtMOxU649WTkgeYUlZfaWVbX1NgNNEZjU4dC5XRB3SYuVLcdIZPpiChiIA
+\begin{tikzcd}
+  & A \times B \arrow[d, "{\langle \pi_1, \pi_2 \rangle}"] \arrow[ldd, "\pi_1"', bend right] \arrow[rdd, "\pi_2", bend left] &   \\
+  & A \times B \arrow[ld, "\pi_1"'] \arrow[rd, "\pi_2"]                                                                &   \\
+A &                                                                                                                    & B
+\end{tikzcd}
+\end{center}
+\emph{But,} there is another morphism that satisfies this same universal property: the 
+identity morphism!
+\begin{equation}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRAEEACAHW7wFt4nAEIgAvqXSZc+QigAMpAExVajFm3bjJIDNjwEiS5avrNWiEKIlT9somXmn1Fjjz5ZBcEeNUwoAObwRKAAZgBOEPxIiiA4EEhkauZsvGhYAPrEINQMdABGMAwACtIGciDhWAEAFjjaYZHRiLHxSMbJGpZpmUoNIBFRSADM1G0t1GZdILz8dDg1cKHAWFBiGcBcvAJCwmL9g82jcQmISYVgUEgAtMOxU649WTkgeYUlZfaWVbX1NgNNEZjU4dC5XRB3SYuVLcdIZPpiChiIA
+\begin{tikzcd}
+  & A \times B \arrow[d, "\mathsf{id}_{A \times B}"] \arrow[ldd, "\pi_1"', bend right] \arrow[rdd, "\pi_2", bend left] &   \\
+  & A \times B \arrow[ld, "\pi_1"'] \arrow[rd, "\pi_2"]                                                                &   \\
+A &                                                                                                                    & B
+\end{tikzcd}
+\label{cd:id-prod}
+\end{equation}
+Note how $\id_{A \times B}$ also makes this diagram commute.
+This establishes that $\id_{A \times B} = \langle \pi_1, \pi_2 \rangle$ (i.e., 
+it is a graphical proof of \cref{eq:id_eq_tupling})
+
+Now, let's find morphisms $g \circ f$ that satisfy the same universal 
+property as $\id_{A \times B}$. Now we can do this by constructing a 
+chain of products:
+
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAmAXVJADcBDAGwFcYkQBBAAgB0e8AtvC4AhEAF9S6TLnyEUABlIBmanSat2HCVJAZseAkXIq1DFm0Qgxk6QblEyxMxsvXe-LELhdttvTKG8iSkCi4WWh6CwjZqMFAA5vBEoABmAE4QAkhKIDgQSGTqEVZ8aFgA+sQgNIz0AEYwjAAKgQ5W6VgJABY4OmmZ2Yi5+UgmxZqlPOUV5P0gGVlIyjSjwzTmkyB8dWAJjDAeMyZHlcQe6fR7B-OLQyt5BYhFjWBQSAC0yrmbbmWVc1qDSarXsRg6XV6t0Gy1WT3Gr3eiG+G1c7H+VWhS0QABY4bCJn8eLt9ocMWRTrMLldSVihnjHoUaIjPijCejpmcaiA6o0Wm1wSBOj0+v47kgGWsETA3ssfmipscJJRxEA
+\begin{tikzcd}[column sep = huge]
+  & A \times B \arrow[d, "{\langle \pi_1, \pi_2 \rangle}"] \arrow[lddd, "\pi_1"', bend right] \arrow[rddd, "\pi_2", bend left] &   \\
+  & B \times A \arrow[d, "{\langle \pi_2, \pi_1 \rangle}"] \arrow[ldd, "\pi_2"', bend right] \arrow[rdd, "\pi_1", bend left]   &   \\
+  & A \times B \arrow[ld, "\pi_1"'] \arrow[rd, "\pi_2"]                                                                        &   \\
+A &                                                                                                                            & B
+\end{tikzcd}
+\label{cd:comp-proj}
+\end{equation}
+Look closely: in the above diagram, $\langle \pi_2, \pi_1 \rangle \circ \langle \pi_1, \pi_2 \rangle$ 
+satisfies the same universal property as $\id_{A \times B}$ in \cref{cd:id-prod}.
+So, by the universal property of products, we have that $\langle \pi_2, \pi_1 \rangle \circ \langle \pi_1, \pi_2 \rangle = \id_{A \times B}$.
+So, we've found our $f$ and $g$. The other half of the isomorphism can be shown by picking 
+the other ordering of products in the sequence of diagrams.
 \end{proof}
 
 Next, here is a theorem with a familiar shape, if one thinks of
