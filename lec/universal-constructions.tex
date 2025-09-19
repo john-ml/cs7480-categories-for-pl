@@ -895,22 +895,57 @@ The only goal of this chapter is to prove the following.
 %% \item Parallel substitution is precomposition.
 %% \end{itemize}
 
-\section{Internal languages}
+\section{Working in internal languages}
 
 Whew! That was quite a long proof.
 You may be wondering: what have we gained by spending so much energy on proving
-Theorem~\ref{thm:calc-products}?
-
-From the PL perspective, Theorem~\ref{thm:calc-products} is not super exciting---\textsc{Calc}
+\cref{thm:calc-products}?
+From the PL perspective, \cref{thm:calc-products} is not super exciting---\textsc{Calc}
 is a toy programming language.
-But Theorem~\ref{thm:calc-products} is extremely helpful for doing category theory.
+But \cref{thm:calc-products} is extremely helpful for doing category theory.
 This is because it provides a convenient language for working with an arbitrary
-category that has finite products.
+category that has finite products. 
 
-For instance, consider Proposition~\ref{prop:products-commutative} again,
-which showed that products are commutative.
-The proof we gave involved showing that a fairly elaborate diagram commutes.
-We now redo the proof using Theorem~\ref{thm:calc-products}:
+Let's see an example of this. Recall the divisor lattice of natural numbers
+$(\mathbb{N}, \preceq)$ extended with a terminal object (the number $0$). We
+showed previously that this category has products, and that these products 
+can be interpreted as greatest common divisors. So, \cref{thm:calc-products} applies 
+to this category, 
+and we can use it to prove the following seemingly non-trivial fact about greatest common divisors:
+\begin{proposition}
+  Let $X, Y, Z$ be natural numbers. Then, $\mathsf{gcd}(\mathsf{gcd}(X, Y), Z)$
+  divides $\mathsf{gcd}(Y, Z)$.
+\end{proposition}
+\begin{proof}
+  Recall that in this category, the $\mathsf{gcd}(X, Y)$ is the categorical product $X \times Y$,
+  and divisibility corresponds to the existence of a morphism.
+  So, the proof strategy is to use \cref{thm:calc-products} to prove the existence of a morphism 
+  of the correct type.
+
+  First, we need a way in \textsc{Calc} of discussing arbitrary objects in a category. 
+  We do this by extending our grammar of \textsc{Calc} types with type formers for three 
+  arbitrary objects in the category:
+  \begin{align*}
+    A ::= \dots \mid X \mid Y \mid Z
+  \end{align*}
+
+  Then, we define the denotation of these three new types to be $\dbracket{X} = X, \dbracket{Y} = Y, 
+  \dbracket{Z} = Z$.
+  Now, the proof amounts to showing that there 
+  exists a morphism $(X \times Y) \times Z \to (Y, Z)$ using \cref{thm:calc-products}, 
+  which means we have to give a term of type $(X \times Y) \times Z \to Y \times Z$.
+  Such a term is quite easy to find if you've ever programmed in a functional 
+  programming language:
+  \begin{align*}
+    p : (X \times Y) \times Z \vdash \langle \plfst{(\plsnd{p})}, \plsnd{p} \rangle : Y \times Z
+  \end{align*}
+  This completes the proof.
+\end{proof}
+Intuitively, \cref{thm:calc-products} gives us license to reason about categorical products 
+like how we are familiar reasoning about them in functional programs: we can 
+project out of them, compose them with other projects, etc.
+A more elaborate application of this theorem is to establish equalities of 
+certain morphisms using the equational theory of \textsc{Calc}:
 \begin{proposition} \label{prop:product-comm-using-calc}
   Let \(\calC\) be a category with products.
   Then \(X\times Y \cong Y \times X\)
@@ -948,8 +983,17 @@ We now redo the proof using Theorem~\ref{thm:calc-products}:
   which by Theorem~\ref{thm:calc-products}
   implies \(\llbr{N} \circ \llbr{M} = \idt_{X\times Y}\)
   and \(\llbr{M} \circ \llbr{N} = \idt_{Y\times X}\)
-  as needed to show \(X \times Y \cong Y \times X\).
+  as needed to show \(X \times Y \cong Y \times X\).\footnote{Those that are familiar 
+  with the Curry-Howard correspondence may notice something here:
+  equalities in the internal language are proofs of equalities in the model category, 
+  so proving equalities in the model category feels like manipulating proof 
+  terms.}
 \end{proof}
+
+This style of proof is broadly referred to was \emph{working in the internal 
+language of a category}. You may have heard of other internal languages for
+categories; perhaps the most well-known are string diagrams, which we may return
+to later. 
 
 In the proof of Proposition~\ref{prop:product-comm-using-calc},
 we extended \textsc{Calc} with new base types \(\plkw{X}\) and \(\plkw{Y}\)
@@ -961,7 +1005,7 @@ with \emph{all} objects in \(\calC\), and also all morphisms.
 This extension to \textsc{Calc} is known
 as the \textbf{internal language}
 of \(\calC\), and programming in it is known as ``working internal to \(\calC\)''.
-\begin{definition}[Internal language]
+\begin{definition}[Internal language for finite products]
   Let \(\calC\) be a category with finite products.
   The \textbf{internal language} of \(\calC\) is
   the syntactic extension to \textsc{Calc}
