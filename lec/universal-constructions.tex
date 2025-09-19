@@ -1043,19 +1043,21 @@ as we progress through the course, we will encounter universal constructions
 that model richer languages with features such as records, pattern matching and structural recursion,
 higher-order functions, and refinement types.
 
-\chapter{Universal Constructions II}
+\chapter{Universal Constructions II: Exponents}
 
-Let us recall the rules for a language with function types.
-First, we have the rule for making terms of function type:
+Now, let's move on to the next major addition to our library of language
+features: first-class functions and function types.  Let's recall the rules for
+a language with function types.  First, we have the rule for making terms of
+function type: 
 \begin{mathpar}
-\inferrule*
+\inferrule
     {\Gamma, x \ofty A \vdash M : B}
     {\Gamma \vdash \pllam{x}{M} : A \plto B}
     ~(\textsc{T-Lam})
 \end{mathpar}
 Next, we have the elimination rule for using terms of function type:
 \begin{mathpar}
-\inferrule*
+\inferrule
     {\Gamma\vdash M : A \plto B
       \\
     \Gamma \vdash N : A
@@ -1068,7 +1070,7 @@ which state that applying a function corresponds to
 substitution and that every term of function type is equivalent
 to a \(\lambda\)-expression.
 \begin{mathpar}
-\inferrule*
+\inferrule
     {
       \Gamma, x\ofty A\vdash M : B
       \\
@@ -1077,308 +1079,309 @@ to a \(\lambda\)-expression.
     {\Gamma \vdash \plapp{(\pllam{x}{M})}{N} \equiv M[N/x] : B}
     ~(\beta^{\plto})
 \and
-\inferrule*
+\inferrule
     {\Gamma \vdash M : A \to B}
     {\Gamma \vdash M \equiv \pllam{x}{\plapp{M}{x}} : A \to B}
     ~(\eta^{\plto})
 \end{mathpar}
 
-In category theory, this language feature is captured by
-the concept of an \emph{exponential object}.
+Our development here will mirror the development so far of 
+product types and unit types: we will identify a 
+special object in a category, characterized by some morphism equalities
+and a universal property,
+such that it validates the equational theory of $\lambda$-expressions.
+Let's designate a special object in the category 
+to denote the interpretation of function types. This object 
+will be called the \textbf{exponential object}:
+\begin{align}
+  \dbracket{A \to B} = B^A
+\end{align}
+Like product and unit types, this special object will be uniquely characterized 
+by a universal property. Let's work up to what that universal property is.
+We can start by filling in our semantics for $\lambda$-formation, 
+which we know must look like:
+\begin{align}
+  \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} : \dbracket{\Gamma} \to B^A
+\end{align}
+We are gathering clues: the above tells us that there must exist some 
+morphism $\dbracket{\Gamma}$ into the special object $B^A$. 
+Let's suggestively call this morphism $\dbracket{\Gamma} \mor{\lambda \dbracket{M}} \dbracket{B}^{\dbracket{A}}$:
+\begin{align}
+  \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} = \dbracket{\Gamma} \mor{\lambda \dbracket{M}} 
+\end{align}
+
+We can imagine this morphism as ``computing the closure'' of the lambda.
+Next, we want to be able to interpret function application, which, following the 
+mantra of denotational semantics, should be given as a composition of 
+morphisms:
+\begin{align}
+  \dbracket{\Gamma \vdash M~N : B}
+  = \dbracket{M} \circ \dbracket{N}
+\end{align}
+
+
+
 \newcommand\app{\mathsf{app}}
 \newcommand\lam{\lambda}
-\begin{definition} \label{def:exponential}
-  \sloppy
+\begin{definition}[Universal property of exponential object] \label{def:exponential}
   Let \(A\) and \(B\) be objects of a category \(\calC\) with products.
   An \emph{exponential of \(A\) by \(B\)}
-  is a pair \((E,\app)\) consisting of
-  an object \(E\) of \(\calC\)
+  is a pair \((B^A,\app)\) consisting of
+  an object \(B^A\) of \(\calC\)
   and a morphism
-  \(\app : E\times A \to B\)
+  \(\app : B^A \times A \to B\)
   such that the following universal property holds:
-  for all morphisms \(f : \Gamma \times A \to B\),
-  there exists a unique morphism \(\lam f : \Gamma \to E\)
+  for objects $\Gamma$ with a morphism \(f : \Gamma \times A \to B\),
+  there exists a unique morphism \(\lam f : \Gamma \to B^A\)
   such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
 \end{definition}
 
-Note that the morphism \(\app\)
-has a domain defined by a product,
-and the universal property of \((E,\app)\)
-is stated in terms of the morphism \(\angled{\lam f \circ \pi_1,\pi_2}\),
-whose existence depends on the existence of products.
-So the definition of exponential objects
-requires products in \(\calC\) as a prerequisite.%
-\footnote{There are actually tricks to define
-the notion of ``function object'' categorically
-without reference to products, but that will have to wait until after Yoneda IV.}
+Let's break this definition down diagrammatically and go through it 
+step-by-step. 
+First, let $A$ and $B$ be objects in our category; when thought of as 
+types, these objects will denote the domain and codomain of the
+lambda. Then, we can visualize $A$ and $B$ together with their 
+exponential object $B^A$ and application function $\app{}$ as:
 
-\noindent How does this definition capture the familiar rules for function types?
-\begin{itemize}
-  \item The object \(E\) models the function space \(A \to B\).
-  \item \(\app\) corresponds to function application:
-    \(f\ofty E, a\ofty A \vdash f\plapp a : B\).
-  \item The universal property models \textsc{T-Lam}.
-  \item What to make of the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)?
-\end{itemize}
+Categories with exponents get a special name: they are called
+\textbf{Cartesian-closed categories}. 
 
-\noindent To understand, we need to take a slightly more detailed look at how to
-    translate terms into categorical combinators.
-\begin{itemize}
-  \item Recap of products: each term formation rule becomes an operation on morphisms.
-    Typing derivations can be translated into categorical combinators this way.
-    Example: fst (a, b)
-  \item Each equational law becomes an equality of composites.
-    Example: fst (a, b) = a.
-  \item Subtle point: weakening as precomposition by structural maps.
-    Example: suppose M is well typed under Gamma; interpret M under Gamma,a:A.
-\end{itemize}
-\begin{align*}
-  \inferrule*[right=T-Wk]
-    {\Gamma \vdash M : B}
-    {\Gamma, a\ofty A \vdash M : B}
-  \qquad\raisebox{1em}{\(\leadsto\)}\qquad
-  \inferrule*[right=C-Wk]
-    {\Gamma \xlongrightarrow{f} B}
-    {\Gamma \times A \xlongrightarrow{f\,\circ\,\pi_1} B}
-\end{align*}
-Note that we are blurring the distinction between syntactic and mathematical objects here:
-in the rule on the left, \(\Gamma\) is a typing context, \(A\) and \(B\)
-are syntactic types, and \(M\) is a term;
-in the rule on the right, \(\Gamma\), \(A\), and \(B\) are all objects of an
-arbitrary category \(\calC\) with products,
-and \(f\) an arbitrary morphism \(\Gamma \to B\).
+\section{Examples of categories with exponential objects}
 
-The universal property of
-Definition~\ref{def:exponential}
-provides a categorical analog of the typing rules \textsc{T-Lam}:
-\begin{align*}
-  \inferrule*[right=T-Lam]
-    {\Gamma, a\ofty A \vdash M : B}
-    {\Gamma \vdash \pllam{a}{M} : A \plto B}
-  \qquad&\raisebox{1em}{\(\leadsto\)}\qquad
-  \inferrule*[right=C-Lam]
-    {\Gamma \times A \xlongrightarrow{f} B}
-    {\Gamma \xlongrightarrow{\lam f} E}
-\end{align*}
-The morphism \(\app\) can be used to construct a categorical analog of \textsc{T-App}:
-\begin{align*}
-  \inferrule*[right=T-App]
-    {
-      \Gamma \vdash M : A \plto B
-      \\\\
-      \Gamma \vdash N : A
-    }
-    {\Gamma \vdash \plapp{M}{N} : B}
-  \qquad&\raisebox{1em}{\(\leadsto\)}\qquad
-  \inferrule*[right=C-App]
-    {
-      \Gamma \xlongrightarrow{f} E
-      \\\\
-      \Gamma \xlongrightarrow{g} A
-    }
-    {\Gamma \xlongrightarrow{\app\,\circ\,\angled{f,g}} B}
-\end{align*}
-The rule on the right skips a few steps
-in order to make its shape fit that of the standard typing rule
-for function application: the morphism displayed in its conclusion
-tree is built by first using the universal property of the product \(E\times A\)
-to form the tupling \(\angled{f,g}\) of the morphisms in its premises,
-and then composing with \(\app\).
-You can think of this rule as an abbreviation for a
-more detailed proof tree:
-\begin{mathpar}
-  \inferrule*
-    {
-      \inferrule*
-        {
-          \Gamma\xlongrightarrow{f} E
-          \\
-          \Gamma\xlongrightarrow{g} A
-        }
-        {\Gamma\xlongrightarrow{\angled{f,g}} E \times A}
-      \\
-      \inferrule*{~}{E \times A \xlongrightarrow{\app} B}
-    }
-    {\Gamma \xlongrightarrow{\app\,\circ\,\angled{f,g}} B}
-\end{mathpar}
+\subsection{Exponents in $\FinSet{}$}
 
-There still remains the question of how to interpret the side condition
-accompanying the universal property: namely, that \(\lam f\)
-is the unique solution to the equation
-\(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
+\begin{proposition}
+  $\FinSet$ is Cartesian-closed.
+\end{proposition}
+\begin{proof}
+  We have already shown that $\FinSet$ has products (the Cartesian product of
+  finite sets). Let $A, B$ be finite sets. Then, we need to show that for 
+  any finite set $\Gamma$ with morphism $\Gamma \times A \mor{f} B$, 
+  there is a unique morphism $\lambda f$ such that the following diagram commutes:
+  
+  \begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BxOgW17oACTnl7xBAQRABfUuky58hFAEZSKqrUYs2AIRlyQGbHgJEyG6vWatEIXQD0Jw9qPFTpmmFADm8IqAAZgBOELxIZCA4EEhqWjZsgQZBoeGIkdFIAExW2rYc7Ax0YD4MMC5FvABGUEKBpC4COAAWcIHAWFDSnMHFpazURVUwDAAKCqbKIMFYPs04ySAhYdnUmYhx1jp2nE2t7TDW0jIU0kA
+\begin{tikzcd}
+  \Gamma \times A \arrow[rd, "f"] \arrow[d, "{\langle \lambda f \circ \pi_1, \mathsf{id} \circ \pi_2\rangle}"'] &   \\
+  B^A \times A \arrow[r, "\mathsf{eval}"]                                               & B
+  \end{tikzcd}
+  \end{center}
 
-As a first step to understanding this condition, let us first translate
-the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)
-into familiar language.
-The following ``typing derivation'' shows how
-the left-hand side of this equation can be built up
-from its components:
-\begin{mathpar}
-  \inferrule*[right=C-App]
-    {
-      \inferrule*[right=C-Wk]
-        {
-          \inferrule*[right=C-Lam]
-            {\Gamma \times A \xlongrightarrow{f} B}
-            {\Gamma \xlongrightarrow{\lam f} E}
-        }
-        {\Gamma \times A \xlongrightarrow{\lam f \circ \pi_1} E}
-      \\
-      \inferrule*[right=C-Var]{~}{\Gamma \times A \xlongrightarrow{\pi_2} A}
-    }
-    {\Gamma \times A \xlongrightarrow{\app\,\circ\,\angled{\lam f \circ \pi_1, \pi_2}} B}
-\end{mathpar}
-Reading this tree from the top down:
-first, the morphism \(f\)
-is turned into a morphism
-\(\lam f\) by the universal property of \((E,\app)\),
-and composed with the projection \(\pi_1\)
-to yield the composite \(\Gamma\times A \xrightarrow{\lam f \circ \pi_1} E\).
-This composite is then tupled with \(\Gamma \times A \xrightarrow{\pi_2} A\)
-using the universal property of the product \(E\times A\)
-to form \(\Gamma\times A \xrightarrow{\angled{\lam f \circ \pi_1,\pi_2}} E \times A\),
-and then composed with \(\app\)
-to form the morphism shown at the root.
+  To satisfy this, we will define $B^A$ to be set of all graphs of functions $A
+  \to B$.\footnote{Recall that the \emph{graph} of a function $f : A \to B$ 
+  is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
+  of $f$.
+  So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
+  \begin{align*}
+    \Big\{\{(a, c), (b, c)\}, \{(a, d), (b, d)\}, \\
+    \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
+  \end{align*}
+  }
+  Then, we define $\mathsf{eval}(f, a)$ to pick the component of the 
+  graph $f$ that corresponds to $a \in A$. 
 
-This ``meta-level derivation''
-can be translated back into an object language one
-by replacing each use of a categorical typing rule
-with its syntactic counterpart:
-\begin{mathpar}
-  \inferrule*[right=T-App]
-    {
-      \inferrule*[right=T-Wk]
-        {
-          \inferrule*[right=T-Lam]
-            {\Gamma, a\ofty A \vdash M : B}
-            {\Gamma \vdash \pllam{a}{M} : A \plto B}
-        }
-        {\Gamma, a\ofty A \vdash \pllam{a}{M} : A \plto B}
-      \\
-      \inferrule*[right=T-Var]{~}{\Gamma, a\ofty A \vdash a : A}
-    }
-    {\Gamma, a \ofty A \vdash \plapp{(\pllam{a}{M})}{a} : B}
-\end{mathpar}
+  Now let's show this choice validates the universal property.  Let $\Gamma$ be
+  any set and $f$ be a function $\Gamma \times A \to B$, and let $\lambda f$ be
+  the morphism that maps $f$ to its graph.
+  Clearly the diagram commutes by the definition of a function graph.
+  Finally, observe that $\lambda f$ is unique by function extensionality.
+\end{proof}
 
-Now let us reexamine the universal property of exponentials,
-which says that
-for each \(f\) there is a unique \(\lam f\)
-such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
-There are two parts to this assertion:
-\begin{enumerate}
-\item (Existence) There is a morphism, called \(\lam f\),
-  such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
-\item (Uniqueness) If \(g\) is a morphism
-  such that \(\app \circ \angled{g \circ \pi_1, \pi_2} = f\),
-  then it must be the case that \(g = \lam f\).
-\end{enumerate}
+\subsection{Exponents in $\mathsf{Formula}$}
 
-Existence corresponds to the following equation between terms:
-\begin{mathpar}
-  \inferrule*
-    {\todo}
-    {\Gamma, a \ofty A \vdash \plapp{(\pllam{a}{M})}{a} \equiv M : B}
-\end{mathpar}
-This equation has an intuitive reading: it is a special case
-of \(\beta^{\plto}\), where the argument to \(\pllam{a}{M}\)
-is a single variable.
-Note something a little magical is happening here:
-the two occurrences of \(M\) in this equation have different
-binding structure. On the left-hand side, occurrences of \(a\)
-in \(M\) refer to the bound variable in \(\pllam{a}{M}\),
-whereas on the right-hand side they refer to the binding \(a\ofty A\)
-in the typing context.
+\subsection{Exponents in topological spaces}
 
-Uniqueness says that if \(\Gamma \vdash M : A \plto B\) is any
-term such that \(\Gamma, a \ofty A \vdash \plapp{M}{a} \equiv N : B\),
-then \(\Gamma \vdash M \equiv \pllam{a}{N} : A \plto B\).
-As a proof rule,
-\begin{mathpar}
-  \inferrule*
-    {
-      \Gamma, a \ofty A \vdash \plapp{M}{a} \equiv N : B
-    }
-    {\Gamma \vdash M \equiv \pllam{a}{N} : A \plto B}
-\end{mathpar}
-This rule is interderivable with \(\eta^{\plto}\).
+\section{Properties of Cartesian-closed categories}
 
 
+% \section{}
 
+% How does this definition capture the familiar rules for function types?
+% \begin{itemize}
+%   \item The object \(E\) models the function space \(A \to B\).
+%   \item \(\app\) corresponds to function application:
+%     \(f\ofty E, a\ofty A \vdash f\plapp a : B\).
+%   \item The universal property models \textsc{T-Lam}.
+%   \item What to make of the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)?
+% \end{itemize}
 
-\begin{itemize}
-  \item Recall the three perspectives:
-    \begin{itemize}
-    \item Algebraic: beta and eta rules as equations
-    \item Graphical: the triangle commutes
-    \item Order-theoretic: exponential as largest code pointer (formally:
-            terminal in a category of code pointers)
-    \end{itemize}
-\end{itemize}
-\todo
+% \noindent To understand, we need to take a slightly more detailed look at how to
+%     translate terms into categorical combinators.
+% \begin{itemize}
+%   \item Recap of products: each term formation rule becomes an operation on morphisms.
+%     Typing derivations can be translated into categorical combinators this way.
+%     Example: fst (a, b)
+%   \item Each equational law becomes an equality of composites.
+%     Example: fst (a, b) = a.
+%   \item Subtle point: weakening as precomposition by structural maps.
+%     Example: suppose M is well typed under Gamma; interpret M under Gamma,a:A.
+% \end{itemize}
+% \begin{align*}
+%   \inferrule*[right=T-Wk]
+%     {\Gamma \vdash M : B}
+%     {\Gamma, a\ofty A \vdash M : B}
+%   \qquad\raisebox{1em}{\(\leadsto\)}\qquad
+%   \inferrule*[right=C-Wk]
+%     {\Gamma \xlongrightarrow{f} B}
+%     {\Gamma \times A \xlongrightarrow{f\,\circ\,\pi_1} B}
+% \end{align*}
+% Note that we are blurring the distinction between syntactic and mathematical objects here:
+% in the rule on the left, \(\Gamma\) is a typing context, \(A\) and \(B\)
+% are syntactic types, and \(M\) is a term;
+% in the rule on the right, \(\Gamma\), \(A\), and \(B\) are all objects of an
+% arbitrary category \(\calC\) with products,
+% and \(f\) an arbitrary morphism \(\Gamma \to B\).
 
-\begin{itemize}
-  \item Examples
-    \begin{itemize}
-    \item Exponentials in FinSet are function spaces
-    \item Exponentials in open subsets of the plane are a funny thing (remember:
-      largest code pointer)
-    \end{itemize}
-\end{itemize}
-\todo
+% The universal property of
+% Definition~\ref{def:exponential}
+% provides a categorical analog of the typing rules \textsc{T-Lam}:
+% \begin{align*}
+%   \inferrule*[right=T-Lam]
+%     {\Gamma, a\ofty A \vdash M : B}
+%     {\Gamma \vdash \pllam{a}{M} : A \plto B}
+%   \qquad&\raisebox{1em}{\(\leadsto\)}\qquad
+%   \inferrule*[right=C-Lam]
+%     {\Gamma \times A \xlongrightarrow{f} B}
+%     {\Gamma \xlongrightarrow{\lam f} E}
+% \end{align*}
+% The morphism \(\app\) can be used to construct a categorical analog of \textsc{T-App}:
+% \begin{align*}
+%   \inferrule*[right=T-App]
+%     {
+%       \Gamma \vdash M : A \plto B
+%       \\\\
+%       \Gamma \vdash N : A
+%     }
+%     {\Gamma \vdash \plapp{M}{N} : B}
+%   \qquad&\raisebox{1em}{\(\leadsto\)}\qquad
+%   \inferrule*[right=C-App]
+%     {
+%       \Gamma \xlongrightarrow{f} E
+%       \\\\
+%       \Gamma \xlongrightarrow{g} A
+%     }
+%     {\Gamma \xlongrightarrow{\app\,\circ\,\angled{f,g}} B}
+% \end{align*}
+% The rule on the right skips a few steps
+% in order to make its shape fit that of the standard typing rule
+% for function application: the morphism displayed in its conclusion
+% tree is built by first using the universal property of the product \(E\times A\)
+% to form the tupling \(\angled{f,g}\) of the morphisms in its premises,
+% and then composing with \(\app\).
+% You can think of this rule as an abbreviation for a
+% more detailed proof tree:
+% \begin{mathpar}
+%   \inferrule*
+%     {
+%       \inferrule*
+%         {
+%           \Gamma\xlongrightarrow{f} E
+%           \\
+%           \Gamma\xlongrightarrow{g} A
+%         }
+%         {\Gamma\xlongrightarrow{\angled{f,g}} E \times A}
+%       \\
+%       \inferrule*{~}{E \times A \xlongrightarrow{\app} B}
+%     }
+%     {\Gamma \xlongrightarrow{\app\,\circ\,\angled{f,g}} B}
+% \end{mathpar}
 
-\section{Getting formal about categorical semantics}
+% There still remains the question of how to interpret the side condition
+% accompanying the universal property: namely, that \(\lam f\)
+% is the unique solution to the equation
+% \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
 
-\begin{itemize}
-  \item What's really going on?
-\end{itemize}
-Wellformedness rules
-\[
-s ::= (M,\dots)
-\]
-\[
-\fbox{\(s : \Gamma \longrightarrow \Gamma'\)}
-\]
-\begin{mathpar}
-\inferrule
-    {\Gamma \vdash M : A
-      \\\dots}
-    {(M,\dots) : \Gamma \longrightarrow x\ofty A,\dots}
-\end{mathpar}
-The following rule is admissible:
-\begin{mathpar}
-  \inferrule{\Gamma \vdash M : A \\ s : \Gamma'\longrightarrow\Gamma}
-            {\Gamma' \vdash M[s] : A}
-\end{mathpar}
-Semantically,
-\[
-\text{if \(s : \Gamma\longrightarrow\Gamma'\)
-then \(\llbr{s} : \llbr{\Gamma} \to \llbr{\Gamma'}\)}
-\]
-\footnote{The dreaded ``substitution lemma'' that all mechanizers hate}
-\[
-\llbr{M[s]} = \llbr{M} \circ \llbr{s}
-\]
-All semantic interpretation functions must be stable
-under substitution/precomposition:
-\begin{align*}
-  \plpair{M}{N}[s] &= \plpair{M[s]}{N[s]}
-  &
-  \angled{f,g} \circ p &= \angled{f\circ p,g\circ p}
-  \\
-  \plfst{M}[s] &= \plfst{M[s]}
-  &
-  (\pi_1 \circ f) \circ p &= \pi_1 \circ (f \circ p)
-\end{align*}
+% As a first step to understanding this condition, let us first translate
+% the equation \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\)
+% into familiar language.
+% The following ``typing derivation'' shows how
+% the left-hand side of this equation can be built up
+% from its components:
+% \begin{mathpar}
+%   \inferrule*[right=C-App]
+%     {
+%       \inferrule*[right=C-Wk]
+%         {
+%           \inferrule*[right=C-Lam]
+%             {\Gamma \times A \xlongrightarrow{f} B}
+%             {\Gamma \xlongrightarrow{\lam f} E}
+%         }
+%         {\Gamma \times A \xlongrightarrow{\lam f \circ \pi_1} E}
+%       \\
+%       \inferrule*[right=C-Var]{~}{\Gamma \times A \xlongrightarrow{\pi_2} A}
+%     }
+%     {\Gamma \times A \xlongrightarrow{\app\,\circ\,\angled{\lam f \circ \pi_1, \pi_2}} B}
+% \end{mathpar}
+% Reading this tree from the top down:
+% first, the morphism \(f\)
+% is turned into a morphism
+% \(\lam f\) by the universal property of \((E,\app)\),
+% and composed with the projection \(\pi_1\)
+% to yield the composite \(\Gamma\times A \xrightarrow{\lam f \circ \pi_1} E\).
+% This composite is then tupled with \(\Gamma \times A \xrightarrow{\pi_2} A\)
+% using the universal property of the product \(E\times A\)
+% to form \(\Gamma\times A \xrightarrow{\angled{\lam f \circ \pi_1,\pi_2}} E \times A\),
+% and then composed with \(\app\)
+% to form the morphism shown at the root.
 
-\begin{itemize}
-  \item Distributivity, ``high school algebra laws''
-\end{itemize}
-\todo
+% This ``meta-level derivation''
+% can be translated back into an object language one
+% by replacing each use of a categorical typing rule
+% with its syntactic counterpart:
+% \begin{mathpar}
+%   \inferrule*[right=T-App]
+%     {
+%       \inferrule*[right=T-Wk]
+%         {
+%           \inferrule*[right=T-Lam]
+%             {\Gamma, a\ofty A \vdash M : B}
+%             {\Gamma \vdash \pllam{a}{M} : A \plto B}
+%         }
+%         {\Gamma, a\ofty A \vdash \pllam{a}{M} : A \plto B}
+%       \\
+%       \inferrule*[right=T-Var]{~}{\Gamma, a\ofty A \vdash a : A}
+%     }
+%     {\Gamma, a \ofty A \vdash \plapp{(\pllam{a}{M})}{a} : B}
+% \end{mathpar}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Now let us reexamine the universal property of exponentials,
+% which says that
+% for each \(f\) there is a unique \(\lam f\)
+% such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
+% There are two parts to this assertion:
+% \begin{enumerate}
+% \item (Existence) There is a morphism, called \(\lam f\),
+%   such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
+% \item (Uniqueness) If \(g\) is a morphism
+%   such that \(\app \circ \angled{g \circ \pi_1, \pi_2} = f\),
+%   then it must be the case that \(g = \lam f\).
+% \end{enumerate}
 
+% Existence corresponds to the following equation between terms:
+% \begin{mathpar}
+%   \inferrule*
+%     {\todo}
+%     {\Gamma, a \ofty A \vdash \plapp{(\pllam{a}{M})}{a} \equiv M : B}
+% \end{mathpar}
+% This equation has an intuitive reading: it is a special case
+% of \(\beta^{\plto}\), where the argument to \(\pllam{a}{M}\)
+% is a single variable.
+% Note something a little magical is happening here:
+% the two occurrences of \(M\) in this equation have different
+% binding structure. On the left-hand side, occurrences of \(a\)
+% in \(M\) refer to the bound variable in \(\pllam{a}{M}\),
+% whereas on the right-hand side they refer to the binding \(a\ofty A\)
+% in the typing context.
 
-% - Give standard rules for function types
-% - Golf rules using substitution
-% - Reverse engineer textbook definition
+% Uniqueness says that if \(\Gamma \vdash M : A \plto B\) is any
+% term such that \(\Gamma, a \ofty A \vdash \plapp{M}{a} \equiv N : B\),
+% then \(\Gamma \vdash M \equiv \pllam{a}{N} : A \plto B\).
+% As a proof rule,
+% \begin{mathpar}
+%   \inferrule*
+%     {
+%       \Gamma, a \ofty A \vdash \plapp{M}{a} \equiv N : B
+%     }
+%     {\Gamma \vdash M \equiv \pllam{a}{N} : A \plto B}
+% \end{mathpar}
+% This rule is interderivable with \(\eta^{\plto}\).
