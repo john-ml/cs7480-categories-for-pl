@@ -1085,44 +1085,77 @@ to a \(\lambda\)-expression.
     ~(\eta^{\plto})
 \end{mathpar}
 
-Our development here will mirror the development so far of 
-product types and unit types: we will identify a 
-special object in a category, characterized by some morphism equalities
-and a universal property,
-such that it validates the equational theory of $\lambda$-expressions.
+Our development here will mirror the development so far of product types and
+unit types: we will identify a special object in a category, characterized by
+some morphism equalities and a universal property, such that it validates the
+equational theory of $\lambda$-expressions.
+
 Let's designate a special object in the category 
 to denote the interpretation of function types. This object 
 will be called the \textbf{exponential object}:
 \begin{align}
-  \dbracket{A \to B} = B^A
+  \dbracket{A \to B} = \dbracket{B}^{\dbracket{A}}
 \end{align}
+Intuitively, this exponential object must summarize all the morphisms from $A$ 
+to $B$.
 Like product and unit types, this special object will be uniquely characterized 
 by a universal property. Let's work up to what that universal property is.
 We can start by filling in our semantics for $\lambda$-formation, 
 which we know must look like:
 \begin{align}
-  \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} : \dbracket{\Gamma} \to B^A
+  \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} : \dbracket{\Gamma} \to \dbracket{B}^{\dbracket{A}}
 \end{align}
 We are gathering clues: the above tells us that there must exist some 
-morphism $\dbracket{\Gamma}$ into the special object $B^A$. 
+morphism $\dbracket{\Gamma}$ into the special object $\dbracket{B}^{\dbracket{A}}$. 
 Let's suggestively call this morphism $\dbracket{\Gamma} \mor{\lambda \dbracket{M}} \dbracket{B}^{\dbracket{A}}$:
 \begin{align}
   \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} = \dbracket{\Gamma} \mor{\lambda \dbracket{M}} 
+  \dbracket{B}^{\dbracket{A}}
 \end{align}
-
-We can imagine this morphism as ``computing the closure'' of the lambda.
-Next, we want to be able to interpret function application, which, following the 
-mantra of denotational semantics, should be given as a composition of 
-morphisms:
-\begin{align}
-  \dbracket{\Gamma \vdash M~N : B}
-  = \dbracket{M} \circ \dbracket{N}
-\end{align}
-
-
 
 \newcommand\app{\mathsf{app}}
 \newcommand\lam{\lambda}
+
+The purpose of the the morphism $\lambda \dbracket{M}$ is to compute the closure
+of $M$: it must package up the body of the lambda $M$ into some representation
+for which it can later be called. Now, to interpret application, 
+we need another special morphism called $\app{}$ that denotes applying a closure 
+to its argument:
+\begin{align}
+  \dbracket{B}^{\dbracket{A}} \times \dbracket{A} \mor{\app{}} \dbracket{B}
+\end{align}
+
+With this special morphism we can give an interpretation to application: 
+\begin{fullwidth}
+\begin{align}
+  \dbracket{\dfrac{\Gamma \vdash M : A \to B \quad \Gamma \vdash N : A}{\Gamma \vdash M~N : B}}
+  = \dbracket{\Gamma} \mor{\langle \lambda M, \id \rangle} \dbracket{B}^{\dbracket{A}} \times \dbracket{\Gamma}
+  \mor{\langle \id, \dbracket{N} \rangle } \dbracket{B}^{\dbracket{A}} \times \dbracket{A}
+  \mor{\app{}} \dbracket{B}
+\end{align}
+\end{fullwidth}
+
+Now, the closure morphism $\lambda \dbracket{M}$ 
+and the application morphism $\app$ needs to satisfy the equational 
+laws. We can package up these laws into a diagram that must commute:
+
+\begin{center}
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BxOgW17oACTnl7xBAQRABfUuky58hFAEZSKqrUYs2AIRlyQGbHgJEyG6vWatEIXQD0Jw9qPFTpmmFADm8IqAAZgBOELxIZCA4EEhqWjZsALLINAD0AB4UBkGh4YiR0UgATFbathzsDHRgPgwwnFW8AEZQQokuAMZYwR0uaFgA+mp9g0UuwdW1rNRVTTAMAAoKpsogwVg+ABY42SAhYcXUhYhx1jp2IjDpODfAdGho0jIU0kA
+\begin{tikzcd}
+  \dbracket{\Gamma} \times \dbracket{A} \arrow[rd, "{\dbracket{M}}"] \arrow[d, "{\langle\lambda \dbracket{M} \circ \pi_1, \pi_2 \rangle}"'] &   \\
+  \dbracket{B}^{\dbracket{A}} \times \dbracket{A} \arrow[r, "\texttt{app}"]                                                             & \dbracket{B}
+  \end{tikzcd}
+\end{center}
+
+Let's unpack this diagram. First, the morphism $\dbracket{\Gamma} \times
+\dbracket{A} \mor{\dbracket{M}} \dbracket{B}$ is the morphism that  gives 
+the semantics of the open term $\Gamma, x : A \vdash M : B$. 
+The diagram says that $\dbracket{M}$ should commute with first forming a 
+closure and then applying the closure to the same argument.
+Finally, the $\eta$ laws assert the uniqueness of the closure-formation 
+morphism $\lambda \dbracket{M}$. Now we can package up all this intuition 
+into a definition of a universal property:
+
 \begin{definition}[Universal property of exponential object] \label{def:exponential}
   Let \(A\) and \(B\) be objects of a category \(\calC\) with products.
   An \emph{exponential of \(A\) by \(B\)}
@@ -1136,17 +1169,12 @@ morphisms:
   such that \(\app \circ \angled{\lam f \circ \pi_1, \pi_2} = f\).
 \end{definition}
 
-Let's break this definition down diagrammatically and go through it 
-step-by-step. 
-First, let $A$ and $B$ be objects in our category; when thought of as 
-types, these objects will denote the domain and codomain of the
-lambda. Then, we can visualize $A$ and $B$ together with their 
-exponential object $B^A$ and application function $\app{}$ as:
-
+A category \textbf{has exponents} if for any two objects $A$ and 
+$B$ there is an exponential of $A$ by $B$.
 Categories with exponents get a special name: they are called
 \textbf{Cartesian-closed categories}. 
 
-\section{Examples of categories with exponential objects}
+\section{Examples of with exponential objects}
 
 \subsection{Exponents in $\FinSet{}$}
 
@@ -1163,7 +1191,7 @@ Categories with exponents get a special name: they are called
  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BxOgW17oACTnl7xBAQRABfUuky58hFAEZSKqrUYs2AIRlyQGbHgJEyG6vWatEIXQD0Jw9qPFTpmmFADm8IqAAZgBOELxIZCA4EEhqWjZsgQZBoeGIkdFIAExW2rYc7Ax0YD4MMC5FvABGUEKBpC4COAAWcIHAWFDSnMHFpazURVUwDAAKCqbKIMFYPs04ySAhYdnUmYhx1jp2nE2t7TDW0jIU0kA
 \begin{tikzcd}
   \Gamma \times A \arrow[rd, "f"] \arrow[d, "{\langle \lambda f \circ \pi_1, \mathsf{id} \circ \pi_2\rangle}"'] &   \\
-  B^A \times A \arrow[r, "\mathsf{eval}"]                                               & B
+  B^A \times A \arrow[r, "\mathsf{app}"]                                               & B
   \end{tikzcd}
   \end{center}
 
@@ -1177,7 +1205,7 @@ Categories with exponents get a special name: they are called
     \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
   \end{align*}
   }
-  Then, we define $\mathsf{eval}(f, a)$ to pick the component of the 
+  Then, we define $\mathsf{app}(f, a)$ to pick the component of the 
   graph $f$ that corresponds to $a \in A$. 
 
   Now let's show this choice validates the universal property.  Let $\Gamma$ be
@@ -1188,8 +1216,60 @@ Categories with exponents get a special name: they are called
 \end{proof}
 
 \subsection{Exponents in $\mathsf{Formula}$}
+Recall from Assignment 1 the category $\mathsf{Formula}$ whose objects are
+logical formulae whose morphisms denote formula entailment. In the assignment
+you showed that this category has products, and that products denoted
+logical conjunction of formulae. Now, let's investigate what exponential objects
+mean in this category.
+
+Suppose $\alpha$ and $\beta$ are logical formulae. Let $\gamma$ be 
+some other logical formula
+such that $\gamma \land \alpha \models \beta$. Then, an exponential object $\beta^\alpha$ 
+is some object that enables the following diagram to commute:
+
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13G0ALOgAk4M6YKIPYBzOgFtpdEAF9S6TLnyEUARlKaqtRizacARjBzylK7HgJEyu6vWatEIAPzi80+OO59+inowUBLwRKAAZgBOENJIZCA4EEialiDRsfHUSUgATNTCpgwACqo2GiBRWBI8OIrK6TFxiPmJyYipFApAA
+\begin{tikzcd}
+  \gamma \land \alpha \arrow[rd] \arrow[d] &       \\
+  \beta^\alpha \land \alpha  \arrow[r]               & \beta
+  \end{tikzcd}
+\end{center}
+
+How do we find what the exponential object $\beta^\alpha$ is, if there is one?
+This is a fairly common thing to do in category theory and there is no fixed
+recipe.  But, one helpful strategy is to have an intuition about how exponential
+objects behave. In brief, the exponential object $\beta^\alpha$ is a special
+object that ``captures all the morphisms from $\alpha$ to $\beta$.'' 
+With this intuition: is there an object in $\mathsf{Formula}$ that is the 
+most general way of showing that $\alpha$ could entail $\beta$? Indeed 
+there is: this is the formula $\alpha \Rightarrow \beta$. 
+Now we can draw a new diagram:
+
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13G0ALOgAk4M6YKIPYBzOgFtpdEAF9S6TLnyEUARlKaqtRizacARjBzylK7HgJEyu6vWatEIAPzi80+OO59+inowUBLwRKAAZgBOENJIZCA4EEialiDRsfHUSUgATNTCpgwACqo2GiBRWBI8OIrK6TFxiPmJyYipFApAA
+\begin{tikzcd}
+  \gamma \land \alpha \arrow[rd] \arrow[d] &       \\
+  (\alpha \Rightarrow \beta) \land \alpha  \arrow[r]               & \beta
+  \end{tikzcd}
+  \label{eq:cd-formula}
+\end{equation}
+
+We see that the morphism corresponding to $\app$ can be interpreted 
+as modus ponens and the morphism corresponding to $\lambda M$ 
+can be interpreted as weakening.
+This is an example of how exponential objects can have surprisingly 
+diverse interpretations depending on your underlying category.
+
+Now, we know what exponents ought to mean, so we can ask: 
+does $\mathsf{Formula}$ have exponents? The answer is \emph{yes}, 
+by the following argument. We know $\gamma \land \alpha \models \beta$ 
+by assumption, and we must show that $\gamma \land \alpha \models (\alpha
+\Rightarrow \beta) \land \alpha$.
 
 \subsection{Exponents in topological spaces}
+
+\subsection{A non-example: natural numbers and divisibility}
+
 
 \section{Properties of Cartesian-closed categories}
 
