@@ -1103,7 +1103,7 @@ by a universal property. Let's work up to what that universal property is.
 We can start by filling in our semantics for $\lambda$-formation, 
 which we know must look like:
 \begin{align}
-  \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} : \dbracket{\Gamma} \to \dbracket{B}^{\dbracket{A}}
+  \dbracket{\Gamma \vdash \pllam{x : A}{M} : {A \plto B}} : \dbracket{\Gamma} \to \dbracket{B}^{\dbracket{A}}
 \end{align}
 We are gathering clues: the above tells us that there must exist some 
 morphism $\dbracket{\Gamma}$ into the special object $\dbracket{B}^{\dbracket{A}}$. 
@@ -1130,7 +1130,7 @@ With this special morphism we can give an interpretation to application:
 \begin{align}
   \dbracket{\dfrac{\Gamma \vdash M : A \to B \quad \Gamma \vdash N : A}{\Gamma \vdash M~N : B}}
   = \dbracket{\Gamma} \mor{\langle \lambda M, \id \rangle} \dbracket{B}^{\dbracket{A}} \times \dbracket{\Gamma}
-  \mor{\langle \id, \dbracket{N} \rangle } \dbracket{B}^{\dbracket{A}} \times \dbracket{A}
+  \mor{\langle \pi_1, \dbracket{N} \circ\pi_2\rangle } \dbracket{B}^{\dbracket{A}} \times \dbracket{A}
   \mor{\app{}} \dbracket{B}
 \end{align}
 \end{fullwidth}
@@ -1157,8 +1157,9 @@ morphism $\lambda \dbracket{M}$. Now we can package up all this intuition
 into a definition of a universal property:
 
 \begin{definition}[Universal property of exponential object] \label{def:exponential}
+  \sloppy
   Let \(A\) and \(B\) be objects of a category \(\calC\) with products.
-  An \emph{exponential of \(A\) by \(B\)}
+  An \emph{\(A\)-exponential of \(B\)}
   is a pair \((B^A,\app)\) consisting of
   an object \(B^A\) of \(\calC\)
   and a morphism
@@ -1210,9 +1211,12 @@ Categories that have exponents get a special name: they are called
 
   Now let's show this choice validates the universal property.  Let $\Gamma$ be
   any set and $f$ be a function $\Gamma \times A \to B$. Then, there 
-  exists a function $\lambda f$ --
-  the morphism that maps $f$ to its graph -- such that the diagram commutes.
-  Observe that $\lambda f$ is unique by function extensionality, completing the proof.
+  exists a function $\lambda f : \Gamma \to B^A$ such that the diagram commutes:
+  it's the function that sends each \(\gamma \in \Gamma\)
+  to the graph \(\{(a,b) \mid f(\gamma,a) = b\}\)
+  representing the ``partial application'' of \(f\) to \(\gamma\).
+  Observe that, by function extensionality, $\lambda f$ is the unique function
+  making the diagram commute, completing the proof.
 \end{proof}
 
 % As a concrete example, consider the sets $A = \{a, b\}$ and $B = \{c, d\}$
@@ -1309,7 +1313,7 @@ First we prove (1):
 \begin{proof}
   We need to show that if $\alpha \land \gamma \models \beta$, then 
   $\gamma \models \neg \alpha \lor \beta$.
-  Suppose by contradiction that $\dbracket{\gamma} \not{\subseteq} \dbracket{\neg \alpha \lor \beta}$.
+  Suppose by contradiction that $\dbracket{\gamma} \not\subseteq \dbracket{\neg \alpha \lor \beta}$.
   Then, there exists an $x \in \Omega$ such that $x \in \dbracket{\gamma}$
   and $x \notin \dbracket{\neg \alpha \lor \beta}$. 
   By De Morgan's law we have that $x \in \dbracket{\alpha \land \neg \beta}$. 
@@ -1362,53 +1366,125 @@ hence is a Cartesian-closed category.
 % by assumption, and we must show that $\gamma \land \alpha \models (\alpha
 % \Rightarrow \beta) \land \alpha$.
 
-\subsection{Exponents in topological spaces}
-\todo{do the real line example to talk about intuitionistic logic. 
-it's pretty interesting}
+\subsection{An example from topology}
 
+In the previous we drew a picture of the exponential as a Venn diagram.
+The exponential was then the largest shaded region \(C\) satisfying
+the constraint \(A \cap C \subseteq B\).
+This spatial intuition can be made formal.
+
+\begin{definition}
+  A subset \(U\) of \(\R\) is \textbf{open}
+  if it is a union of open intervals.
+\end{definition}
+
+The set of open subsets of \(\R\), written \(\mathcal O(\R)\),
+forms a partial order under subset inclusion,
+and hence also a thin category (Construction~\ref{prop:every-preorder-is-a-category}).
+As a category, \(\mathcal O(\R)\) has finite products:
+the terminal object is the largest open subset of \(\R\),
+namely the whole space \(\R\),
+and the product of two opens subsets \(U\) and \(V\)
+is their intersection \(U\cap V\).
+
+\begin{proposition}
+  \(\mathcal O(\R)\) is Cartesian closed.
+\end{proposition}
+\begin{proof}
+  Following the intuition that the exponential of two objects \(U\) and \(V\)
+  is the largest object \(W\) such that \(U\cap W \subseteq V\),
+  we define
+  \[
+  V^U = \text{the largest open subset \(W\) of \(\R\) such that \(U\cap W\subseteq V\)}
+  \]
+  This subset can be expressed as the \textbf{interior}
+  of \((\R\setminus W) \cup V\). Pictorially,
+  \[\todo: U=(-\infty,0),V=\varnothing,V^U=(0,\infty)\]
+  Note that \(V^U\) does not include \(0\), even though \(\R\setminus U\) does.
+\end{proof}
 
 \subsection{A non-example: natural numbers and divisibility}
 It's worth exploring examples of categories that \emph{do not}
 have exponential objects. A good example of this 
 is the category $(\mathbb{N}, \preceq)$, the category of 
-natural numbers modulo divisibility.
+natural numbers with divisibility relations as morphisms.
 
-Let's see why this is the case. Pick two numbers, $A = 54$
-(which has factors $1,2,3,6,9,18,27$) 
-and $B = 42$ (which has factors $1,2,3,6,7,14,21$). Let's try to calculate $B^A$ in two different 
-situations:
-\begin{itemize}
-  \item First let $C = 3$. Then, we can fill in the diagram 
-  defining the exponential:
-  \begin{center}
- % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEYA2AAgB1e8AW3jd2AJm4BebgBYQAX1LpMufIRTtS7KrUYs2ADgVKQGbHgJEy26vWatEIAwD1g4+XwFZhcUWIU6MFAA5vBEoABmAE4QgkhkIDgQSOyKkTFxiAlJSGJpINGxudQ5iKkU8kA
-\begin{tikzcd}
-  3 \times 54 = 3 \arrow[rd] \arrow[d] &   \\
-  42^{54} \times 54 \arrow[r]            & 42
-  \end{tikzcd}
-  \end{center}
-  From the above we can conclude that $42^{54} = 3$.
+Let's see why this is the case.
+Concretely, we will show that \(2\) and \(3\)
+do not have an exponential.
 
-  \item Second let $C = 2$. Again we can fill in the diagram:
-  \begin{center}
- % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEYA2AAgB1e8AW3jd2AJm4BebgBYQAX1LpMufIRTtS7KrUYs2ADgVKQGbHgJEy26vWatEIAwD1g4+XwFZhcUWIU6MFAA5vBEoABmAE4QgkhkIDgQSOyKkTFxiAlJSGJpINGxudQ5iKkU8kA
-\begin{tikzcd}
-  2 \times 54 = 2 \arrow[rd] \arrow[d] &   \\
-  42^{54} \times 54 \arrow[r]            & 42
-  \end{tikzcd}
-  \end{center}
+Suppose that there \emph{was} an exponential \(k\).
+Then we would have two things.
+\begin{enumerate}
+\item A morphism \(k \times 2 \xrightarrow{\app} 3\).
+\item For any \(k'\)
+and any morphism \(k' \times 2 \to 3\),
+there exists a unique morphism \(k' \to k\) such that
+a triangle commutes.
+\end{enumerate}
+Unpacking point (1),
+we have that \(\mathsf{gcd}(k,2)\) divides \(3\) (because product in this
+category is greatest common divisor and morphisms are divisilibity relations).
+Unpacking point (2), we have that for any \(k'\) such that \(\mathsf{gcd}(k',2)\) divides \(3\),
+it holds that \(k'\) divides \(k\). The fact that the morphism \(k' \to k\)
+is the unique one making a given triangle commute does not mean much here because our category
+is thin: the moment we know a morphism \(k' \to k\) exists, we also know it must be the unique
+such morphism.
 
-  From this diagram we can conclude that $42^{54}$ must be even, and so cannot equal $3$. 
+What do these two conditions tell us about the supposed exponential object \(k\)?
+Intuitively, they say that \(k\) is the ``largest number \(k\) such that \(\mathsf{gcd}(k,2)\) divides \(3\)''.
+It is suspicious that there would be a largest such number: \(\mathsf{gcd}(k,2) = \mathsf{gcd}(3k,2)\)
+for any \(k\), so if \(\mathsf{gcd}(k,2)\) divides \(3\) then so does \(\mathsf{gcd}(3k,2)\).
+In short, we can always keep increasing \(k\) by multiplying it by \(3\), so there cannot be a largest such.
 
-\end{itemize}
+We can turn this intuitive argument into a rigorous one as follows.
+We will exhibit an counterexample to point (2) above. Set \(k' = 3k\).
+We have that \(\mathsf{gcd}(3k,2) = \mathsf{gcd}(k,2)\), and \(\mathsf{gcd}(k,2)\) divides \(3\),
+so \(\mathsf{gcd}(3k,2)\) divides \(3\) too. This fulfills the precondition of point (2).
+The conclusion of point (2) then tells us that
+\(3k\) divides \(k\). But this is impossible.
 
-Since two different objects satisfy the same universal property, 
-we can conclude that an even number is isomorphic to an 
-odd number in $(\mathbb{N}, \preceq)$. Such 
-objects are not isomorphic in this category, which is a 
-contradiction from which we can conclude that there is not 
-exponential object for $42^{54}$.
+Since we derived a contradiction starting from an arbitrary choice of \(k\) satisfying (1) and (2),
+this argument shows
+there can be no \(k\) satisfying the universal property of the exponential \(3^2\),
+and hence that
+$(\mathbb{N}, \preceq)$ is not Cartesian closed.
 
+%% Pick two numbers, $A = 54$
+%% (which has factors $1,2,3,6,9,18,27$)
+%% and $B = 42$ (which has factors $1,2,3,6,7,14,21$). Let's try to calculate $B^A$ in two different
+%% situations:
+%% \begin{itemize}
+%%   \item First let $C = 3$. Then, we can fill in the diagram
+%%   defining the exponential:
+%%   \begin{center}
+%%  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEYA2AAgB1e8AW3jd2AJm4BebgBYQAX1LpMufIRTtS7KrUYs2ADgVKQGbHgJEy26vWatEIAwD1g4+XwFZhcUWIU6MFAA5vBEoABmAE4QgkhkIDgQSOyKkTFxiAlJSGJpINGxudQ5iKkU8kA
+%% \begin{tikzcd}
+%%   3 \times 54 = 3 \arrow[rd] \arrow[d] &   \\
+%%   42^{54} \times 54 \arrow[r]            & 42
+%%   \end{tikzcd}
+%%   \end{center}
+%%   From the above we can conclude that $42^{54} = 3$.
+
+%%   \item Second let $C = 2$. Again we can fill in the diagram:
+%%   \begin{center}
+%%  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEYA2AAgB1e8AW3jd2AJm4BebgBYQAX1LpMufIRTtS7KrUYs2ADgVKQGbHgJEy26vWatEIAwD1g4+XwFZhcUWIU6MFAA5vBEoABmAE4QgkhkIDgQSOyKkTFxiAlJSGJpINGxudQ5iKkU8kA
+%% \begin{tikzcd}
+%%   2 \times 54 = 2 \arrow[rd] \arrow[d] &   \\
+%%   42^{54} \times 54 \arrow[r]            & 42
+%%   \end{tikzcd}
+%%   \end{center}
+
+%%   From this diagram we can conclude that $42^{54}$ must be even, and so cannot equal $3$.
+
+%% \end{itemize}
+
+%% Since two different objects satisfy the same universal property,
+%% we can conclude that an even number is isomorphic to an
+%% odd number in $(\mathbb{N}, \preceq)$. Such
+%% objects are not isomorphic in this category, which is a
+%% contradiction from which we can conclude that there is not
+%% exponential object for $42^{54}$.
 
 \section{CCCs are models of the simply-typed lambda calculus}
 Cartesian closed categories give us all the structure that we need to interpret
