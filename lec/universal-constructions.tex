@@ -1290,7 +1290,7 @@ Viewed from an order-theoretic perspective, the exponential object
 $\beta^\alpha$ is the \emph{greatest subset} of $\Omega$ such that
 $\dbracket{\alpha} \cap \dbracket{\beta^\alpha} \subseteq \dbracket{\beta}$. 
 We can draw this subset in green:
-\begin{center}
+\begin{center} \label{pic:venn-impl}
   \includegraphics[width=150px]{fig/venn-impl.png}
 \end{center}
 
@@ -1394,14 +1394,45 @@ is their intersection \(U\cap V\).
   Following the intuition that the exponential of two objects \(U\) and \(V\)
   is the largest object \(W\) such that \(U\cap W \subseteq V\),
   we define
-  \[
-  V^U = \text{the largest open subset \(W\) of \(\R\) such that \(U\cap W\subseteq V\)}
-  \]
-  This subset can be expressed as the \textbf{interior}
-  of \((\R\setminus W) \cup V\). Pictorially,
-  \[\todo: U=(-\infty,0),V=\varnothing,V^U=(0,\infty)\]
-  Note that \(V^U\) does not include \(0\), even though \(\R\setminus U\) does.
+  \begin{align}
+  V^U &= \text{the largest open subset \(W\) of \(\R\) such that \(U\cap W\subseteq V\)} \\
+      &= \text{the largest open subset \(W\) of \(\R\) contained in \((\R\setminus U) \cup V\)}.
+  \end{align}
+  This largest open subset has a name: it is called the
+  \textbf{interior} of \((\R\setminus U) \cup V\),
+  written \(\mathsf{int}((\R\setminus U) \cup V)\).
+  Intuitively, taking the interior of a set is a way of ``forcing'' it to be open,
+  by deleting all of its boundary points. For example, the interior of a closed interval is the corresponding
+  open interval: \(\mathsf{int}[0,1] = (0,1)\).
+  From this perspective, the subset \(\mathsf{int}((\R\setminus U) \cup V)\) defining the exponential \(V^U\)
+  is the largest open contained in \((\R\setminus U) \cup V\), which corresponds to the Venn diagram (\ref{pic:venn-impl}).
+  of \((\R\setminus W) \cup V\).
 \end{proof}
+As an example, let us compute the exponential where \(U = (-\infty,0)\) and \(V=\varnothing\).
+In this case,
+\begin{align}
+  V^U = \mathsf{int}([0,\infty) \cup \varnothing)
+      = \mathsf{int}[0,\infty)
+      = (0,\infty).
+\end{align}
+Note how, in the last step, the use of the interior operator ``rounds out'' the closed interval \([0,\infty]\)
+into the open interval \((0,\infty)\).
+
+Thinking of the exponential \(\varnothing^U\) as a ``complement'' or ``negation'' of \(U\),
+%% (following the intuitionistic definition of \(\neg A\) as \(A \Rightarrow \bot\)),
+this says that the complement of \((-\infty,0)\) in \(\mathcal O(\R)\) is \((0,\infty)\).
+Note that \(\R\) is \emph{not} the union of \(U\) and its complement:
+\[
+U \cup \varnothing^U
+=
+(-\infty,0) \cup (0,\infty)
+=
+\R\setminus\{0\}
+\ne \R
+\]
+What this demonstrates is that the law of excluded middle fails in \(\mathcal O(\R)\):
+the open subsets of \(\R\) form a model of intuitionistic propositional logic
+that refutes \(A \lor \neg A = \top\).
 
 \subsection{A non-example: natural numbers and divisibility}
 It's worth exploring examples of categories that \emph{do not}
@@ -1528,8 +1559,9 @@ Then we interpret terms as morphisms:
 
 These morphisms satisfy the equational theory of the simply-typed 
 lambda calculus:
-\begin{theorem}
-  Cartesian closed categories are models of the simply-typed 
+\begin{theorem} \label{thm:cccs}
+  Every Cartesian closed category is a
+  model of the simply-typed
   lambda calculus.
 \end{theorem}
 
