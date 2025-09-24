@@ -166,9 +166,35 @@ With this dictionary in hand, we can translate the standard definition of produc
 
 \end{proof}
 
+We can also go in the other direction: every product in the ordinary categorical sense can be turned into a PL-product.
+
 \begin{construction} \label{cons:prod-to-pl-prod}
   Any product can be turned into a PL-product.
 \end{construction}
+\begin{proof}
+  The previous construction provides a strong hint as to how to do this one.
+  Given a product \((A\times B, \mathsf{fst}, \mathsf{snd})\), define
+  \begin{align*}
+    \mathsf{Fst}_\Gamma(f) &= \mathsf{fst} \circ f \\
+    \mathsf{Snd}_\Gamma(f) &= \mathsf{snd} \circ f
+  \end{align*}
+  for all morphisms \(\Gamma \xrightarrow{f} A \times B\),
+  and
+  \begin{align*}
+    \mathsf{Pair}_\Gamma(f,g) &= \angled{f,g}
+  \end{align*}
+  for all morphisms \(\Gamma\xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\).
+  The fact that \(\mathsf{Fst}\) and \(\mathsf{Snd}\) respect substitution boil down to the following equations:
+  \begin{align*}
+    (\mathsf{fst} \circ f) \circ s &= \mathsf{fst} \circ (f \circ s)  \\
+    (\mathsf{snd} \circ f) \circ s &= \mathsf{snd} \circ (f \circ s)
+  \end{align*}
+  The fact that \(\mathsf{Pair}\) respects substitution boils down to Proposition~\ref{prop:tupling-nat}.
+
+  The \(\beta\) law follows from the equations \(\mathsf{fst} \circ \angled{f,g} = f\)
+  and \(\mathsf{snd} \circ \angled{f,g} = g\),
+  and the \(\eta\) law from the uniqueness property of \(\angled{f,g}\).
+\end{proof}
 
 \begin{proposition}
  Constructions
