@@ -1,185 +1,390 @@
 \chapter{Yoneda I}
 
-\noindent In set theory, functions enjoy the following nice properties.
-\begin{enumerate}
-\item Extensional equality: two functions \(f,g : X \to Y\)
-  are equal if and only if \(f(x) = g(x)\) for all elements \(x\) of \(X\).
-\item Elementwise definition:
-  to define a function \(f : X \to Y\),
-  it suffices give a relation,
-  called the \emph{graph of \(f\)},
-  such that each element \(X\)
-  is related exactly one element of \(Y\).
-\end{enumerate}
-The presence of elements makes functions much easier to work with.
-For instance, compare the proof \(X \times (Y \times Z) \cong (X\times Y) \times Z\)
-as sets with the abstract proof for an arbitrary category with products.
+We have seen two theorems about internal languages:
+Theorem~\ref{thm:calc-products} says that Calc can be used as a language for categories with finite products, and
+Theorem~\ref{thm:cccs} says that STLC can be used as a language for Cartesian closed categories.
 
-In this chapter we will see how to recover a similar kind of element-wise reasoning
-style that works in an arbitrary category.
-While objects of categories don't have elements,
-they do have \emph{generalized elements},
-which bring much of the benefits of elements in set theory
-to working in arbitrary categories.
+One way of thinking of these theorems is that they serve as a check that the definitions for
+terminal object, product, and exponential are working as expected.
+The keyword here is ``internalization'':
+the terminal object is the internalization of the singleton set,
+product is the internalization of Cartesian product of sets,
+and exponential is the internalization of morphism.
 
-The starting point for this generalization is the following
-proposition, which recasts ``element of a (finite) set'' into categorical language.
-\begin{proposition}[Elements in \(\FinSet\)]
-  Let \(X\) be an object of \(\FinSet\).
-  Elements of \(X\) are in bijection
-  with morphisms of \(\FinSet\)
-  from \(1\) to \(X\).
-\end{proposition}
-In light of this proposition, properties (1) and (2)
-above translate into the following statements about \(\FinSet\):
-\begin{itemize}
-\item \textbf{(Property 1)} Extensional equality:
-  Two morphisms \(f,g : X \to Y\)
-  in \(\FinSet\) are equal if and only if \(f \circ x = g \circ x\)
-  for all morphisms \(x : 1 \to X\).
-\item \textbf{(Property 2)} Elementwise definition:
-  to define a morphism \(f : X \to Y\)
-  of \(\FinSet\),
-  it suffices to give a relation \(R\)
-  such that each
-  morphism \(1 \to X\)
-  is related to exactly one morphism \(1 \to Y\).
-\end{itemize}
+The Yoneda lemma connects the internal to the external.
 
-\sh{Let's slow down and give some concrete examples of 
-``reasoning pointwise'' in finset. Give an example of 
-this element-wise definition.}
+First we have the hypothetical judgment \(\Gamma \vdash A\).
 
-\sh{define the notion of ``testing'' objects in a 
-category by considering morphisms into them}
+\begin{definition}
+  Let \(X\) and \(Y\) be objects of a category \(\calC\).
+  The set of morphisms from \(X\) to \(Y\),
+  written \(\calC(X,Y)\), is defined as follows:
+  \[
+  \calC(X,Y) := \{f \mid \dom(f) = X, \cod(f) = g\}.
+  \]
+\end{definition}
+This set is sometimes called the \textbf{hom-set} of \(\calC\) at \(X,Y\).\footnote{%
+  The word ``hom'' is an abbreviation of ``homomorphism'',
+  and the name hom-set comes from the fact many of the original motivating examples of categories
+  had morphisms that were homomorphisms between algebraic structures.}
 
-\section{From sets to categories}
-\sh{Transition systems, canonical loop and canonical edge}
+Next we have the inference rules, like
+\begin{mathpar}
+  \inferrule*
+    {\Gamma \vdash M : A \pltimes B}
+    {\Gamma \vdash \plfst{M} : A}
+\end{mathpar}
+This corresponds to functions
+\begin{align*}
+  \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
+\end{align*}
+Rules with multiple premises correspond to functions that take in multiple arguments.
+For example,
+\begin{mathpar}
+  \inferrule*
+    {\Gamma \vdash M : A
+      \\
+     \Gamma \vdash N : B
+    }
+    {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
+\end{mathpar}
+becomes a function
+\begin{align*}
+  \mathsf{Pair}_\Gamma : \calC(\Gamma,A) \times \calC(\Gamma,B) \to \calC(\Gamma,A\times B)
+\end{align*}
+The rules respect substitution:
+\begin{align*}
+  \plfst{M}[s] = \plfst{(M[s])}
+\end{align*}
+This corresponds to \(\mathsf{Fst}\) respecting composition:
+\begin{align*}
+  \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
+\end{align*}
 
-How to generalize the above situation to an arbitrary category?
-An arbitrary category might not have a terminal object \(1\).
-Even if they do, it's not guaranteed that functions can be
-defined and tested for equality simply via morphisms \(1 \to X\).
+With this dictionary in hand, we can translate the standard definition of product types into category theory.
 
-The trick is to replace the special object \(1\)
-with a \emph{quantification over all possible objects}.
-Compare the statement of extensionality for \(\FinSet\)
-above with the following proposition, which holds in any category:
+\begin{definition}
+  \sloppy
+  Let \(A\) and \(B\) be objects of a category \(\calC\).
+  A \emph{PL-product} of \(A\) and \(B\) consists of
+  \begin{itemize}
+  \item An object \(A \times B\)
+  \item For each object \(\Gamma\), functions
+    \begin{align*}
+      \mathsf{Fst}_\Gamma &: \calC(\Gamma,A\times B) \to \calC(\Gamma,A) \\
+      \mathsf{Snd}_\Gamma &: \calC(\Gamma,A\times B) \to \calC(\Gamma,B) \\
+      \mathsf{Pair}_\Gamma &: \calC(\Gamma,A)\times\calC(\Gamma,B) \to \calC(\Gamma,A\times B)
+    \end{align*}
+  \end{itemize}
+  such that
+  \begin{itemize}
+  \item \(\mathsf{Fst}\), \(\mathsf{Snd}\), and \(\mathsf{Pair}\) ``respect substitution'': for all
+    \(\Gamma'\xrightarrow{s}\Gamma\),
+    \begin{align*}
+      \mathsf{Fst}_{\Gamma}(f)\circ s &= \mathsf{Fst}_{\Gamma'}(f \circ s) & \text{for all \(\Gamma\xrightarrow{f} A \times B\)} \\
+      \mathsf{Snd}_{\Gamma}(f)\circ s &= \mathsf{Snd}_{\Gamma'}(f \circ s) & \text{for all \(\Gamma\xrightarrow{f} A \times B\)} \\
+      \mathsf{Pair}_{\Gamma}(f,g)\circ s &= \mathsf{Pair}_{\Gamma'}(f \circ s,g\circ s) & \text{for all \(\Gamma\xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\)}
+    \end{align*}
+  \item Analogs of the \(\beta\) and \(\eta\) laws hold:
+    \begin{align*}
+      \mathsf{Fst}_{\Gamma}(\mathsf{Pair}_{\Gamma}(f,g)) &= f   & \text{for all \(\Gamma\xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\)} \\
+      \mathsf{Snd}_{\Gamma}(\mathsf{Pair}_{\Gamma}(f,g)) &= g   & \text{for all \(\Gamma\xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\)} \\
+      \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(f),\mathsf{Snd}_\Gamma(f)) &= f   & \text{for all \(\Gamma\xrightarrow{f} A\times B\)}
+    \end{align*}
+  \end{itemize}
+\end{definition}
 
-\begin{proposition}[Generalized extensionality] \label{prop:generalized-extensionality}
-  Let \(f,g : X \to Y\) be two morphisms in a category \(\calC\).
-  Suppose that \(f \circ x = g \circ x\) for all objects \(\Gamma\)
-  and all morphisms \(x : \Gamma \to X\).
-  Then \(f = g\).
-\end{proposition}
+\begin{construction} \label{cons:pl-prod-to-prod}
+  Any PL-product can be turned into a product.
+\end{construction}
 \begin{proof}
-  Letting \(\Gamma = X\) and \(x = \idt_X\) gives \(f \circ \idt_X = g \circ \idt_X\).
-  Simplifying yields \(f = g\).
+  Suppose given a PL-product of two objects \(A\) and \(B\) of a category \(\calC\).
+  Unpacking this, we have an object \(A \times B\)
+  and functions \(\mathsf{Fst}_\Gamma\), \(\mathsf{Snd}_\Gamma\), and \(\mathsf{Pair}_\Gamma\)
+  that respect substitution and satisfy the \(\beta\) and \(\eta\) laws.
+
+  We will show how to use this information to turn the object \(A \times B\)
+  into a categorical product of \(A\) and \(B\).
+  To do this we will need to build morphisms
+  \begin{align*}
+  \mathsf{fst} &: A \times B \to A\\
+  \mathsf{snd} &: A \times B \to B
+  \end{align*}
+  that satisfy the universal property of products.
+
+  These morphisms can be defined in terms of the functions \(\mathsf{Fst}\) and \(\mathsf{Snd}\).
+  To see how, let's take a closer look at the type of \(\mathsf{Fst}\).
+  \[
+    \mathsf{Fst}_\Gamma : \calC(\Gamma, A\times B) \to \calC(\Gamma, A)
+    \qquad\text{for all objects \(\Gamma\)}
+  \]
+  How can we get a morphism from \(A \times B\) to \(A\) out of this function?
+  For starters, we have to evaluate the function on an input in order to get anything from it at all.
+  The type of \(\mathsf{Fst}_\Gamma\) indicates that if we input a morphism from \(\Gamma\) to \(A \times B\),
+  then we will get back a morphism from \(\Gamma\) to \(A\).
+  To get back a morphism \(A \times B\) to \(A\), then, we should set \(\Gamma = A \times B\):
+  \[
+    \mathsf{Fst}_{A\times B}: \calC(A \times B, A\times B) \to \calC(A \times B, A)
+  \]
+  Now all we need to do is find a morphism from \(A \times B\) to itself to give
+  to this function as input. But there is always a natural choice of such a morphism, namely the identity \(\idt_{A\times B}\) on \((A \times B)\)!
+  This gives us a definition of \(\mathsf{fst}\).
+  \[
+    \mathsf{fst} := \mathsf{Fst}_{A\times B}(\idt_{A\times B})
+  \]
+  Symmetrically, we can define a morphism \(\mathsf{snd}\) from \(A \times B\) to \(B\)
+  in terms of \(\mathsf{Snd}\):
+  \[
+    \mathsf{snd} := \mathsf{Snd}_{A\times B}(\idt_{A\times B})
+  \]
+
+  Now all that's left is to show that \((A\times B, \mathsf{fst},\mathsf{snd})\) satisfies the universal property
+  of product. For this, consider an arbitrary pair of morphisms \(\Gamma \xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\).
+  We must find a unique \(\Gamma \xrightarrow{h} A \times B\) satisfying \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
+
+  Set \(h = \mathsf{Pair}_\Gamma(f,g)\). This choice of \(h\) satisfies \(\mathsf{fst}\circ h = f\):
+  \begin{align*}
+    \mathsf{fst} \circ h
+    &= \mathsf{Fst}_{A\times B}(\idt_{A\times B}) \circ \mathsf{Pair}_{\Gamma}(f,g) & \text{unwinding definitions} \\
+    &= \mathsf{Fst}_{\Gamma}(\mathsf{Pair}_{\Gamma}(f,g)) & \text{\(\mathsf{Fst}\) respects substitution} \\
+    &= f & \text{\(\beta\)}
+  \end{align*}
+  The symmetrical argument shows \(\mathsf{snd} \circ h = g\).
+
+  To show uniqueness, suppose \(h'\) satisfies \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
+  Then the following calculation uses the \(\eta\) law to establish that \(h' = h\).
+  \begin{align*}
+    h' &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(h'),\mathsf{Snd}_\Gamma(h')) & \text{\(\eta\)} \\
+     &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_{A\times B}(\idt_{A\times B})\circ h',\mathsf{Snd}_{A\times B}(\idt_{A\times B})\circ h') & \text{substitution} \\
+     &= \mathsf{Pair}_\Gamma(\mathsf{fst}\circ h',\mathsf{snd}\circ h') & \\
+     &= \mathsf{Pair}_\Gamma(f,g) & \text{assumption} \\
+     &= \mathsf{Pair}_\Gamma(\mathsf{fst}\circ h,\mathsf{snd} \circ h) & \text{shown above} \\
+     &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_{A\times B}(\idt_{A\times B})\circ h,\mathsf{Snd}_{A\times B}(\idt_{A\times B}) \circ h) & \\
+     &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(h),\mathsf{Snd}_\Gamma(h)) & \text{substitution} \\
+     &= h & \text{\(\eta\)}
+  \end{align*}
+
 \end{proof}
 
-\begin{definition}[Generalized element]
-  Let \(X\) and \(\Gamma\) be objects of a category \(\calC\).
-  A \emph{generalized element of \(X\) at stage \(\Gamma\)}
-  is a morphism \(x : \Gamma \to X\).
-  The set of generalized elements of \(X\) at stage \(\Gamma\)
-  will be written \(\genelt{X}{\Gamma}\).
-\end{definition}
+We can also go in the other direction: every product in the ordinary categorical sense can be turned into a PL-product.
 
-In this new language, Proposition~\ref{prop:generalized-extensionality}
-says that two morphisms of a category are equal if
-they act the same on all generalized elements.
+\begin{construction} \label{cons:prod-to-pl-prod}
+  Any product can be turned into a PL-product.
+\end{construction}
+\begin{proof}
+  The previous construction provides a strong hint as to how to do this one.
+  Given a product \((A\times B, \mathsf{fst}, \mathsf{snd})\), define
+  \begin{align*}
+    \mathsf{Fst}_\Gamma(f) &= \mathsf{fst} \circ f \\
+    \mathsf{Snd}_\Gamma(f) &= \mathsf{snd} \circ f
+  \end{align*}
+  for all morphisms \(\Gamma \xrightarrow{f} A \times B\),
+  and
+  \begin{align*}
+    \mathsf{Pair}_\Gamma(f,g) &= \angled{f,g}
+  \end{align*}
+  for all morphisms \(\Gamma\xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\).
+  The fact that \(\mathsf{Fst}\) and \(\mathsf{Snd}\) respect substitution boil down to the following equations:
+  \begin{align*}
+    (\mathsf{fst} \circ f) \circ s &= \mathsf{fst} \circ (f \circ s)  \\
+    (\mathsf{snd} \circ f) \circ s &= \mathsf{snd} \circ (f \circ s)
+  \end{align*}
+  The fact that \(\mathsf{Pair}\) respects substitution boils down to Proposition~\ref{prop:tupling-nat}.
 
-Generalizing the principle of property 2, the elementwise definition,
-is trickier. Since the single object \(1\) has been replaced by a quantification over
-all objects \(\Gamma\), the notion of ``function'' as graph
-needs to be adjusted similarly.
-
-\begin{definition}[Generalized function]
-  Let \(X,Y\) be objects of a category \(\calC\).
-  A \emph{generalized function} \(\varphi\) from \(X\) to \(Y\)
-  is a family of functions
-  \(\varphi_\Gamma \subseteq \genelt{X}{\Gamma} \to \genelt{Y}{\Gamma}\)
-  indexed by objects \(\Gamma\) of \(\calC\)
-  that respects ``change of stage''
-  in the sense that for all \(p : \Gamma' \to \Gamma\)
-  and all \(x \in \genelt{X}{\Gamma}\)
-  it holds that \(\varphi_\Gamma(x\circ p) = \varphi_\gamma(x)\circ p\).
-\end{definition}
-
-\begin{proposition}[Generalized elementwise definition]
-  \label{prop:generalized-elementwise-definition}
-  Let \(X,Y\) be objects of a category \(\calC\).
-  Let \(\varphi\) be a generalized function from \(X\) to \(Y\).
-  There exists a morphism \(f : X \to Y\)
-  such that \(\varphi_\Gamma(x) = f \circ x\)
-  for all objects \(\Gamma\) and all \(x \in \genelt{X}{\Gamma}\).
-\end{proposition}
+  The \(\beta\) law follows from the equations \(\mathsf{fst} \circ \angled{f,g} = f\)
+  and \(\mathsf{snd} \circ \angled{f,g} = g\),
+  and the \(\eta\) law from the uniqueness property of \(\angled{f,g}\).
+\end{proof}
 
 \begin{proposition}
-  \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
-  in any category \(\calC\) with products.
+ Constructions
+ \ref{cons:pl-prod-to-prod}
+ and
+ \ref{cons:prod-to-pl-prod}
+ are mutually inverse.
 \end{proposition}
-\begin{proof}
-  Let \(\varphi\) be a family of functions
-  from generalized elements of \(X \times (Y\times Z)\)
-  to generalized elements of \((X\times Y) \times Z\)
-  defined as follows:
-  \[
-  \varphi_\Gamma\angled{x,\angled{y,z}}
-  =\angled{\angled{x,y},z}
-  \text{ for all \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\)}
-  \]
-  This function respects change of stage:
-  \begin{align}
-    \varphi_\Gamma\angled{x,\angled{y,z}}\circ p
-    &= \angled{\angled{x,y},z}\circ p\\
-    &= \angled{\angled{x\circ p,y\circ p},z \circ p}\\
-    &= \varphi_\Gamma\angled{x\circ p,\angled{y\circ p,z\circ p}}\\
-    &= \varphi_\Gamma(\angled{x,\angled{y,z}}\circ p).
-  \end{align}
-  Hence \(\varphi\) is a generalized function from \(X \times (Y\times Z)\)
-  to \((X\times Y) \times Z\) and,
-  by generalized elementwise definition,
-  there exists a morphism \(f : X \times (Y\times Z) \to (X\times Y) \times Z\),
-  such that \(f\circ \angled{x,\angled{y,z}}
-  = \varphi_\Gamma\angled{x,\angled{y,z}}
-  = \angled{\angled{x,y},z}\)
-  for all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\).
 
-  Similarly, we can define a morphism \(g\) going the other way,
-  in terms of the following generalized function \(\psi\):
-  \[
-  \psi_\Gamma\angled{\angled{x,y},z} = \angled{x,\angled{y,z}}.
-  \]
 
-  Now for
-  all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\),
-  it holds that
-  \begin{align}
-    (f\circ g)\circ \angled{\angled{x,y},z}
-    &= f\circ (g\circ \angled{\angled{x,y},z}) \\
-    &= f\circ (\psi_\Gamma\angled{\angled{x,y},z}) \\
-    &= f\circ \angled{x,\angled{y,z}} \\
-    &= \varphi_\Gamma\angled{x,\angled{y,z}} \\
-    &= \angled{\angled{x,y},z} \\
-    &= \idt_{(X\times Y) \times Z} \circ \angled{\angled{x,y},z}
-  \end{align}
-  so \(f\circ g = \idt_{(X\times Y) \times Z}\)
-  by generalized extensionality.
+%% \noindent In set theory, functions enjoy the following nice properties.
+%% \begin{enumerate}
+%% \item Extensional equality: two functions \(f,g : X \to Y\)
+%%   are equal if and only if \(f(x) = g(x)\) for all elements \(x\) of \(X\).
+%% \item Elementwise definition:
+%%   to define a function \(f : X \to Y\),
+%%   it suffices give a relation,
+%%   called the \emph{graph of \(f\)},
+%%   such that each element \(X\)
+%%   is related exactly one element of \(Y\).
+%% \end{enumerate}
+%% The presence of elements makes functions much easier to work with.
+%% For instance, compare the proof \(X \times (Y \times Z) \cong (X\times Y) \times Z\)
+%% as sets with the abstract proof for an arbitrary category with products.
 
-  An analogous argument gives \(g \circ f = \idt_{X\times (Y\times Z)}\).
-  Hence \(f\) and \(g\) form an isomorphism
-  between \(X \times (Y\times Z)\) and \((X\times Y) \times Z\).
-\end{proof}
-Note the similarity between this proof and the standard set-theoretic
-argument that \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
-when \(X,Y,Z\) are sets.
-The key differences in this more general setting are (1)
-the quantification over stages \(\Gamma\)
-and (2) the checks that generalized functions respect change of stage.
+%% In this chapter we will see how to recover a similar kind of element-wise reasoning
+%% style that works in an arbitrary category.
+%% While objects of categories don't have elements,
+%% they do have \emph{generalized elements},
+%% which bring much of the benefits of elements in set theory
+%% to working in arbitrary categories.
 
-If you want to learn more about this perspective, check out
-Tom Leinster's ``\href{https://webhomes.maths.ed.ac.uk/~tl/elements.pdf}{Doing without diagrams}''.
+%% The starting point for this generalization is the following
+%% proposition, which recasts ``element of a (finite) set'' into categorical language.
+%% \begin{proposition}[Elements in \(\FinSet\)]
+%%   Let \(X\) be an object of \(\FinSet\).
+%%   Elements of \(X\) are in bijection
+%%   with morphisms of \(\FinSet\)
+%%   from \(1\) to \(X\).
+%% \end{proposition}
+%% In light of this proposition, properties (1) and (2)
+%% above translate into the following statements about \(\FinSet\):
+%% \begin{itemize}
+%% \item \textbf{(Property 1)} Extensional equality:
+%%   Two morphisms \(f,g : X \to Y\)
+%%   in \(\FinSet\) are equal if and only if \(f \circ x = g \circ x\)
+%%   for all morphisms \(x : 1 \to X\).
+%% \item \textbf{(Property 2)} Elementwise definition:
+%%   to define a morphism \(f : X \to Y\)
+%%   of \(\FinSet\),
+%%   it suffices to give a relation \(R\)
+%%   such that each
+%%   morphism \(1 \to X\)
+%%   is related to exactly one morphism \(1 \to Y\).
+%% \end{itemize}
+
+%% \sh{Let's slow down and give some concrete examples of
+%% ``reasoning pointwise'' in finset. Give an example of
+%% this element-wise definition.}
+
+%% \sh{define the notion of ``testing'' objects in a
+%% category by considering morphisms into them}
+
+%% \section{From sets to categories}
+%% \sh{Transition systems, canonical loop and canonical edge}
+
+%% How to generalize the above situation to an arbitrary category?
+%% An arbitrary category might not have a terminal object \(1\).
+%% Even if they do, it's not guaranteed that functions can be
+%% defined and tested for equality simply via morphisms \(1 \to X\).
+
+%% The trick is to replace the special object \(1\)
+%% with a \emph{quantification over all possible objects}.
+%% Compare the statement of extensionality for \(\FinSet\)
+%% above with the following proposition, which holds in any category:
+
+%% \begin{proposition}[Generalized extensionality] \label{prop:generalized-extensionality}
+%%   Let \(f,g : X \to Y\) be two morphisms in a category \(\calC\).
+%%   Suppose that \(f \circ x = g \circ x\) for all objects \(\Gamma\)
+%%   and all morphisms \(x : \Gamma \to X\).
+%%   Then \(f = g\).
+%% \end{proposition}
+%% \begin{proof}
+%%   Letting \(\Gamma = X\) and \(x = \idt_X\) gives \(f \circ \idt_X = g \circ \idt_X\).
+%%   Simplifying yields \(f = g\).
+%% \end{proof}
+
+%% \begin{definition}[Generalized element]
+%%   Let \(X\) and \(\Gamma\) be objects of a category \(\calC\).
+%%   A \emph{generalized element of \(X\) at stage \(\Gamma\)}
+%%   is a morphism \(x : \Gamma \to X\).
+%%   The set of generalized elements of \(X\) at stage \(\Gamma\)
+%%   will be written \(\genelt{X}{\Gamma}\).
+%% \end{definition}
+
+%% In this new language, Proposition~\ref{prop:generalized-extensionality}
+%% says that two morphisms of a category are equal if
+%% they act the same on all generalized elements.
+
+%% Generalizing the principle of property 2, the elementwise definition,
+%% is trickier. Since the single object \(1\) has been replaced by a quantification over
+%% all objects \(\Gamma\), the notion of ``function'' as graph
+%% needs to be adjusted similarly.
+
+%% \begin{definition}[Generalized function]
+%%   Let \(X,Y\) be objects of a category \(\calC\).
+%%   A \emph{generalized function} \(\varphi\) from \(X\) to \(Y\)
+%%   is a family of functions
+%%   \(\varphi_\Gamma \subseteq \genelt{X}{\Gamma} \to \genelt{Y}{\Gamma}\)
+%%   indexed by objects \(\Gamma\) of \(\calC\)
+%%   that respects ``change of stage''
+%%   in the sense that for all \(p : \Gamma' \to \Gamma\)
+%%   and all \(x \in \genelt{X}{\Gamma}\)
+%%   it holds that \(\varphi_\Gamma(x\circ p) = \varphi_\gamma(x)\circ p\).
+%% \end{definition}
+
+%% \begin{proposition}[Generalized elementwise definition]
+%%   \label{prop:generalized-elementwise-definition}
+%%   Let \(X,Y\) be objects of a category \(\calC\).
+%%   Let \(\varphi\) be a generalized function from \(X\) to \(Y\).
+%%   There exists a morphism \(f : X \to Y\)
+%%   such that \(\varphi_\Gamma(x) = f \circ x\)
+%%   for all objects \(\Gamma\) and all \(x \in \genelt{X}{\Gamma}\).
+%% \end{proposition}
+
+%% \begin{proposition}
+%%   \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
+%%   in any category \(\calC\) with products.
+%% \end{proposition}
+%% \begin{proof}
+%%   Let \(\varphi\) be a family of functions
+%%   from generalized elements of \(X \times (Y\times Z)\)
+%%   to generalized elements of \((X\times Y) \times Z\)
+%%   defined as follows:
+%%   \[
+%%   \varphi_\Gamma\angled{x,\angled{y,z}}
+%%   =\angled{\angled{x,y},z}
+%%   \text{ for all \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\)}
+%%   \]
+%%   This function respects change of stage:
+%%   \begin{align}
+%%     \varphi_\Gamma\angled{x,\angled{y,z}}\circ p
+%%     &= \angled{\angled{x,y},z}\circ p\\
+%%     &= \angled{\angled{x\circ p,y\circ p},z \circ p}\\
+%%     &= \varphi_\Gamma\angled{x\circ p,\angled{y\circ p,z\circ p}}\\
+%%     &= \varphi_\Gamma(\angled{x,\angled{y,z}}\circ p).
+%%   \end{align}
+%%   Hence \(\varphi\) is a generalized function from \(X \times (Y\times Z)\)
+%%   to \((X\times Y) \times Z\) and,
+%%   by generalized elementwise definition,
+%%   there exists a morphism \(f : X \times (Y\times Z) \to (X\times Y) \times Z\),
+%%   such that \(f\circ \angled{x,\angled{y,z}}
+%%   = \varphi_\Gamma\angled{x,\angled{y,z}}
+%%   = \angled{\angled{x,y},z}\)
+%%   for all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\).
+
+%%   Similarly, we can define a morphism \(g\) going the other way,
+%%   in terms of the following generalized function \(\psi\):
+%%   \[
+%%   \psi_\Gamma\angled{\angled{x,y},z} = \angled{x,\angled{y,z}}.
+%%   \]
+
+%%   Now for
+%%   all objects \(\Gamma\) and morphisms \(x:\Gamma\to X,y:\Gamma\to Y,z:\Gamma\to Z\),
+%%   it holds that
+%%   \begin{align}
+%%     (f\circ g)\circ \angled{\angled{x,y},z}
+%%     &= f\circ (g\circ \angled{\angled{x,y},z}) \\
+%%     &= f\circ (\psi_\Gamma\angled{\angled{x,y},z}) \\
+%%     &= f\circ \angled{x,\angled{y,z}} \\
+%%     &= \varphi_\Gamma\angled{x,\angled{y,z}} \\
+%%     &= \angled{\angled{x,y},z} \\
+%%     &= \idt_{(X\times Y) \times Z} \circ \angled{\angled{x,y},z}
+%%   \end{align}
+%%   so \(f\circ g = \idt_{(X\times Y) \times Z}\)
+%%   by generalized extensionality.
+
+%%   An analogous argument gives \(g \circ f = \idt_{X\times (Y\times Z)}\).
+%%   Hence \(f\) and \(g\) form an isomorphism
+%%   between \(X \times (Y\times Z)\) and \((X\times Y) \times Z\).
+%% \end{proof}
+%% Note the similarity between this proof and the standard set-theoretic
+%% argument that \(X \times (Y\times Z) \cong (X \times Y) \times Z\)
+%% when \(X,Y,Z\) are sets.
+%% The key differences in this more general setting are (1)
+%% the quantification over stages \(\Gamma\)
+%% and (2) the checks that generalized functions respect change of stage.
+
+%% If you want to learn more about this perspective, check out
+%% Tom Leinster's ``\href{https://webhomes.maths.ed.ac.uk/~tl/elements.pdf}{Doing without diagrams}''.
 
 \chapter{Yoneda II: indexed set theory and representability}
 
