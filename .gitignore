@@ -20,3 +20,5 @@ submodules
 *.bcf-SAVE-ERROR
 *.pdf
 *.toc
+*.synctex
+*.synctex(busy)
