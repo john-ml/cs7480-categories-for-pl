@@ -1,40 +1,64 @@
 \chapter{Yoneda I}
 
 We have seen two theorems about internal languages:
-Theorem~\ref{thm:calc-products} says that Calc can be used as a language for categories with finite products, and
-Theorem~\ref{thm:cccs} says that STLC can be used as a language for Cartesian closed categories.
+Theorem~\ref{thm:calc-products} says that Calc can be used as a language for
+categories with finite products, and Theorem~\ref{thm:cccs} says that STLC can
+be used as a language for Cartesian closed categories.
 
-One way of thinking of these theorems is that they serve as a check that the definitions for
-terminal object, product, and exponential are working as expected.
-The keyword here is ``internalization'':
-the terminal object is the internalization of the singleton set,
-product is the internalization of Cartesian product of sets,
-and exponential is the internalization of morphism.
+One way of thinking of these theorems is that they serve as a check that the
+definitions for terminal object, product, and exponential are working as
+expected.  The keyword here is ``internalization'': the terminal object is the
+internalization of the singleton set, product is the internalization of
+Cartesian product of sets, and exponential is the internalization of morphism.
+Over the next several chapters we will be working towards understanding the 
+famous \emph{Yoneda lemma}, widely regarded as one of the most important 
+ideas in category theory. 
+Like many big ideas in mathematics, there are a variety of perspectives one can 
+have on the Yoneda lemma that lend themselves better to different intuitions.
+The perspective we will be pursuing here is that 
+the Yoneda lemma \emph{connects the internal to the external}.
 
-The Yoneda lemma connects the internal to the external.
+We begin with the notion of a \emph{hom-set}:
 
-First we have the hypothetical judgment \(\Gamma \vdash A\).
+\vspace{0.2cm}
 
-\begin{definition}
+\marginnote{%
+  The word ``hom'' is an abbreviation of ``homomorphism'',
+  and the name hom-set comes from the fact many of the original motivating examples of categories
+  had morphisms that were homomorphisms between algebraic structures.}
+\begin{definition}[Hom-set]
   Let \(X\) and \(Y\) be objects of a category \(\calC\).
-  The set of morphisms from \(X\) to \(Y\),
-  written \(\calC(X,Y)\), is defined as follows:
+  The \emph{hom-set} of $\calC$ at $X$ and $Y$, 
+  written \(\calC(X,Y)\),
+  is the set of morphisms from \(X\) to \(Y\):
   \[
   \calC(X,Y) := \{f \mid \dom(f) = X, \cod(f) = g\}.
   \]
 \end{definition}
-This set is sometimes called the \textbf{hom-set} of \(\calC\) at \(X,Y\).\footnote{%
-  The word ``hom'' is an abbreviation of ``homomorphism'',
-  and the name hom-set comes from the fact many of the original motivating examples of categories
-  had morphisms that were homomorphisms between algebraic structures.}
 
-Next we have the inference rules, like
+Our first step towards the Yoneda perspective is to begin to characterize
+objects by their hom-sets.  In the previous chapters we described, in a somewhat
+ad-hoc way, how to extract morphisms and universal properties from typing
+judgments and equational theories of programs. 
+We will now become much 
+more formal about this process.
+
+\section{Deriving universal properties}
+Our goal now is to systematically derive, from first principles (meaning, without any creativity), the universal
+property that corresponds to products.
+We begin with a hypothetical judgment \(\Gamma \vdash M : A\).
+Next we have the inference rules like:
 \begin{mathpar}
   \inferrule*
     {\Gamma \vdash M : A \pltimes B}
     {\Gamma \vdash \plfst{M} : A}
 \end{mathpar}
-This corresponds to functions
+
+The first step in this process is to transcribe typing judgments into 
+\emph{functions between hom-sets}.
+The premise of the judgment will be the domain of the function, 
+and the consequence of the judgment will be the codomain, like so:
+
 \begin{align*}
   \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
 \end{align*}
@@ -63,10 +87,10 @@ This corresponds to \(\mathsf{Fst}\) respecting composition:
 
 With this dictionary in hand, we can translate the standard definition of product types into category theory.
 
-\begin{definition}
+\begin{definition}[PL-product]
   \sloppy
   Let \(A\) and \(B\) be objects of a category \(\calC\).
-  A \emph{PL-product} of \(A\) and \(B\) consists of
+  A \emph{PL-product} of \(A\) and \(B\) consists of:
   \begin{itemize}
   \item An object \(A \times B\)
   \item For each object \(\Gamma\), functions
