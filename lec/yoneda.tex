@@ -58,10 +58,18 @@ The first step in this process is to transcribe typing judgments into
 \emph{functions between hom-sets}.
 The premise of the judgment will be the domain of the function, 
 and the consequence of the judgment will be the codomain, like so:
-
-\begin{align*}
+\begin{align}
   \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
-\end{align*}
+\end{align}
+Let's pause to inspect the unusual shape of this function $\mathsf{Fst}_\Gamma$.
+First, observe that this is a function between two sets: this is \emph{not} a
+morphism in the category $\calC$.  Second, it is a function between two sets of
+morphisms with the same domain, $\Gamma$.  And third, the function is
+\emph{indexed by $\Gamma$}, written with a subscript: we will build towards 
+the idea that
+there is some family of ``\textsf{Fst}-like functions'' that ought to behave
+coherently for different choices of context $\Gamma$.
+
 Rules with multiple premises correspond to functions that take in multiple arguments.
 For example,
 \begin{mathpar}
