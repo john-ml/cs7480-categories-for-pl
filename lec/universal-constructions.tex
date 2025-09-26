@@ -1183,7 +1183,7 @@ that we're familiar with. We'll begin with the category of finite sets $\FinSet$
 For two finite sets $A$ and $B$, the exponential $B^A$ is an object that
 represents the set of all functions from $A$ to $B$.
 For instance, suppose $A = \{a, b\}$ and $B = \{c, d\}$.
-Then, there are 4 possible functions between these two sets:
+Then, there are 4 possible functions between these two sets: \sh{add $\Gamma = \{\star\}$}
 \begin{align*}
   f_1 &= a \mapsto c, b \mapsto c \\
   f_2 &= a \mapsto c, b \mapsto d \\
@@ -1192,7 +1192,7 @@ Then, there are 4 possible functions between these two sets:
 \end{align*}
 
 The crucial idea is that this collection of 4 morphisms can itself 
-be represent as a finite set.
+be represented as a finite set.
 Recall that the \emph{graph} of a function $f : A \to B$ 
 is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
 of $f$. Then, the exponential object $B^A$ is the \emph{finite 
@@ -1419,14 +1419,14 @@ the reals satisfying that, for any $x \in U$,
 an $\epsilon$-ball around $x$ is also contained in $U$.
 I.e.,
 there exists an $\epsilon > 0$ 
-such that $x - \epsilon < x < \epsilon \subseteq U$.
+such that $(x-\epsilon, x + \epsilon) \subseteq U$.
 }
 \begin{definition}[Open set]
   \sloppy
   A subset \(U\) of of the real numbers \(\R\) is \textbf{open}
-  if it is a (possibly countably infinite) union of open intervals, where an open interval 
+  if it is a (possibly infinite) union of open intervals, where an open interval 
   $(a, b)$ is the collection of real numbers between $a$ and $b$
-  exluding $a$ and $b$, i.e.  $\{r \mid a < r < b\}$.
+  excluding $a$ and $b$, i.e.  $\{r \mid a < r < b\}$.
 \end{definition}
 
 The set of all open subsets of \(\R\), written \(\mathcal O(\R)\),
