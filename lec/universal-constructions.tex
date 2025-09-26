@@ -1404,18 +1404,32 @@ hence is a Cartesian-closed category.
 % \Rightarrow \beta) \land \alpha$.
 
 \subsection{An example from topology}
+Category theory is a bridge between many branches of mathematics, and we 
+can gain significant insight into categorical definitions by viewing them 
+through the lens of different mathematical subfields. Many important 
+developments in category theory stemmed from topology, so we explore 
+some of the basics of topology here.
 
-In the previous we drew a picture of the exponential as a Venn diagram.
-The exponential was then the largest shaded region \(C\) satisfying
-the constraint \(A \cap C \subseteq B\).
-This spatial intuition can be made formal.
+In the previous section we drew a picture of the exponential as a Venn diagram.  The
+exponential was then the largest shaded region \(C\) satisfying the constraint
+\(A \cap C \subseteq B\).  This spatial intuition can be made formal.
 
-\begin{definition}
-  A subset \(U\) of \(\R\) is \textbf{open}
-  if it is a union of open intervals.
+\marginnote{An equivalent way to define an open set is a subset $U$ of 
+the reals satisfying that, for any $x \in U$, 
+an $\epsilon$-ball around $x$ is also contained in $U$.
+I.e.,
+there exists an $\epsilon > 0$ 
+such that $x - \epsilon < x < \epsilon \subseteq U$.
+}
+\begin{definition}[Open set]
+  \sloppy
+  A subset \(U\) of of the real numbers \(\R\) is \textbf{open}
+  if it is a (possibly countably infinite) union of open intervals, where an open interval 
+  $(a, b)$ is the collection of real numbers between $a$ and $b$
+  exluding $a$ and $b$, i.e.  $\{r \mid a < r < b\}$.
 \end{definition}
 
-The set of open subsets of \(\R\), written \(\mathcal O(\R)\),
+The set of all open subsets of \(\R\), written \(\mathcal O(\R)\),
 forms a partial order under subset inclusion,
 and hence also a thin category (Construction~\ref{prop:every-preorder-is-a-category}).
 As a category, \(\mathcal O(\R)\) has finite products:
@@ -1467,9 +1481,11 @@ U \cup \varnothing^U
 \R\setminus\{0\}
 \ne \R
 \]
-What this demonstrates is that the law of excluded middle fails in \(\mathcal O(\R)\):
-the open subsets of \(\R\) form a model of intuitionistic propositional logic
-that refutes \(A \lor \neg A = \top\).
+What this demonstrates is that the law of excluded middle fails in \(\mathcal
+O(\R)\): the open subsets of \(\R\) form a model of intuitionistic propositional
+logic that refutes \(A \lor \neg A = \top\). This is a somewhat surprising 
+bridge between geometry and logic, which we will explore later if we have 
+time.
 
 \subsection{A non-example: natural numbers and divisibility}
 It's worth exploring examples of categories that \emph{do not}
