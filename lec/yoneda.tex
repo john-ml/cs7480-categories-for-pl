@@ -1,31 +1,52 @@
 \chapter{Yoneda I: Deriving universal properties}
 
-We have seen two theorems about internal languages:
-\cref{thm:calc-products} says that Calc can be used as a language for
-categories with finite products, and \cref{thm:cccs} says that STLC can
-be used as a language for Cartesian closed categories.
 
-One way of thinking of these theorems is that they serve as a check that the
-definitions for terminal object, product, and exponential are working as
-expected.  The keyword here is ``internalization'': the terminal object is the
-internalization of the singleton set, product is the internalization of
-Cartesian product of sets, and exponential is the internalization of morphism.
-Over the next several chapters we will be working towards understanding the 
-famous \emph{Yoneda lemma}, widely regarded as one of the most important 
-ideas in category theory. 
-Like many big ideas in mathematics, there are a variety of perspectives one can 
-have on the Yoneda lemma that lend themselves better to different intuitions.
-The perspective we will be pursuing here is that 
-the Yoneda lemma \emph{connects the internal to the external}.
+% Our first step towards the Yoneda perspective is to begin to characterize
+% objects by their hom-sets:
 
-We begin with the notion of a \emph{hom-set}:
+% \vspace{0.2cm}
 
-\vspace{0.2cm}
+% \section{From typing rules to $\calC$-indexed functions}
+Our goal is to systematically derive, from first principles (meaning, without any creativity), the universal
+property that corresponds to products.
+Products have typing rules like:
+\begin{mathpar}
+  \inferrule*
+    {\Gamma \vdash M : A \pltimes B}
+    {\Gamma \vdash \plfst{M} : A}
+\end{mathpar}
 
-\marginnote{%
-  The word ``hom'' is an abbreviation of ``homomorphism'',
-  and the name hom-set comes from the fact many of the original motivating examples of categories
-  had morphisms that were homomorphisms between algebraic structures.}
+Following the principle of ``terms are interpreted as morphisms'',
+the above typing rule implies that a category that 
+can interpret $\plfst{M}$ must have certain morphisms.
+There are many such morphisms that come about 
+from this typing rule, one for each possible type context $\Gamma$,
+which we can draw like this:
+
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BxOgW17oB9AIwgAvqXSZc+QijLCqtRizace-IQCZxkkBmx4CRMlqX1mrRB258BggMy6ph2UWGlF1C6usBBAAJOPF54AIAhAOd9aSM5ZC1SM28VKxA-aIMZY3lSB3NUtgA6EvElGCgAc3giUAAzACcIXiQyEBwIJAcUyzZKkRBqBjoAIxgGAAVYt2ssMGxYaMbm1uoOpAAWajGwKC62nzS6gaHR8anXHJA5hdYJeqaWxA92zsRu5V7rfp1TscnplcblhFvcQMsni91ogtp9fODBL8QMN-hdsnJrvMQXc9BCkIlXl0evD+k4-udARjgaDcY98Ws3rCURTLlSsYtiUdHGUxEA
+\begin{tikzcd}
+  {\color{red} \Gamma_1} \arrow[rd, "g_1" description, color = red] \arrow[rrdd, "f_1" description, bend left, color = red] &             &   \\
+  {\color{blue}\Gamma_2} \arrow[r, "g_2" description, color = blue] \arrow[rrd, "f_2" description, color = blue]              & A \times B  &   \\
+  {\color{orange} \Gamma_3} \arrow[ru, "g_3" description, color = orange] \arrow[rr, "f_3" description, color = orange]              &             & A \\
+  ...                                                                               &             &  
+  \end{tikzcd}
+  \label{cd:indexed-fam}
+\end{equation}
+
+As in prior chapters,
+we can extract equations of morphisms from 
+equations we know must hold about programs. For instance, we know that 
+$\plfst{M}$ is invariant under substitution for some (possibly multi-way)
+substitution $s$:
+\begin{align*}
+  (\plfst{M})[s] = \plfst{(M[s])}
+\end{align*}
+
+We can translate this invariance under under substitution into morphism equalities 
+that must hold in \ref{cd:indexed-fam}. First, we can interpret substitution as
+a morphism $s : \Gamma' \to \Gamma$. 
+
 \begin{definition}[Hom-set]
   Let \(X\) and \(Y\) be objects of a category \(\calC\).
   The \emph{hom-set} of $\calC$ at $X$ and $Y$, 
@@ -35,28 +56,29 @@ We begin with the notion of a \emph{hom-set}:
   \calC(X,Y) := \{f \mid \dom(f) = X, \cod(f) = Y\}.
   \]
 \end{definition}
+\marginnote{%
+The word ``hom'' is an abbreviation of ``homomorphism'',
+and the name hom-set comes from the fact many of the original motivating examples of categories
+had morphisms that were homomorphisms between algebraic structures.
+}
 
-Our first step towards the Yoneda perspective is to begin to characterize
-objects by their hom-sets.  In the previous chapters we described, in a somewhat
-ad-hoc way, how to extract morphisms and universal properties from typing
-judgments and equational theories of programs. 
-We will now become much 
-more formal about this process.
 
-\section{From typing rules to $\calC$-indexed functions}
-Our goal now is to systematically derive, from first principles (meaning, without any creativity), the universal
-property that corresponds to products.
-Products have typing rules like:
-\begin{mathpar}
-  \inferrule*
-    {\Gamma \vdash M : A \pltimes B}
-    {\Gamma \vdash \plfst{M} : A}
-\end{mathpar}
 
-The first step in this process is to transcribe typing rules into 
-\emph{functions between hom-sets}.
+
+This equality corresponds to \(\mathsf{Fst}\) respecting composition:
+\begin{align*}
+  \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
+\end{align*}
+A parallel substitution from $\Gamma'$ to $\Gamma$ is a 
+function sending each variable $x \in \Gamma$ to a term $\Gamma' \vdash s(x) : \Gamma(x)$.
+For example, 
+$s : \Gamma' \to \Gamma$
+
+
+
+
 The premise of the judgment will be the domain of the function, 
-and the consequence of the judgment will be the codomain, like so:
+and the conclusion of the judgment will be the codomain, like so:
 \begin{align}
   \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
 \end{align}
@@ -64,22 +86,26 @@ Let's pause to inspect the unusual shape of this function.
 First, observe that this is a function between two sets: this is \emph{not} a
 morphism in the category $\calC$.  Second, it is a function between two sets of
 morphisms with the same domain, $\Gamma$.  And third, the function is
-\emph{indexed by $\Gamma$}, written with a subscript: we will build towards 
-the idea that
-there is some family of ``\textsf{Fst}-like functions'' that ought to behave
-coherently for different choices of context $\Gamma$.
+\emph{indexed by $\Gamma$}, written with a subscript. We can visualize elements 
+of this family of ``$\mathsf{Fst}$-like morphisms'' as follows:
 
-The rules respect substitution:
-\begin{align*}
-  (\plfst{M})[s] = \plfst{(M[s])}
-\end{align*}
-This corresponds to \(\mathsf{Fst}\) respecting composition:
-\begin{align*}
-  \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
-\end{align*}
 
-\marginnote{Mention that this is also  called a presheaf}
-\begin{definition}
+
+There may be many morphisms that satisfy the type signature of $\mathsf{Fst}$, 
+but the key is that there are relatively few that are 
+\emph{invariant under the choice of $\Gamma$}. Concretely, if 
+there are is a morphism $s : \Gamma' \to \Gamma$ that relates $\Gamma'$ to $\Gamma$,
+
+
+
+We will build towards the idea that there is some family of ``\textsf{Fst}-like
+functions'' that ought to behave coherently for different choices of context
+$\Gamma$.  The notion of coherence we need is stability under parallel substitution.
+
+
+\marginnote{For a particular object $X$, the $\calC$-indexed set at $X$ is 
+often also called the \emph{presheaf of $X$}.}
+\begin{definition}[$\calC$-indexed set]
   A \emph{\(\calC\)-indexed set}
   consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
   along with ``substitution functions'' \(Pf : PY \to PX\)
@@ -98,7 +124,7 @@ This corresponds to \(\mathsf{Fst}\) respecting composition:
 \end{definition}
 
 
-\begin{definition}
+\begin{definition}[$\calC$-indexed function]
   \sloppy
   Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
   A \emph{\(\calC\)-indexed function}
@@ -123,7 +149,8 @@ By now you may have noticed that \(\calC\)-indexed sets and functions
 look like they ought to form a category. More on this later.
 
 
-\begin{definition}
+\marginnote{The symbol $\yo$ is pronounced ``yo''.}
+\begin{definition}[Representable set]
   The \emph{representable \(\calC\)-indexed set at \(X\)}
   is written \(\yo X\) and defined by
   \begin{align}
@@ -299,6 +326,30 @@ We can also go in the other direction: every product in the ordinary categorical
  \ref{cons:prod-to-pl-prod}
  are mutually inverse.
 \end{proposition}
+
+
+\section{Yoneda perspective}
+
+\todo{category theory is all about different perspectives. we saw 
+how the order theoretic, algebraic, diagrammatic perspective gave us 
+useful different insights into univeral constructions. 
+what we've just seen is a new perspective on universal constructions:
+we've transitioned from an internal view to an external view, internalized 
+notion of product, fill in 
+}
+
+One way of thinking of these theorems is that they serve as a check that the
+definitions for terminal object, product, and exponential are working as
+expected.  The keyword here is ``internalization'': the terminal object is the
+internalization of the singleton set, product is the internalization of
+Cartesian product of sets, and exponential is the internalization of morphism.
+Over the next several chapters we will be working towards understanding the 
+famous \emph{Yoneda lemma}, widely regarded as one of the most important 
+ideas in category theory. 
+Like many big ideas in mathematics, there are a variety of perspectives one can 
+have on the Yoneda lemma that lend themselves better to different intuitions.
+The perspective we will be pursuing here is that 
+the Yoneda lemma \emph{connects the internal to the external}.
 
 
 %% \noindent In set theory, functions enjoy the following nice properties.
