@@ -1178,6 +1178,51 @@ Categories that have exponents get a special name: they are called
 \section{Examples of exponential objects}
 
 \subsection{Exponents in $\FinSet{}$}
+Let's begin as usual by seeing examples of universal properties in categories 
+that we're familiar with. We'll begin with the category of finite sets $\FinSet$.
+For two finite sets $A$ and $B$, the exponential $B^A$ is an object that
+represents the set of all functions from $A$ to $B$.
+For instance, suppose $A = \{a, b\}$ and $B = \{c, d\}$.
+Then, there are 4 possible functions between these two sets:
+\begin{align*}
+  f_1 &= a \mapsto c, b \mapsto c \\
+  f_2 &= a \mapsto c, b \mapsto d \\
+  f_3 &= a \mapsto d, b \mapsto c \\
+  f_4 &= a \mapsto d, b \mapsto d
+\end{align*}
+
+The crucial idea is that this collection of 4 morphisms can itself 
+be represent as a finite set.
+Recall that the \emph{graph} of a function $f : A \to B$ 
+is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
+of $f$. Then, the exponential object $B^A$ is the \emph{finite 
+set of all graphs of functions from $A$ to $B$}.
+So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
+  \begin{align*}
+    \Big\{\{(a, c), (b, c)\}, \{(a, d), (b, d)\}, \\
+    \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
+  \end{align*}
+
+Using this, we can define the closure $\lambda f$ as mapping a 
+function to its graph. For example:
+\begin{align*}
+  \lambda f_1 &= \{(a, c), (b, c)\} \\
+  \lambda f_2 &= \{(a, c), (b, d)\} \\
+  \lambda f_3 &= \{(a, d), (b, c)\} \\
+  \lambda f_3 &= \{(a, d), (b, d)\}
+\end{align*}
+
+Next, an exponential object is paired with a morphism $\app$ 
+that calls the closure on an argument. We can implement 
+the function $\app$ by picking the entry of the graph that corresponds 
+to the argument. For example, $\app \circ \langle \lambda f_1, a \rangle = c$.
+
+The exponential object must satisfy the property that $\app \circ \langle
+\lambda f, A \rangle = f$. This is surely true, because applying the graph of a 
+function to an argument $a$ must agree with calling $f$ on $a$.
+Finally, uniqueness follows by function extensionality: any $\lambda f$ 
+that satisfies this property must behave identically to the graph of $f$.
+Summing up:
 
 \begin{proposition}
   $\FinSet$ is Cartesian-closed.
@@ -1197,15 +1242,7 @@ Categories that have exponents get a special name: they are called
   \end{center}
 
   To satisfy this, we will define $B^A$ to be set of all graphs of functions $A
-  \to B$.\footnote{Recall that the \emph{graph} of a function $f : A \to B$ 
-  is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
-  of $f$.
-  So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
-  \begin{align*}
-    \Big\{\{(a, c), (b, c)\}, \{(a, d), (b, d)\}, \\
-    \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
-  \end{align*}
-  }
+  \to B$.
   Then, we define $\mathsf{app}(f, a)$ to pick the component of the 
   graph $f$ that corresponds to $a \in A$. 
 

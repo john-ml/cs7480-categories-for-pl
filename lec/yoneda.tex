@@ -61,7 +61,7 @@ and the consequence of the judgment will be the codomain, like so:
 \begin{align}
   \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
 \end{align}
-Let's pause to inspect the unusual shape of this function $\mathsf{Fst}_\Gamma$.
+Let's pause to inspect the unusual shape of this function.
 First, observe that this is a function between two sets: this is \emph{not} a
 morphism in the category $\calC$.  Second, it is a function between two sets of
 morphisms with the same domain, $\Gamma$.  And third, the function is
@@ -69,6 +69,15 @@ morphisms with the same domain, $\Gamma$.  And third, the function is
 the idea that
 there is some family of ``\textsf{Fst}-like functions'' that ought to behave
 coherently for different choices of context $\Gamma$.
+
+The rules respect substitution:
+\begin{align*}
+  (\plfst{M})[s] = \plfst{(M[s])}
+\end{align*}
+This corresponds to \(\mathsf{Fst}\) respecting composition:
+\begin{align*}
+  \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
+\end{align*}
 
 Rules with multiple premises correspond to functions that take in multiple arguments.
 For example,
@@ -80,18 +89,13 @@ For example,
     }
     {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
 \end{mathpar}
-becomes a function
+becomes a function:
 \begin{align*}
   \mathsf{Pair}_\Gamma : \calC(\Gamma,A) \times \calC(\Gamma,B) \to \calC(\Gamma,A\times B)
 \end{align*}
-The rules respect substitution:
-\begin{align*}
-  \plfst{M}[s] = \plfst{(M[s])}
-\end{align*}
-This corresponds to \(\mathsf{Fst}\) respecting composition:
-\begin{align*}
-  \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
-\end{align*}
+Note that the product above is \emph{Cartesian product of sets}. The ability to 
+form this product does not depend on $\calC$ having products.
+
 
 With this dictionary in hand, we can translate the standard definition of product types into category theory.
 
@@ -127,7 +131,7 @@ With this dictionary in hand, we can translate the standard definition of produc
 \end{definition}
 
 \begin{construction} \label{cons:pl-prod-to-prod}
-  Any PL-product can be turned into a product.
+  Any PL-product can be turned into a categorical product.
 \end{construction}
 \begin{proof}
   Suppose given a PL-product of two objects \(A\) and \(B\) of a category \(\calC\).
