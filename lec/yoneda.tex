@@ -1,8 +1,8 @@
 \chapter{Yoneda I: Deriving universal properties}
 
 We have seen two theorems about internal languages:
-Theorem~\ref{thm:calc-products} says that Calc can be used as a language for
-categories with finite products, and Theorem~\ref{thm:cccs} says that STLC can
+\cref{thm:calc-products} says that Calc can be used as a language for
+categories with finite products, and \cref{thm:cccs} says that STLC can
 be used as a language for Cartesian closed categories.
 
 One way of thinking of these theorems is that they serve as a check that the
@@ -32,7 +32,7 @@ We begin with the notion of a \emph{hom-set}:
   written \(\calC(X,Y)\),
   is the set of morphisms from \(X\) to \(Y\):
   \[
-  \calC(X,Y) := \{f \mid \dom(f) = X, \cod(f) = g\}.
+  \calC(X,Y) := \{f \mid \dom(f) = X, \cod(f) = Y\}.
   \]
 \end{definition}
 
@@ -43,18 +43,17 @@ judgments and equational theories of programs.
 We will now become much 
 more formal about this process.
 
-\section{Deriving universal properties}
+\section{From typing rules to $\calC$-indexed functions}
 Our goal now is to systematically derive, from first principles (meaning, without any creativity), the universal
 property that corresponds to products.
-We begin with a hypothetical judgment \(\Gamma \vdash M : A\).
-Next we have the inference rules like:
+Products have typing rules like:
 \begin{mathpar}
   \inferrule*
     {\Gamma \vdash M : A \pltimes B}
     {\Gamma \vdash \plfst{M} : A}
 \end{mathpar}
 
-The first step in this process is to transcribe typing judgments into 
+The first step in this process is to transcribe typing rules into 
 \emph{functions between hom-sets}.
 The premise of the judgment will be the domain of the function, 
 and the consequence of the judgment will be the codomain, like so:
@@ -79,6 +78,60 @@ This corresponds to \(\mathsf{Fst}\) respecting composition:
   \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
 \end{align*}
 
+\marginnote{Mention that this is also  called a presheaf}
+\begin{definition}
+  A \emph{\(\calC\)-indexed set}
+  consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
+  along with ``substitution functions'' \(Pf : PY \to PX\)
+  for each morphism \(f : X \to Y\) in \(C\).
+  Given an element \(y \in PY\)
+  and a morphism \(f : X \to Y\),
+  the element \((Pf)(y)\) will be written \(y \cdot_P f\)
+  and called the ``substitution of \(y\) by \(f\)''.
+  Every \(\calC\)-indexed set \(P\)
+  must satisfy the following laws:
+  \begin{itemize}
+  \item Identity: \(x \cdot_P \idt_X = x\) for all objects \(X\) and \(x \in PX\)
+  \item Composition: \(z \cdot_P (f\circ g) = z \cdot_P f \cdot_P g\)
+    for all objects \(f : Y \to Z\) and \(g : X \to Y\) and \(z \in PZ\).
+  \end{itemize}
+\end{definition}
+
+
+\begin{definition}
+  \sloppy
+  Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
+  A \emph{\(\calC\)-indexed function}
+  from \(P\) to \(Q\),
+  written \(\alpha : P \Rightarrow Q\),
+  is a family of functions \(\alpha_X : PX \to QX\)
+  that ``respects substitution''
+  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
+\end{definition}
+
+\begin{itemize}
+\item \(\calC\)-indexed functions can be composed:
+  the composition of \(\alpha : Q \Rightarrow R\)
+  and \(\beta: P \Rightarrow Q\),
+  written \(\alpha\circ\beta : P \Rightarrow R\),
+  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
+\item For each \(\calC\)-indexed set \(P\),
+  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
+  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+\end{itemize}
+By now you may have noticed that \(\calC\)-indexed sets and functions
+look like they ought to form a category. More on this later.
+
+
+\begin{definition}
+  The \emph{representable \(\calC\)-indexed set at \(X\)}
+  is written \(\yo X\) and defined by
+  \begin{align}
+    (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
+    (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
+  \end{align}
+\end{definition}
+
 Rules with multiple premises correspond to functions that take in multiple arguments.
 For example,
 \begin{mathpar}
@@ -97,22 +150,27 @@ Note that the product above is \emph{Cartesian product of sets}. The ability to
 form this product does not depend on $\calC$ having products.
 
 
+\todo{product of $\calC$-indexed sets defn}
+
+\section{Deriving a universal property for products}
+
 With this dictionary in hand, we can translate the standard definition of product types into category theory.
 
+\marginnote{Note that we are not presupposing in this definition that $\calC$ \emph{has} products}
 \begin{definition}[PL-product]
   \sloppy
   Let \(A\) and \(B\) be objects of a category \(\calC\).
   A \emph{PL-product} of \(A\) and \(B\) consists of:
   \begin{itemize}
   \item An object \(A \times B\)
-  \item For each object \(\Gamma\), functions
+  \item $\calC$-indexed functions:
     \begin{align*}
       \mathsf{Fst}_\Gamma &: \calC(\Gamma,A\times B) \to \calC(\Gamma,A) \\
       \mathsf{Snd}_\Gamma &: \calC(\Gamma,A\times B) \to \calC(\Gamma,B) \\
       \mathsf{Pair}_\Gamma &: \calC(\Gamma,A)\times\calC(\Gamma,B) \to \calC(\Gamma,A\times B)
     \end{align*}
   \end{itemize}
-  such that
+  satisfying the necessary properties to be $\calC$-indexed, i.e.: 
   \begin{itemize}
   \item \(\mathsf{Fst}\), \(\mathsf{Snd}\), and \(\mathsf{Pair}\) ``respect substitution'': for all
     \(\Gamma'\xrightarrow{s}\Gamma\),
