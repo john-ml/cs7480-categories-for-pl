@@ -132,7 +132,7 @@ often also called the \emph{presheaf of $X$}.}
   written \(\alpha : P \Rightarrow Q\),
   is a family of functions \(\alpha_X : PX \to QX\)
   that ``respects substitution''
-  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
+  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_P p\).
 \end{definition}
 
 \begin{itemize}
@@ -274,7 +274,7 @@ With this dictionary in hand, we can translate the standard definition of produc
   \end{align*}
   The symmetrical argument shows \(\mathsf{snd} \circ h = g\).
 
-  To show uniqueness, suppose \(h'\) satisfies \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
+  To show uniqueness, suppose \(h'\) satisfies \(\mathsf{fst} \circ h' = f\) and \(\mathsf{snd} \circ h' = g\).
   Then the following calculation uses the \(\eta\) law to establish that \(h' = h\).
   \begin{align*}
     h' &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(h'),\mathsf{Snd}_\Gamma(h')) & \text{\(\eta\)} \\
@@ -585,7 +585,7 @@ This example is a special case of a canonical kind of \(\calC\)-indexed set.
   written \(\alpha : P \Rightarrow Q\),
   is a family of functions \(\alpha_X : PX \to QX\)
   that ``respects substitution''
-  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
+  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_P p\).
 \end{definition}
 
 \begin{itemize}
