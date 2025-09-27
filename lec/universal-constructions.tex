@@ -1178,6 +1178,51 @@ Categories that have exponents get a special name: they are called
 \section{Examples of exponential objects}
 
 \subsection{Exponents in $\FinSet{}$}
+Let's begin as usual by seeing examples of universal properties in categories 
+that we're familiar with. We'll begin with the category of finite sets $\FinSet$.
+For two finite sets $A$ and $B$, the exponential $B^A$ is an object that
+represents the set of all functions from $A$ to $B$.
+For instance, suppose $A = \{a, b\}$ and $B = \{c, d\}$.
+Then, there are 4 possible functions between these two sets: \sh{add $\Gamma = \{\star\}$}
+\begin{align*}
+  f_1 &= a \mapsto c, b \mapsto c \\
+  f_2 &= a \mapsto c, b \mapsto d \\
+  f_3 &= a \mapsto d, b \mapsto c \\
+  f_4 &= a \mapsto d, b \mapsto d
+\end{align*}
+
+The crucial idea is that this collection of 4 morphisms can itself 
+be represented as a finite set.
+Recall that the \emph{graph} of a function $f : A \to B$ 
+is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
+of $f$. Then, the exponential object $B^A$ is the \emph{finite 
+set of all graphs of functions from $A$ to $B$}.
+So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
+  \begin{align*}
+    \Big\{\{(a, c), (b, c)\}, \{(a, d), (b, d)\}, \\
+    \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
+  \end{align*}
+
+Using this, we can define the closure $\lambda f$ as mapping a 
+function to its graph. For example:
+\begin{align*}
+  \lambda f_1 &= \{(a, c), (b, c)\} \\
+  \lambda f_2 &= \{(a, c), (b, d)\} \\
+  \lambda f_3 &= \{(a, d), (b, c)\} \\
+  \lambda f_3 &= \{(a, d), (b, d)\}
+\end{align*}
+
+Next, an exponential object is paired with a morphism $\app$ 
+that calls the closure on an argument. We can implement 
+the function $\app$ by picking the entry of the graph that corresponds 
+to the argument. For example, $\app \circ \langle \lambda f_1, a \rangle = c$.
+
+The exponential object must satisfy the property that $\app \circ \langle
+\lambda f, A \rangle = f$. This is surely true, because applying the graph of a 
+function to an argument $a$ must agree with calling $f$ on $a$.
+Finally, uniqueness follows by function extensionality: any $\lambda f$ 
+that satisfies this property must behave identically to the graph of $f$.
+Summing up:
 
 \begin{proposition}
   $\FinSet$ is Cartesian-closed.
@@ -1197,15 +1242,7 @@ Categories that have exponents get a special name: they are called
   \end{center}
 
   To satisfy this, we will define $B^A$ to be set of all graphs of functions $A
-  \to B$.\footnote{Recall that the \emph{graph} of a function $f : A \to B$ 
-  is the set of pairs $(a, b)$ where $a$ is the input and $b$ is the output 
-  of $f$.
-  So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
-  \begin{align*}
-    \Big\{\{(a, c), (b, c)\}, \{(a, d), (b, d)\}, \\
-    \{(a, c), (b, d)\}, \{(a, d), (b, c)\}\Big\}
-  \end{align*}
-  }
+  \to B$.
   Then, we define $\mathsf{app}(f, a)$ to pick the component of the 
   graph $f$ that corresponds to $a \in A$. 
 
@@ -1367,18 +1404,32 @@ hence is a Cartesian-closed category.
 % \Rightarrow \beta) \land \alpha$.
 
 \subsection{An example from topology}
+Category theory is a bridge between many branches of mathematics, and we 
+can gain significant insight into categorical definitions by viewing them 
+through the lens of different mathematical subfields. Many important 
+developments in category theory stemmed from topology, so we explore 
+some of the basics of topology here.
 
-In the previous we drew a picture of the exponential as a Venn diagram.
-The exponential was then the largest shaded region \(C\) satisfying
-the constraint \(A \cap C \subseteq B\).
-This spatial intuition can be made formal.
+In the previous section we drew a picture of the exponential as a Venn diagram.  The
+exponential was then the largest shaded region \(C\) satisfying the constraint
+\(A \cap C \subseteq B\).  This spatial intuition can be made formal.
 
-\begin{definition}
-  A subset \(U\) of \(\R\) is \textbf{open}
-  if it is a union of open intervals.
+\marginnote{An equivalent way to define an open set is a subset $U$ of 
+the reals satisfying that, for any $x \in U$, 
+an $\epsilon$-ball around $x$ is also contained in $U$.
+I.e.,
+there exists an $\epsilon > 0$ 
+such that $(x-\epsilon, x + \epsilon) \subseteq U$.
+}
+\begin{definition}[Open set]
+  \sloppy
+  A subset \(U\) of of the real numbers \(\R\) is \textbf{open}
+  if it is a (possibly infinite) union of open intervals, where an open interval 
+  $(a, b)$ is the collection of real numbers between $a$ and $b$
+  excluding $a$ and $b$, i.e.  $\{r \mid a < r < b\}$.
 \end{definition}
 
-The set of open subsets of \(\R\), written \(\mathcal O(\R)\),
+The set of all open subsets of \(\R\), written \(\mathcal O(\R)\),
 forms a partial order under subset inclusion,
 and hence also a thin category (Construction~\ref{prop:every-preorder-is-a-category}).
 As a category, \(\mathcal O(\R)\) has finite products:
@@ -1430,9 +1481,11 @@ U \cup \varnothing^U
 \R\setminus\{0\}
 \ne \R
 \]
-What this demonstrates is that the law of excluded middle fails in \(\mathcal O(\R)\):
-the open subsets of \(\R\) form a model of intuitionistic propositional logic
-that refutes \(A \lor \neg A = \top\).
+What this demonstrates is that the law of excluded middle fails in \(\mathcal
+O(\R)\): the open subsets of \(\R\) form a model of intuitionistic propositional
+logic that refutes \(A \lor \neg A = \top\). This is a somewhat surprising 
+bridge between geometry and logic, which we will explore later if we have 
+time.
 
 \subsection{A non-example: natural numbers and divisibility}
 It's worth exploring examples of categories that \emph{do not}
