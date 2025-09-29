@@ -1,29 +1,60 @@
-\chapter{Yoneda I: Deriving universal properties}
+\chapter{Yoneda I: Internal vs. external}
 
+This section marks the start of a long journey that ends in
+the statement and proof of the famous Yoneda lemma in category theory (\todo).
+As with any important concept in category theory, the Yoneda lemma
+can be understood through a variety of perspectives. In these
+notes we will explore a particular perspective that feels most
+relevant to PL: the Yoneda lemma is a means of connecting
+the ``internal'' to the ``external''.
 
-% Our first step towards the Yoneda perspective is to begin to characterize
-% objects by their hom-sets:
+Consider, for example, the case of product.
+In the preceding sections, we have given you the definition of product
+that is most commonly found in standard textbooks on category theory.
+This definition has an ``internal'' character, because it defines
+product in a category \(\calC\) purely in terms of
+other objects and morphisms \emph{inside} of \(\calC\).
 
-% \vspace{0.2cm}
-\begin{itemize}
-  \item category theorist's product might be a diagram from the book
-  \item A PL/type-theorists product is ``the internalization of 
-  Cartesian product'', or ``the internalization of context extension''
-  \item Intuition: product in the object language is supposed to express 
-  the meta-language product
-  \item The PL-theorist's product has: types $A$, contexts $\Gamma$, 
-  hypothetical judgment $\Gamma \vdash M : A$. These become morphisms.
-  \item Equations: $\Gamma \vdash M \equiv N : A$
-  \item We've become pretty comforatble with 
-  \item We haven't talked too much about inference rules:
-  \begin{mathpar}
-  \inferrule*
-    {\Gamma \vdash M : A \pltimes B}
-    {\Gamma \vdash \plfst{M} : A}
-  \end{mathpar}
-  These will be interpreted as functions from morphisms to morphisms
-  \item To formalize this idea of ``maps between morphisms'',
-  it's useful to have the following definition that we've put off for a long time
+But there is another way to define product.
+Think back to \cref{thm:calc-products},
+which showed how to interpret a simple programming language
+in an arbitrary category \(\calC\) with finite products.
+The proof of \cref{thm:calc-products} gave a recipe
+for interpreting each of the judgments of programming language
+in \(\calC\). Following this recipe,
+each of the typing rules became
+\emph{functions on morphisms}. For example, the typing rule
+\[
+\inferrule*[right=T-Fst]{\Gamma \vdash M : A \pltimes B}{\Gamma \vdash \plfst{M} : A}
+\]
+for projecting out the first component of a pair
+was interpreted as a function
+\begin{align*}
+  \{\text{morphisms \(\llbr\Gamma\) to \(\llbr{A\pltimes B}\)}\}
+  \longrightarrow
+  \{\text{morphisms \(\llbr\Gamma\) to \(\llbr{A}\)} \},
+\end{align*}
+namely the function
+that sends interpretations of \(\llbr{M}\) to interpretations of \(\llbr{\plfst M}\).
+
+It turns out that we can promote this recipe into a \emph{definition} for product.
+In contrast to the textbook definition in terms of objects and morphisms
+of \(\calC\), this definition characterizes the product in terms of \emph{functions} between
+\emph{sets} of morphisms. This gives it an ``external'' character,
+because it defines the product in terms of set-theoretic objects (sets and functions)
+that live \emph{outside} of \(\calC\).
+
+Of course, it will make no difference whether one chooses the internal
+or the external definition of product: as we will see further down the line,
+the Yoneda lemma implies that the two formulations are equivalent.
+As a warm up to this abstract proof, this section will show
+concretely how the equivalence works for the special case of products.
+
+First, we must make precise what we mean by this ``external'' definition of product
+that defines product in terms of functions on morphisms.
+To formalize this idea of ``maps between morphisms'',
+  it's useful to have the following definition that we've put off for a long time.
+
 \begin{definition}[Hom-set]
   Let \(X\) and \(Y\) be objects of a category \(\calC\).
   The \emph{hom-set} of $\calC$ at $X$ and $Y$, 
@@ -38,23 +69,30 @@ The word ``hom'' is an abbreviation of ``homomorphism'',
 and the name hom-set comes from the fact many of the original motivating examples of categories
 had morphisms that were homomorphisms between algebraic structures.
 }
-\item Example: In the category of finite sets and set functions $\FinSet$, the
-  hom-set $\FinSet(\{a,b\}, \{1, 2, 3\})$ is the set of all functions 
+For example, \begin{itemize}
+\item In the category of finite sets and set functions $\FinSet$, the
+  hom-set $\FinSet(\{a,b\}, \{1, 2, 3\})$ is the set of all functions
   from $\{a,b\}$ to $\{1, 2, 3\}$.
-\item The set can be empty. In the divisibility category $(\mathbb{N}, \preceq)$,
-the hom-set $\mathbb{N}(3,4) = \emptyset$, while $\mathbb{N}(3, 6) = \{\top\}$. 
-\item To translate inference rules, we will translate these into \emph{families 
-of well-behaved functions}:
-  \begin{mathpar}
-  \inferrule
-    {\Gamma \vdash M : A \pltimes B}
-    {\Gamma \vdash \plfst{M} : A}
-    \rightsquigarrow
-    \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma, A)
-  \end{mathpar}
+\item Hom-sets can be empty. In the divisibility category $(\mathbb{N}, \preceq)$,
+the hom-set $\mathbb{N}(3,4) = \emptyset$, while $\mathbb{N}(3, 6) = \{\top\}$.
+\end{itemize}
+This definition lets us state formally what it means for an inference rule
+like \(\textsc{T-Fst}\) to denote a function from morphisms to morphisms.
+We shall say that the interpretation of \(\textsc{T-Fst}\) is
+a family of functions \((\mathsf{Fst}_\Gamma)_{\Gamma\in\calC}\),
+indexed by the ambient context \(\Gamma\),
+of the following type:
+\[
+\mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma, A)
+\]
 
-  \item This family of functions is \emph{polymorphic in $\Gamma$}
-  \item We can visualize this family of functions:
+%% Let's pause to inspect the unusual shape of this function.
+%% First, observe that this is a function between two sets: this is \emph{not} a
+%% morphism in the category $\calC$.  Second, it is a function between two sets of
+%% morphisms with the same domain, $\Gamma$.  And third, the function is
+%% \emph{indexed by $\Gamma$}, written with a subscript. We can visualize elements
+%% of this family of ``$\mathsf{Fst}$-like morphisms'' as follows:
+We can visualize this family of functions as follows:
 \begin{equation}
   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BxOgW17oB9AIwgAvqXSZc+QijLCqtRizace-IQCZxkkBmx4CRMlqX1mrRB258BggMy6ph2UWGlF1C6usBBAAJOPF54AIAhAOd9aSM5ZC1SM28VKxA-aIMZY3lSB3NUtgA6EvElGCgAc3giUAAzACcIXiQyEBwIJAcUyzZKkRBqBjoAIxgGAAVYt2ssMGxYaMbm1uoOpAAWajGwKC62nzS6gaHR8anXHJA5hdYJeqaWxA92zsRu5V7rfp1TscnplcblhFvcQMsni91ogtp9fODBL8QMN-hdsnJrvMQXc9BCkIlXl0evD+k4-udARjgaDcY98Ws3rCURTLlSsYtiUdHGUxEA
 \begin{tikzcd}
@@ -65,262 +103,94 @@ of well-behaved functions}:
   \end{tikzcd}
   \label{cd:indexed-fam}
 \end{equation}
-\item As an example of working with this function, we have that 
-$\mathsf{Fst}_{\Gamma_1}(f) = f'$
-\item What does it mean for the function to be ``polymorphic in $\Gamma$''?
-Intuitively, this means it should behave the same for any $\Gamma$. 
-We can formalize this as an equation 
-that should hold for any $s : \Gamma' \to \Gamma$:
+As an example of working with this function, we have that
+$\mathsf{Fst}_{\Gamma_1}(f) = f'$.
+
+In addition to the basic type shown above, we will also require that \(\mathsf{Fst}\)
+be \emph{natural} in \(\Gamma\).
+Intuitively, what this means is that \(\mathsf{Fst}\) is in a sense ``polymorphic in \(\Gamma\)''.
+Just as polymorphic functions in System F
+respect ``change of representation'' for the type variables that they are polymorphic over~\citep{reynolds1983types},
+we will require that the family of functions \((\mathsf{Fst}_\Gamma)_{\Gamma\in\mathsf{Ob}(\calC)}\)
+respect ``change of \(\Gamma\)''.
+Concretely, this means that if any input \(f\) as shown in the pictue above is changed into \(f \circ s\) via some morphism
+$s : \Gamma' \to \Gamma$,
+it must be the case that \(\mathsf{Fst}_\Gamma(f)\) is changed into \(\mathsf{Fst}_{\Gamma'}(f\circ s)\)
+via \(s\) too. Formally, the following \emph{naturality condition} must hold for any such \(f\) and \(s\):\marginnote{We will save a formal abstract definition
+of naturality for \todo.}
+
+%% There may be many morphisms that satisfy the type signature of $\mathsf{Fst}$,
+%% but the key is that there are relatively few that are
+%% \emph{invariant under the choice of $\Gamma$}. Concretely, if
+%% there are is a morphism $s : \Gamma' \to \Gamma$ that relates $\Gamma'$ to $\Gamma$,
+
+%% We will build towards the idea that there is some family of ``\textsf{Fst}-like
+%% functions'' that ought to behave coherently for different choices of context
+%% $\Gamma$.  The notion of coherence we need is stability under parallel substitution.
+
 \begin{align*}
   \mathsf{Fst}_\Gamma(f) \circ s = \mathsf{Fst}_{\Gamma'}(f \circ s)
 \end{align*}
-\item An intuition for this condition is \emph{stability under 
-substitution}.
-For instance, we know that 
+Another intution for this condition comes from the requirement that the interpretation of a programming language
+be \emph{stable under substitution}.
+For instance, we know that
 $\plfst{M}$ is invariant under substitution for some (possibly multi-way)
 substitution $s$:
 \begin{align*}
-  (\plfst{M})[s] = \plfst{(M[s])}
+  (\plfst{M})[s] \equiv \plfst{(M[s])}
 \end{align*}
-\item Let's continue translating typing rules into these special 
-collections of functions, noting the requirements that we have:
-\begin{fullwidth}
-  \begin{mathpar}
-  \inferrule
-    {\Gamma \vdash M : A \pltimes B}
-    {\Gamma \vdash \plfst{M} : A}
-    \rightsquigarrow
-    \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma, A)
-    \quad
-    \text{such that }\forall s : \Gamma' \to \Gamma, 
-    \mathsf{Fst}_\Gamma(f)\circ s = \mathsf{Fst}_\Gamma(f \circ s)
-  \end{mathpar}
+This program equation corresponds directly to the naturality condition given above.
 
-  \begin{mathpar}
-  \inferrule
+Applying the above analysis to the typing rule \textsc{T-Snd}
+gives an analogous function for extracting the second component of a pair:
+\begin{align*}
+  &\inferrule
+    {\Gamma \vdash M : A \pltimes B}
+    {\Gamma \vdash \plsnd{M} : B}
+    \rightsquigarrow
+    \mathsf{Snd}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma, B)
+    \\
+  &\text{such that }\forall s : \Gamma' \to \Gamma,
+    \mathsf{Snd}_\Gamma(f)\circ s = \mathsf{Snd}_\Gamma(f \circ s)
+\end{align*}
+The rule \textsc{T-Pair} for forming pairs becomes a function
+that takes in two morphisms and bundles them together into a morphism into the product:
+\begin{align*}
+  &\inferrule
     {\Gamma \vdash M : A \quad
       \Gamma \vdash N : B }
     {\Gamma \vdash \plpair{M}{N} : A \times B}
     \rightsquigarrow
     \mathsf{Pair}_\Gamma : \calC(\Gamma, A) \times \calC(\Gamma, B) 
     \to \calC(\Gamma, A \times B)
-    \quad
-    \text{such that }\forall s : \Gamma' \to \Gamma, 
+\\
+   &\text{such that }\forall s : \Gamma' \to \Gamma,
     \mathsf{Pair}_\Gamma(f, g)\circ s = \mathsf{Pair}_\Gamma(f \circ s, g \circ s)
-  \end{mathpar}
-\end{fullwidth}
-
-\item The $\beta$ and $\eta$ laws once again translate into equations of 
-morphisms:
-  \begin{mathpar}
+\end{align*}
+Finally, the $\beta$ and $\eta$ laws become equations between nested applications of the functinos \(\mathsf{Fst}\), \(\mathsf{Snd}\),
+and \(\mathsf{Pair}\).
+\begin{align*}
   \inferrule
     {\Gamma \vdash M : A \quad
       \Gamma \vdash N : B }
     {\Gamma \vdash \plfst{\plpair{M}{N}} \equiv M}
-    \rightsquigarrow
-    \mathsf{Fst}_\Gamma(\mathsf{Pair}(f,g)) = f
-  \end{mathpar}
-
-  \begin{mathpar}
+    &\quad\rightsquigarrow\quad
+    \mathsf{Fst}_\Gamma(\mathsf{Pair}_\Gamma(f,g)) = f
+\\
   \inferrule
     {\Gamma \vdash M : A \quad
       \Gamma \vdash N : B }
     {\Gamma \vdash \plsnd{\plpair{M}{N}} \equiv N}
-    \rightsquigarrow
-    \mathsf{Snd}_\Gamma(\mathsf{Pair}(f,g)) = g
-  \end{mathpar}
-
-\begin{fullwidth}
-   \begin{mathpar}
+    &\quad\rightsquigarrow\quad
+    \mathsf{Snd}_\Gamma(\mathsf{Pair}_\Gamma(f,g)) = g
+\\
   \inferrule
     {\Gamma \vdash M : A \times B}
     {\Gamma \vdash M \equiv \plpair{\plfst{M}}{\plsnd{M}} \equiv N}
-    \rightsquigarrow
-    \text{If }f : \calC(\Gamma, A \times B)
-    \text{ then } f = \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(f), \mathsf{Snd}_\Gamma(f))
-  \end{mathpar}
-\end{fullwidth}
-\item This set of constraints on morphisms is broadly called a 
-``PL-product''
-\item Now we can state an important theorem: every PL product of $A$ and $B$ 
-can be turned into a categorical product.
-\begin{proof}
-  Suppose you have $(A \times B, \mathsf{Fst}_\Gamma, \mathsf{Snd}_\Gamma, 
-  \mathsf{Pair}_\Gamma)$. Remember, $\mathsf{Fst}_\Gamma$ (and all these 
-  other functions) behave like polymorphic functions, and we 
-  need to find a diagram like:
-
-  \begin{center}
-   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBAAgB0e8AtvC4AhEAF9S6TLnyEU5UsWp0mrdhwlSQGbHgJEATEpUMWbRCDHiVMKAHN4RUADMAThAFJFIHBCRkqubsLnA4IDSM9ABGMIwACjL68iBuWPYAFuGSrh5eiD5+SMZB6pZwYFASlOJAA
-\begin{tikzcd}
-  & A \times B \arrow[ld, "fst"'] \arrow[rd, "snd"] &   \\
-A &                                                 & B
-\end{tikzcd} 
-  \end{center}
-
-  How do we get a morphism $fst$? The key is that $\mathsf{Fst}$ is 
-  polymorphic in $\Gamma$, so we can plug in $A \times B$ there 
-  to get something of the required type:
-  \begin{align*}
-    \mathsf{Fst}_{A \times B} : \calC(A \times B, A \times B) \to  \calC(A \times B, A)
-  \end{align*}
-  Now we need to get a morphism of the required type of $fst$. 
-  From here, we can play ``type tetris'': we call $\mathsf{Fst}_{A \times B}$
-  with a morphism that meets the type constraint, the identity!
-  \begin{align*}
-    \mathsf{Fst}_{A \times B}(\id_{A \times B}) =? fst
-  \end{align*}
-  We can do the same thing to get the morphism $snd$. 
-
-  Now the question: does this satisfy the universal property 
-  for products?
-
-  First, let's show that there exists an $h$ such that the diagram
-  commutes:
-% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRAEEACAHW7wFt4nAEIgAvqXSZc+QigAMpAExVajFm3bjJIDNjwEiS5avrNWiEKIlT9somXmn1FkAGFxqmFADm8IqAAZgBOEPxIiiA4EEhkauZsgXA4INQMdABGMAwACtIGciDBWD4AFik2ICFhEdTRSMbxGpZwYFDaQaHhiADMdTGI8pXV3X1RA3FZbUgAtD2RZs0gpakg6Vm5+faWxWUVOiNIY-WIjVPtvQsubD6eYkA
-\begin{tikzcd}
-  & C \arrow[d] \arrow[ldd, "h"', bend right] \arrow[rdd, "g", bend left] &   \\
-  & A \times B \arrow[ld, "fst"'] \arrow[rd, "snd"]                       &   \\
-A &                                                                       & B
-\end{tikzcd}
-
-Where can we find $h$? We can let $h = \mathsf{Pair}_C(f, g)$. 
-
-We need to show that the diagram commutes: 
-\begin{align*}
-  fst \circ h &= \mathsf{Fst}_{A \times B} (\id_{A \times B}) \circ \mathsf{Pair}_C(f, g) \\ 
-    &= \mathsf{Fst}_C(\id_{A \times B} \circ \mathsf{Pair}_C(f, g)) \\
-    &= f
+    &\quad\rightsquigarrow\quad
+    \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(f), \mathsf{Snd}_\Gamma(f)) = f
 \end{align*}
-\end{proof}
-
-\item Now show categorical products are equivalent to PL Products
-\item 
-\end{itemize}
-
-
-As in prior chapters,
-we can extract equations of morphisms from 
-equations we know must hold about programs. 
-
-We can translate this invariance under under substitution into morphism equalities 
-that must hold in \ref{cd:indexed-fam}. First, we can interpret substitution as
-a morphism . 
-
-
-
-
-
-This equality corresponds to \(\mathsf{Fst}\) respecting composition:
-A parallel substitution from $\Gamma'$ to $\Gamma$ is a 
-function sending each variable $x \in \Gamma$ to a term $\Gamma' \vdash s(x) : \Gamma(x)$.
-For example, 
-$s : \Gamma' \to \Gamma$
-
-
-The premise of the judgment will be the domain of the function, 
-and the conclusion of the judgment will be the codomain, like so:
-\begin{align}
-  \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
-\end{align}
-Let's pause to inspect the unusual shape of this function.
-First, observe that this is a function between two sets: this is \emph{not} a
-morphism in the category $\calC$.  Second, it is a function between two sets of
-morphisms with the same domain, $\Gamma$.  And third, the function is
-\emph{indexed by $\Gamma$}, written with a subscript. We can visualize elements 
-of this family of ``$\mathsf{Fst}$-like morphisms'' as follows:
-
-There may be many morphisms that satisfy the type signature of $\mathsf{Fst}$, 
-but the key is that there are relatively few that are 
-\emph{invariant under the choice of $\Gamma$}. Concretely, if 
-there are is a morphism $s : \Gamma' \to \Gamma$ that relates $\Gamma'$ to $\Gamma$,
-
-We will build towards the idea that there is some family of ``\textsf{Fst}-like
-functions'' that ought to behave coherently for different choices of context
-$\Gamma$.  The notion of coherence we need is stability under parallel substitution.
-
-
-\marginnote{For a particular object $X$, the $\calC$-indexed set at $X$ is 
-often also called the \emph{presheaf of $X$}.}
-\begin{definition}[$\calC$-indexed set]
-  A \emph{\(\calC\)-indexed set}
-  consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
-  along with ``substitution functions'' \(Pf : PY \to PX\)
-  for each morphism \(f : X \to Y\) in \(C\).
-  Given an element \(y \in PY\)
-  and a morphism \(f : X \to Y\),
-  the element \((Pf)(y)\) will be written \(y \cdot_P f\)
-  and called the ``substitution of \(y\) by \(f\)''.
-  Every \(\calC\)-indexed set \(P\)
-  must satisfy the following laws:
-  \begin{itemize}
-  \item Identity: \(x \cdot_P \idt_X = x\) for all objects \(X\) and \(x \in PX\)
-  \item Composition: \(z \cdot_P (f\circ g) = z \cdot_P f \cdot_P g\)
-    for all objects \(f : Y \to Z\) and \(g : X \to Y\) and \(z \in PZ\).
-  \end{itemize}
-\end{definition}
-
-
-\begin{definition}[$\calC$-indexed function]
-  \sloppy
-  Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
-  A \emph{\(\calC\)-indexed function}
-  from \(P\) to \(Q\),
-  written \(\alpha : P \Rightarrow Q\),
-  is a family of functions \(\alpha_X : PX \to QX\)
-  that ``respects substitution''
-  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
-\end{definition}
-
-\begin{itemize}
-\item \(\calC\)-indexed functions can be composed:
-  the composition of \(\alpha : Q \Rightarrow R\)
-  and \(\beta: P \Rightarrow Q\),
-  written \(\alpha\circ\beta : P \Rightarrow R\),
-  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
-\item For each \(\calC\)-indexed set \(P\),
-  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
-  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
-\end{itemize}
-By now you may have noticed that \(\calC\)-indexed sets and functions
-look like they ought to form a category. More on this later.
-
-
-\marginnote{The symbol $\yo$ is pronounced ``yo''.}
-\begin{definition}[Representable set]
-  The \emph{representable \(\calC\)-indexed set at \(X\)}
-  is written \(\yo X\) and defined by
-  \begin{align}
-    (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
-    (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
-  \end{align}
-\end{definition}
-
-Rules with multiple premises correspond to functions that take in multiple arguments.
-For example,
-\begin{mathpar}
-  \inferrule*
-    {\Gamma \vdash M : A
-      \\
-     \Gamma \vdash N : B
-    }
-    {\Gamma \vdash \plpair{M}{N} : A \pltimes B}
-\end{mathpar}
-becomes a function:
-\begin{align*}
-  \mathsf{Pair}_\Gamma : \calC(\Gamma,A) \times \calC(\Gamma,B) \to \calC(\Gamma,A\times B)
-\end{align*}
-Note that the product above is \emph{Cartesian product of sets}. The ability to 
-form this product does not depend on $\calC$ having products.
-
-
-\todo{product of $\calC$-indexed sets defn}
-
-\section{Deriving a universal property for products}
-
-With this dictionary in hand, we can translate the standard definition of product types into category theory.
-
-\marginnote{Note that we are not presupposing in this definition that $\calC$ \emph{has} products}
+Packaging up all of these constraints into a definition,\footnote{We have chosen to name this concept ``PL-product'' as it was derived from the typing rules for product types in a programming language.}
 \begin{definition}[PL-product]
   \sloppy
   Let \(A\) and \(B\) be objects of a category \(\calC\).
@@ -334,7 +204,7 @@ With this dictionary in hand, we can translate the standard definition of produc
       \mathsf{Pair}_\Gamma &: \calC(\Gamma,A)\times\calC(\Gamma,B) \to \calC(\Gamma,A\times B)
     \end{align*}
   \end{itemize}
-  satisfying the necessary properties to be $\calC$-indexed, i.e.: 
+  satisfying the necessary properties to be $\calC$-indexed, i.e.:
   \begin{itemize}
   \item \(\mathsf{Fst}\), \(\mathsf{Snd}\), and \(\mathsf{Pair}\) ``respect substitution'': for all
     \(\Gamma'\xrightarrow{s}\Gamma\),
@@ -351,67 +221,78 @@ With this dictionary in hand, we can translate the standard definition of produc
     \end{align*}
   \end{itemize}
 \end{definition}
-
-\todo{PL product is equivalent to having a representation for the product of $\calC$-indexed sets.}
-
+Now we can state an important theorem.
+\begin{theorem}
+  PL-products are equivalent to ordinary products.
+\end{theorem}
+This theorem breaks down into multiple components.
+\begin{enumerate}
+\item Every PL-product can be turned into a categorical product.
+\item Every categorical product can be turned into a PL product.
+\item Constructions (1) and (2) round-trip to the identity.
+\end{enumerate}
+The proof tackles each piece separately.
 \begin{construction} \label{cons:pl-prod-to-prod}
-  Any PL-product can be turned into a categorical product.
+Every PL product of $A$ and $B$
+can be turned into a categorical product.\footnote{In general, we will use the word ``'construction'' to signal a lemma whose proof details are going to be relevant later. In this case, we will need the precise definition of how PL products are turned into categorical ones later on, to prove that the two constructions we have done round-trip to the identity.}
 \end{construction}
 \begin{proof}
-  Suppose given a PL-product of two objects \(A\) and \(B\) of a category \(\calC\).
-  Unpacking this, we have an object \(A \times B\)
-  and functions \(\mathsf{Fst}_\Gamma\), \(\mathsf{Snd}_\Gamma\), and \(\mathsf{Pair}_\Gamma\)
-  that respect substitution and satisfy the \(\beta\) and \(\eta\) laws.
+  Suppose you have $(A \times B, \mathsf{Fst}_\Gamma, \mathsf{Snd}_\Gamma, 
+  \mathsf{Pair}_\Gamma)$. Remember, $\mathsf{Fst}_\Gamma$ (and all these 
+  other functions) behave like polymorphic functions, and we 
+  need to find a diagram like:
+  \begin{center}
+   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQBBAAgB0e8AtvC4AhEAF9S6TLnyEU5UsWp0mrdhwlSQGbHgJEATEpUMWbRCDHiVMKAHN4RUADMAThAFJFIHBCRkqubsLnA4IDSM9ABGMIwACjL68iBuWPYAFuGSrh5eiD5+SMZB6pZwYFASlOJAA
+\begin{tikzcd}
+  & A \times B \arrow[ld, "\mathsf{fst}"'] \arrow[rd, "\mathsf{snd}"] &   \\
+A &                                                 & B
+\end{tikzcd} 
+  \end{center}
 
-  We will show how to use this information to turn the object \(A \times B\)
-  into a categorical product of \(A\) and \(B\).
-  To do this we will need to build morphisms
+  How do we get a morphism $\mathsf{fst}$? The key is that $\mathsf{Fst}$ is
+  polymorphic in $\Gamma$, so we can plug in $A \times B$ there 
+  to get something of the required type:
   \begin{align*}
-  \mathsf{fst} &: A \times B \to A\\
-  \mathsf{snd} &: A \times B \to B
+    \mathsf{Fst}_{A \times B} : \calC(A \times B, A \times B) \to  \calC(A \times B, A)
   \end{align*}
-  that satisfy the universal property of products.
-
-  These morphisms can be defined in terms of the functions \(\mathsf{Fst}\) and \(\mathsf{Snd}\).
-  To see how, let's take a closer look at the type of \(\mathsf{Fst}\).
-  \[
-    \mathsf{Fst}_\Gamma : \calC(\Gamma, A\times B) \to \calC(\Gamma, A)
-    \qquad\text{for all objects \(\Gamma\)}
-  \]
-  How can we get a morphism from \(A \times B\) to \(A\) out of this function?
-  For starters, we have to evaluate the function on an input in order to get anything from it at all.
-  The type of \(\mathsf{Fst}_\Gamma\) indicates that if we input a morphism from \(\Gamma\) to \(A \times B\),
-  then we will get back a morphism from \(\Gamma\) to \(A\).
-  To get back a morphism \(A \times B\) to \(A\), then, we should set \(\Gamma = A \times B\):
-  \[
-    \mathsf{Fst}_{A\times B}: \calC(A \times B, A\times B) \to \calC(A \times B, A)
-  \]
-  Now all we need to do is find a morphism from \(A \times B\) to itself to give
-  to this function as input. But there is always a natural choice of such a morphism, namely the identity \(\idt_{A\times B}\) on \((A \times B)\)!
-  This gives us a definition of \(\mathsf{fst}\).
-  \[
-    \mathsf{fst} := \mathsf{Fst}_{A\times B}(\idt_{A\times B})
-  \]
-  Symmetrically, we can define a morphism \(\mathsf{snd}\) from \(A \times B\) to \(B\)
-  in terms of \(\mathsf{Snd}\):
-  \[
-    \mathsf{snd} := \mathsf{Snd}_{A\times B}(\idt_{A\times B})
-  \]
-
-  Now all that's left is to show that \((A\times B, \mathsf{fst},\mathsf{snd})\) satisfies the universal property
-  of product. For this, consider an arbitrary pair of morphisms \(\Gamma \xrightarrow{f} A\) and \(\Gamma\xrightarrow{g} B\).
-  We must find a unique \(\Gamma \xrightarrow{h} A \times B\) satisfying \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
-
-  Set \(h = \mathsf{Pair}_\Gamma(f,g)\). This choice of \(h\) satisfies \(\mathsf{fst}\circ h = f\):
+  Now we need to get a morphism of the required type of $\mathsf{fst}$.
+  From here, we can play ``type tetris'': we call $\mathsf{Fst}_{A \times B}$
+  with a morphism that meets the type constraint, the identity!
   \begin{align*}
-    \mathsf{fst} \circ h
-    &= \mathsf{Fst}_{A\times B}(\idt_{A\times B}) \circ \mathsf{Pair}_{\Gamma}(f,g) & \text{unwinding definitions} \\
-    &= \mathsf{Fst}_{\Gamma}(\mathsf{Pair}_{\Gamma}(f,g)) & \text{\(\mathsf{Fst}\) respects substitution} \\
+    \mathsf{Fst}_{A \times B}(\id_{A \times B}) =: \mathsf{fst}
+  \end{align*}
+  We can do the same thing to get the morphism $\mathsf{snd}$.
+  \begin{align*}
+    \mathsf{Snd}_{A \times B}(\id_{A \times B}) =: \mathsf{snd}
+  \end{align*}
+
+  Now the question: does this satisfy the universal property 
+  for products?
+
+  First, let's show that there exists an $h$ such that the diagram
+  commutes:
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRAEEACAHW7wFt4nAEIgAvqXSZc+QigAMpAExVajFm3bjJIDNjwEiS5avrNWiEKIlT9somXmn1FkAGFxqmFADm8IqAAZgBOEPxIiiA4EEhkauZsgXA4INQMdABGMAwACtIGciDBWD4AFik2ICFhEdTRSMbxGpZwYFDaQaHhiADMdTGI8pXV3X1RA3FZbUgAtD2RZs0gpakg6Vm5+faWxWUVOiNIY-WIjVPtvQsubD6eYkA
+\begin{tikzcd}
+  & C \arrow[d] \arrow[ldd, "h"', bend right] \arrow[rdd, "g", bend left] &   \\
+  & A \times B \arrow[ld, "\mathsf{fst}"'] \arrow[rd, "\mathsf{snd}"]                       &   \\
+A &                                                                       & B
+\end{tikzcd}
+
+Where can we find $h$? We can let $h = \mathsf{Pair}_C(f, g)$. 
+
+We need to show that the diagram commutes. The left triangle commutes by the following equational argument:
+\begin{align*}
+  \mathsf{fst} \circ h
+    &= \mathsf{Fst}_{A \times B} (\id_{A \times B}) \circ \mathsf{Pair}_C(f, g) & \text{expanding definitions} \\
+    &= \mathsf{Fst}_C(\id_{A \times B} \circ \mathsf{Pair}_C(f, g)) & \text{naturality of \(\mathsf{Fst}\)}\\
+    &= \mathsf{Fst}_C(\mathsf{Pair}_C(f, g)) & \text{identity law}\\
     &= f & \text{\(\beta\)}
-  \end{align*}
-  The symmetrical argument shows \(\mathsf{snd} \circ h = g\).
+\end{align*}
+The right triangle commutes similarly.
 
-  To show uniqueness, suppose \(h'\) satisfies \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
+Finally, we need to show that \(\mathsf{Pair}_C(f,g)\) is the unique \(h\) making the above diagram commute.
+For this we use the \(\eta\) law.
+Suppose \(h'\) satisfies \(\mathsf{fst} \circ h = f\) and \(\mathsf{snd} \circ h = g\).
   Then the following calculation uses the \(\eta\) law to establish that \(h' = h\).
   \begin{align*}
     h' &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(h'),\mathsf{Snd}_\Gamma(h')) & \text{\(\eta\)} \\
@@ -423,9 +304,7 @@ With this dictionary in hand, we can translate the standard definition of produc
      &= \mathsf{Pair}_\Gamma(\mathsf{Fst}_\Gamma(h),\mathsf{Snd}_\Gamma(h)) & \text{substitution} \\
      &= h & \text{\(\eta\)}
   \end{align*}
-
 \end{proof}
-
 We can also go in the other direction: every product in the ordinary categorical sense can be turned into a PL-product.
 
 \begin{construction} \label{cons:prod-to-pl-prod}
@@ -456,6 +335,8 @@ We can also go in the other direction: every product in the ordinary categorical
   and the \(\eta\) law from the uniqueness property of \(\angled{f,g}\).
 \end{proof}
 
+Finally, we show that the two constructions just described roundtrip to the identity.
+
 \begin{proposition}
  Constructions
  \ref{cons:pl-prod-to-prod}
@@ -464,30 +345,73 @@ We can also go in the other direction: every product in the ordinary categorical
  are mutually inverse.
 \end{proposition}
 
+\begin{proof}
+  We show both roundtrips are the identity.
+  First, suppose one has a categorical product of \(A\) and \(B\),
+  hence a tuple \((A \times B, \mathsf{fst},\mathsf{snd})\)
+  satisfying the universal property of product.
+  Applying \cref{cons:prod-to-pl-prod}
+  yields a PL-product \((A\times B,\mathsf{Fst},\mathsf{Snd},\mathsf{Pair})\)
+  where
+  \begin{align*}
+    \mathsf{Fst}_\Gamma(f) &= \mathsf{fst} \circ f \\
+    \mathsf{Snd}_\Gamma(f) &= \mathsf{snd} \circ f \\
+    \mathsf{Pair}_\Gamma(f,g) &= \angled{f,g}
+  \end{align*}
+  Next, applying \cref{cons:pl-prod-to-prod} to this PL-product
+  yields a tuple \((A\times B, \mathsf{fst}',\mathsf{snd}')\)
+  where
+  \begin{align*}
+    \mathsf{fst}' &= \mathsf{Fst}_{A\times B}(\idt_{A \times B}) \\
+    \mathsf{snd}' &= \mathsf{Snd}_{A\times B}(\idt_{A \times B})
+  \end{align*}
+  The goal is now to show that
+  \(\mathsf{fst} = \mathsf{fst}'\)
+  and
+  \(\mathsf{snd} = \mathsf{snd}'\).
+  This follows from a straightforward calculation. We show only the proof of \(\mathsf{fst} = \mathsf{fst}'\);
+  the case of \(\mathsf{snd}\) is analogous.
+  \begin{align*}
+    \mathsf{fst}' &= \mathsf{Fst}_{A\times B}(\idt_{A \times B}) \\
+     &= \mathsf{fst}_{A\times B}\circ \idt_{A \times B} \\
+     &= \mathsf{fst}_{A\times B}
+  \end{align*}
 
-\section{Yoneda perspective}
+  Now for the other roundtrip. Suppose one has a PL-product \((A \times B,  \mathsf{Fst},\mathsf{Snd},\mathsf{Pair})\).
+  Applying \cref{cons:pl-prod-to-prod} to this PL-product yields the tuple product \((A\times B,\mathsf{fst},\mathsf{snd})\)
+  where
+  \begin{align*}
+    \mathsf{fst} &= \mathsf{Fst}_{A\times B}(\idt_{A \times B}) \\
+    \mathsf{snd} &= \mathsf{Snd}_{A\times B}(\idt_{A \times B})
+  \end{align*}
+  Then, applying \cref{cons:prod-to-pl-prod} to this product yields
+  \((A\times B, \mathsf{Fst}',\mathsf{Snd}',\mathsf{Pair}')\)
+  where
+  \begin{align*}
+    \mathsf{Fst}_\Gamma(f) &= \mathsf{fst} \circ f \\
+    \mathsf{Snd}_\Gamma(f) &= \mathsf{snd} \circ f \\
+    \mathsf{Pair}_\Gamma(f,g) &= \angled{f,g}
+  \end{align*}
+  Note that in the final equation, \(\angled{f,g}\) is guaranteed to exist by the universal property
+  of \((A\times B,\mathsf{fst},\mathsf{snd})\) established in \cref{cons:pl-prod-to-prod}.
 
-\todo{category theory is all about different perspectives. we saw 
-how the order theoretic, algebraic, diagrammatic perspective gave us 
-useful different insights into univeral constructions. 
-what we've just seen is a new perspective on universal constructions:
-we've transitioned from an internal view to an external view, internalized 
-notion of product, fill in 
-}
-
-One way of thinking of these theorems is that they serve as a check that the
-definitions for terminal object, product, and exponential are working as
-expected.  The keyword here is ``internalization'': the terminal object is the
-internalization of the singleton set, product is the internalization of
-Cartesian product of sets, and exponential is the internalization of morphism.
-Over the next several chapters we will be working towards understanding the 
-famous \emph{Yoneda lemma}, widely regarded as one of the most important 
-ideas in category theory. 
-Like many big ideas in mathematics, there are a variety of perspectives one can 
-have on the Yoneda lemma that lend themselves better to different intuitions.
-The perspective we will be pursuing here is that 
-the Yoneda lemma \emph{connects the internal to the external}.
-
+  The goal is now to show that \(\mathsf{Fst} = \mathsf{Fst}'\) and \(\mathsf{Snd} = \mathsf{Snd}'\) and \(\mathsf{Pair} = \mathsf{Pair}'\).
+  By function extensionality, it's enough to show these functions are equal for any object \(\Gamma\) and morphisms out of \(\Gamma\).
+  First, we have
+  \begin{align*}
+    \mathsf{Fst}'_\Gamma(f) = \mathsf{fst}\circ f = \mathsf{Fst}_{A\times B}(\idt_{A\times B})\circ f = \mathsf{Fst}_\Gamma(f).
+  \end{align*}
+  The case of \(\mathsf{Snd}\) is analogous.
+  Then, we have
+  \begin{align*}
+    \mathsf{Pair}'_\Gamma(f,g) = \angled{f,g} \stackrel{(!)}= \mathsf{Pair}_\Gamma(f,g).
+  \end{align*}
+  Note that the equation marked \((!)\) follows from the fact that, in the proof of \cref{cons:pl-prod-to-prod},
+  the unique mediating map \(h\) making the relevant product diagram involving \(f\) and \(g\)
+  commute was built using \(\mathsf{Pair}\).\footnote{%
+   It is also possible to establish \((!)\) without rifling through the proof of \cref{cons:pl-prod-to-prod},
+   by appealing to the uniqueness property of the morphism \(\angled{f,g}\).}
+\end{proof}
 
 %% \noindent In set theory, functions enjoy the following nice properties.
 %% \begin{enumerate}
