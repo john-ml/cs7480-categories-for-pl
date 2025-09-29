@@ -1182,13 +1182,22 @@ Let's begin as usual by seeing examples of universal properties in categories
 that we're familiar with. We'll begin with the category of finite sets $\FinSet$.
 For two finite sets $A$ and $B$, the exponential $B^A$ is an object that
 represents the set of all functions from $A$ to $B$.
-For instance, suppose $A = \{a, b\}$ and $B = \{c, d\}$.
-Then, there are 4 possible functions between these two sets: \sh{add $\Gamma = \{\star\}$}
+For instance, suppose $A = \{a, b\}$, $B = \{c, d\}$,
+and let $\Gamma = \{\star\}$.
+Then, there are 4 possible functions between these two sets:
 \begin{align*}
-  f_1 &= a \mapsto c, b \mapsto c \\
-  f_2 &= a \mapsto c, b \mapsto d \\
-  f_3 &= a \mapsto d, b \mapsto c \\
-  f_4 &= a \mapsto d, b \mapsto d
+  f_1(\gamma, x) &= c\\
+  f_2(\gamma, x) &= 
+  \begin{cases}
+    c \quad& \text{if }x = a\\
+    d \quad& \text{if }x = b\\
+  \end{cases}\\
+  f_3(\gamma, x) &= 
+  \begin{cases}
+    d \quad& \text{if }x = a\\
+    c \quad& \text{if }x = b\\
+  \end{cases}\\
+  f_4(\gamma, x) &= d
 \end{align*}
 
 The crucial idea is that this collection of 4 morphisms can itself 
@@ -1205,11 +1214,17 @@ So, for instance, the set $\{a,b\}^{\{c, d\}}$ is:
 
 Using this, we can define the closure $\lambda f$ as mapping a 
 function to its graph. For example:
+
+\marginnote{Note that in this 
+example, since $\Gamma = \{\star\}$, 
+the argument $\gamma$ is ignored in this definition. 
+If $\Gamma$ were more interesting, it may be the case that 
+different graphs are returned for different contexts.}
 \begin{align*}
-  \lambda f_1 &= \{(a, c), (b, c)\} \\
-  \lambda f_2 &= \{(a, c), (b, d)\} \\
-  \lambda f_3 &= \{(a, d), (b, c)\} \\
-  \lambda f_3 &= \{(a, d), (b, d)\}
+  \lambda f_1(\gamma) &= \{(a, c), (b, c)\} \\
+  \lambda f_2(\gamma) &= \{(a, c), (b, d)\} \\
+  \lambda f_3(\gamma) &= \{(a, d), (b, c)\} \\
+  \lambda f_3(\gamma) &= \{(a, d), (b, d)\}
 \end{align*}
 
 Next, an exponential object is paired with a morphism $\app$ 
