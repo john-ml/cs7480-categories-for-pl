@@ -199,102 +199,6 @@ We need to show that the diagram commutes:
 \end{itemize}
 
 
-As in prior chapters,
-we can extract equations of morphisms from 
-equations we know must hold about programs. 
-
-We can translate this invariance under under substitution into morphism equalities 
-that must hold in \ref{cd:indexed-fam}. First, we can interpret substitution as
-a morphism . 
-
-
-
-
-
-This equality corresponds to \(\mathsf{Fst}\) respecting composition:
-A parallel substitution from $\Gamma'$ to $\Gamma$ is a 
-function sending each variable $x \in \Gamma$ to a term $\Gamma' \vdash s(x) : \Gamma(x)$.
-For example, 
-$s : \Gamma' \to \Gamma$
-
-
-The premise of the judgment will be the domain of the function, 
-and the conclusion of the judgment will be the codomain, like so:
-\begin{align}
-  \mathsf{Fst}_\Gamma : \calC(\Gamma, A \times B) \to \calC(\Gamma,A)
-\end{align}
-Let's pause to inspect the unusual shape of this function.
-First, observe that this is a function between two sets: this is \emph{not} a
-morphism in the category $\calC$.  Second, it is a function between two sets of
-morphisms with the same domain, $\Gamma$.  And third, the function is
-\emph{indexed by $\Gamma$}, written with a subscript. We can visualize elements 
-of this family of ``$\mathsf{Fst}$-like morphisms'' as follows:
-
-There may be many morphisms that satisfy the type signature of $\mathsf{Fst}$, 
-but the key is that there are relatively few that are 
-\emph{invariant under the choice of $\Gamma$}. Concretely, if 
-there are is a morphism $s : \Gamma' \to \Gamma$ that relates $\Gamma'$ to $\Gamma$,
-
-We will build towards the idea that there is some family of ``\textsf{Fst}-like
-functions'' that ought to behave coherently for different choices of context
-$\Gamma$.  The notion of coherence we need is stability under parallel substitution.
-
-
-\marginnote{For a particular object $X$, the $\calC$-indexed set at $X$ is 
-often also called the \emph{presheaf of $X$}.}
-\begin{definition}[$\calC$-indexed set]
-  A \emph{\(\calC\)-indexed set}
-  consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
-  along with ``substitution functions'' \(Pf : PY \to PX\)
-  for each morphism \(f : X \to Y\) in \(C\).
-  Given an element \(y \in PY\)
-  and a morphism \(f : X \to Y\),
-  the element \((Pf)(y)\) will be written \(y \cdot_P f\)
-  and called the ``substitution of \(y\) by \(f\)''.
-  Every \(\calC\)-indexed set \(P\)
-  must satisfy the following laws:
-  \begin{itemize}
-  \item Identity: \(x \cdot_P \idt_X = x\) for all objects \(X\) and \(x \in PX\)
-  \item Composition: \(z \cdot_P (f\circ g) = z \cdot_P f \cdot_P g\)
-    for all objects \(f : Y \to Z\) and \(g : X \to Y\) and \(z \in PZ\).
-  \end{itemize}
-\end{definition}
-
-
-\begin{definition}[$\calC$-indexed function]
-  \sloppy
-  Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
-  A \emph{\(\calC\)-indexed function}
-  from \(P\) to \(Q\),
-  written \(\alpha : P \Rightarrow Q\),
-  is a family of functions \(\alpha_X : PX \to QX\)
-  that ``respects substitution''
-  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
-\end{definition}
-
-\begin{itemize}
-\item \(\calC\)-indexed functions can be composed:
-  the composition of \(\alpha : Q \Rightarrow R\)
-  and \(\beta: P \Rightarrow Q\),
-  written \(\alpha\circ\beta : P \Rightarrow R\),
-  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
-\item For each \(\calC\)-indexed set \(P\),
-  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
-  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
-\end{itemize}
-By now you may have noticed that \(\calC\)-indexed sets and functions
-look like they ought to form a category. More on this later.
-
-
-\marginnote{The symbol $\yo$ is pronounced ``yo''.}
-\begin{definition}[Representable set]
-  The \emph{representable \(\calC\)-indexed set at \(X\)}
-  is written \(\yo X\) and defined by
-  \begin{align}
-    (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
-    (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
-  \end{align}
-\end{definition}
 
 Rules with multiple premises correspond to functions that take in multiple arguments.
 For example,
@@ -334,7 +238,7 @@ With this dictionary in hand, we can translate the standard definition of produc
       \mathsf{Pair}_\Gamma &: \calC(\Gamma,A)\times\calC(\Gamma,B) \to \calC(\Gamma,A\times B)
     \end{align*}
   \end{itemize}
-  satisfying the necessary properties to be $\calC$-indexed, i.e.: 
+  satisfying: 
   \begin{itemize}
   \item \(\mathsf{Fst}\), \(\mathsf{Snd}\), and \(\mathsf{Pair}\) ``respect substitution'': for all
     \(\Gamma'\xrightarrow{s}\Gamma\),
@@ -351,8 +255,6 @@ With this dictionary in hand, we can translate the standard definition of produc
     \end{align*}
   \end{itemize}
 \end{definition}
-
-\todo{PL product is equivalent to having a representation for the product of $\calC$-indexed sets.}
 
 \begin{construction} \label{cons:pl-prod-to-prod}
   Any PL-product can be turned into a categorical product.
@@ -464,29 +366,59 @@ We can also go in the other direction: every product in the ordinary categorical
  are mutually inverse.
 \end{proposition}
 
+\section{Terminal objects}
 
-\section{Yoneda perspective}
+\section{Exponential objects}
+Let's play the same game for exponential objects:
 
-\todo{category theory is all about different perspectives. we saw 
-how the order theoretic, algebraic, diagrammatic perspective gave us 
-useful different insights into univeral constructions. 
-what we've just seen is a new perspective on universal constructions:
-we've transitioned from an internal view to an external view, internalized 
-notion of product, fill in 
-}
 
-One way of thinking of these theorems is that they serve as a check that the
-definitions for terminal object, product, and exponential are working as
-expected.  The keyword here is ``internalization'': the terminal object is the
-internalization of the singleton set, product is the internalization of
-Cartesian product of sets, and exponential is the internalization of morphism.
-Over the next several chapters we will be working towards understanding the 
-famous \emph{Yoneda lemma}, widely regarded as one of the most important 
-ideas in category theory. 
-Like many big ideas in mathematics, there are a variety of perspectives one can 
-have on the Yoneda lemma that lend themselves better to different intuitions.
-The perspective we will be pursuing here is that 
-the Yoneda lemma \emph{connects the internal to the external}.
+\begin{definition}[PL-exponential]
+  \sloppy
+Let $A$ and $B$ be objects of a category $\calC$ with products. A \emph{PL-exponential} of 
+$A$ by $B$ consists of:
+\begin{itemize}
+  \item An object $B^A$
+  \item $\calC$-indexed functions:
+  \begin{align*}
+    \mathsf{Lam}_\Gamma &: \calC(\Gamma \times A, B) \to \calC(\Gamma, B^A) \\
+    \mathsf{App}_\Gamma &: \calC(\Gamma, B^A) \times \calC(\Gamma, A) \to \calC(\Gamma, B)
+  \end{align*}
+\end{itemize}
+  satisfying:
+\begin{itemize}
+    \item Stability under substitution: for all $\Gamma' \mor{s} \Gamma$,
+    \begin{align*}
+      \mathsf{Lam}_\Gamma(f) \circ s &= \mathsf{Lam}_{\Gamma'} (f \circ \langle s \circ \pi_1, \pi_2 \rangle) & \text{for all } \Gamma \times A \mor{f} B \\
+      \mathsf{App}_\Gamma(f) \circ s &= \mathsf{App}_{\Gamma'} (f \circ \langle s, \id_A \rangle) & \text{for all } \Gamma \times A \mor{f} B
+    \end{align*}
+
+\end{itemize}
+
+  
+\end{definition}
+
+% \section{Yoneda perspective}
+
+% \todo{category theory is all about different perspectives. we saw 
+% how the order theoretic, algebraic, diagrammatic perspective gave us 
+% useful different insights into univeral constructions. 
+% what we've just seen is a new perspective on universal constructions:
+% we've transitioned from an internal view to an external view, internalized 
+% notion of product, fill in 
+% }
+
+% One way of thinking of these theorems is that they serve as a check that the
+% definitions for terminal object, product, and exponential are working as
+% expected.  The keyword here is ``internalization'': the terminal object is the
+% internalization of the singleton set, product is the internalization of
+% Cartesian product of sets, and exponential is the internalization of morphism.
+% Over the next several chapters we will be working towards understanding the 
+% famous \emph{Yoneda lemma}, widely regarded as one of the most important 
+% ideas in category theory. 
+% Like many big ideas in mathematics, there are a variety of perspectives one can 
+% have on the Yoneda lemma that lend themselves better to different intuitions.
+% The perspective we will be pursuing here is that 
+% the Yoneda lemma \emph{connects the internal to the external}.
 
 
 %% \noindent In set theory, functions enjoy the following nice properties.
