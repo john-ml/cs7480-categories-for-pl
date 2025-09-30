@@ -596,6 +596,12 @@ Finally, we show that the two constructions just described roundtrip to the iden
 
 \chapter{Yoneda II: indexed set theory and representability}
 
+\savebox0{
+\(\begin{tikzcd}
+\bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
+\end{tikzcd}\)
+}
+
 ``free definitions:''
 
 \begin{center}
@@ -628,6 +634,33 @@ are composition of morphisms, and some are composition of functions.}
     \end{itemize}
   \end{itemize}
 \end{definition}
+
+Examples: 
+\begin{itemize}
+  \item \usebox0: each $\calC$-indexed set is a set, morphism mapped to identity morphism
+  \item \usebox0\!\!\!\!\!\!\!\usebox0 : pairs of sets with identity
+  \item \(\usebox0\!\!\!\!\!\!\!\!\!\longrightarrow\!\!\!\!\!\!\!\!\!\usebox0\): function
+  \item 
+\begin{tikzpicture}[
+]
+% Objects (circles)
+\node[minimum size=0.6cm] (o1) at (0,-1) {0};
+\node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
+\node[minimum size=0.6cm] (o3) at (3,-1) {2};
+\node (dots) at (4.2,-1) {$\cdots$};
+
+% Arrows between objects
+\draw[->] (o1) -- node[above] {$\mathsf{succ}_0$} (o2);
+\draw[->] (o2) -- node[above] {$\mathsf{succ}_1$} (o3);
+\draw[->] (o3) -- (dots);
+
+\draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
+\draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
+\draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
+\end{tikzpicture}:
+functions over time
+\end{itemize}
+
 
 \begin{definition}[$\calC$-indexed function]
   \sloppy
@@ -677,11 +710,6 @@ FX \arrow[r, "\beta_X"']                & GX \arrow[r, "\alpha_X"']             
 In general, \(\calC\)-indexed set theory looks
 kind of like set theory ``with shape \(\calC\)''.
 The following examples illustrate.
-\savebox0{
-\(\begin{tikzcd}
-\bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
-\end{tikzcd}\)
-}
 %% \savebox1{
 %%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12AjJhhmHCAC+pdJlz5CKAIzkqtRizacefAcPkwoAc3hFQAMwBOEALZIyIHBAvUGECGiLSAHGQOM4MeQzpcYDAAK4ngEbEZY2gAWgtT0zKyIHOxYUIIihibmiLJWNjl2Dk4ybqQeDF4+fgHB2KFSIBHRsQoJyilpGkJAA
 %% \(\begin{tikzcd}
