@@ -596,24 +596,318 @@ Finally, we show that the two constructions just described roundtrip to the iden
 
 \chapter{Yoneda II: indexed set theory and representability}
 
-Throughout this section we will work with an arbitrary catetgory \(\calC\).
+``free definitions:''
 
-\begin{definition}
-  A \emph{\(\calC\)-indexed set}
-  consists of a family of sets \(PX\) indexed by objects \(X\) of \(\calC\),
-  along with ``substitution functions'' \(Pf : PY \to PX\)
-  for each morphism \(f : X \to Y\) in \(C\).
-  Given an element \(y \in PY\)
-  and a morphism \(f : X \to Y\),
-  the element \((Pf)(y)\) will be written \(y \cdot_P f\)
-  and called the ``substitution of \(y\) by \(f\)''.
-  Every \(\calC\)-indexed set \(P\)
-  must satisfy the following laws:
+\begin{center}
+ \begin{tabular}{cc}
+  \toprule
+  \textbf{Ordinary} & \textbf{$\calC$-Indexed} \\
+  \midrule 
+  Sets & $\calC$-indexed sets \\
+  Functions & $\calC$-indexed functions \\
+  Cartesian products & $\calC$-indexed product \\
+  \bottomrule
+\end{tabular}
+ 
+\end{center}
+
+\marginnote{Use your typechecker! Some of these compositions $\circ$ 
+are composition of morphisms, and some are composition of functions.}
+\begin{definition}[$\calC$-indexed set]
+  For a category $\calC$,
+  a $\calC$-indexed set $F$ is:
   \begin{itemize}
-  \item Identity: \(x \cdot_P \idt_X = x\) for all objects \(X\) and \(x \in PX\)
-  \item Composition: \(z \cdot_P (f\circ g) = z \cdot_P f \cdot_P g\)
-    for all objects \(f : Y \to Z\) and \(g : X \to Y\) and \(z \in PZ\).
+    \item A family of sets
+  $F(X)$ for each object $X$ in $\calC$
+    \item For each morphism $X \mor{f} Y$ in $\calC$, 
+    a function $F(f) : F(Y) \to F(X)$ satisfying 
+    (1) \emph{identity preservation}: $F(\id_X) = \id_{F(X)}$ and 
+    (2) \emph{functoriality}: for $X \mor{f} Y \mor{g} Z$, $F(g \circ f) = F(f) \circ F(g)$.
   \end{itemize}
+\end{definition}
+
+\begin{definition}[$\calC$-indexed function]
+  \sloppy
+  Given a category $\calC$ and two $\calC$-indexed sets $F$ and $G$, 
+  a $\calC$-indexed function $\alpha : F \Rightarrow G$ 
+  is a family of functions $\alpha_X : F(X) \to G(X)$ for objects $X$ 
+  of $\calC$ satisfying the following 
+  commuting diagram called the
+  \emph{naturality condition}:
+  % for any morphism $X \mor{f} Y$, 
+  % $\alpha_X \circ F(f) = $
+
+  \begin{center}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEAKATQEoQAvqXSZc+QigCM5KrUYs2AcR78hI7HgJEyk2fWatEHTgA1VwkBg3ii03dX0Kjys4NkwoAc3hFQAMwAnCABbJDIQHAgkACYHeUNjP3N-INDEaQioxABmOIMlTiTBC0CQsOpIpAzHBIAdWsY0AAs6AH1uYpSyxFjMpFy5fKN6xpbWkzcBIA
+\begin{tikzcd}
+  F(Y) \arrow[d, "F(f)"] \arrow[r, "\alpha_Y"] & G(Y) \arrow[d, "G(f)"] \\
+  F(X) \arrow[r, "\alpha_X"]                   & G(X)                  
+  \end{tikzcd}
+  \end{center}
+\end{definition}
+
+\begin{itemize}
+\item \(\calC\)-indexed functions can be composed:
+  the composition of \(\alpha : Q \Rightarrow R\)
+  and \(\beta: P \Rightarrow Q\),
+  written \(\alpha\circ\beta : P \Rightarrow R\),
+  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
+\item For each \(\calC\)-indexed set \(P\),
+  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
+  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+\end{itemize}
+
+
+\begin{center}
+  \begin{tabular}{ccc}
+    \toprule
+    $\calC$ & $\calC$-indexed set & $\calC$-indexed function \\ 
+    \midrule
+    
+    
+  \end{tabular}
+\end{center}
+
+Examples:
+\begin{itemize}
+  \item Ex 1: Single object with only identity map indexed set = set
+  \item Ex 2: Two object identity only: pairs of sets
+  \item Ex 3: arrow between two objects set: 
+\end{itemize}
+
+\begin{definition}[$\calC$-indexed product]
+  \sloppy
+  Given a category $\calC$ and two indexed sets $F$ and $G$,
+  the $\calC$-indexed product of $F$ and $G$, written $F \times G$,
+  is the $\calC$-indexed set defined by:
+  \begin{itemize}
+    \item Action on objects: $(F \times G)(X) = F(X) \times G(X)$
+    \item Action on morphisms: for $X \mor{f} Y$,
+    $(F \times G)(f) : F(Y) \times G(Y) \to F(X) \times G(X)$ 
+    satisfying functoriality: $(F \times G)(f) = (x,y) \mapsto (F(f)(x), G(f)(y))$ 
+  \end{itemize}
+\end{definition} 
+
+Example: ``Cartesian product of two balloons'' 
+
+% \begin{definition}[$\calC$-indexed projections]
+%   \sloppy
+%   Given $\calC$-indexed sets $F$ and $G$ and a $\calC$-indexed product $F \times G$,
+%   the \emph{$\calC$-indexed left projection} $\pi_1$ is a $\calC$-indexed 
+%   function of functions $\pi_{1,X} : F(X) \times G(X) \to F(X)$ defined by 
+%   $\pi_{1,X}(x,y) = x$ where $x \in F(X), y \in G(X)$.
+% \end{definition}
+
+% Show that this is natural by showing this square commutes:
+
+% \begin{center}
+%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAAoAxAAgB1e8AW3jcA4gEp2ATXHcAvN07TZ-ISNHKQAX1LpMufIRQBGclVqMWbJTO26QGbHgJEyx8-WatEHHqqzCcGKSABqyCkphfAIB6uxhdnpOhkSm7tSeVj6R4trmMFAA5vBEoABmAE4QgkhkIDgQSABMGZbevtFqQRLsZbk65VU1iKb1jYgAzK1ebBp9iSCV1bXUDUijme38aFgA+sCm3FJaINQMdABGMAwACvrORiAMMGU4C0vDLWNIUxYzPts9gdSCETloKFogA
+% \begin{tikzcd}
+%   (F \times G)(Y) = F(Y) \times G(Y) \arrow[d, "(F \times G)(f)"] \arrow[r, "{\pi_{1, Y}}"] & F(Y) \arrow[d, "G(f)"] \\
+%   (F \times G)(X) = F(X) \times G(X) \arrow[r, "{\pi_{1,X}}"]                               & F(X)                  
+%   \end{tikzcd}
+% \end{center}
+
+
+
+
+% In the internal viewpoint, we characterized products
+% by the existence of certain morphisms 
+% satisfying universal properties in $\calC$. In the external
+% viewpoint, we characterized products by how ``sets of morphisms''
+% behaved. What happened is that, to gain insight on $\calC$, we shifted our
+% perspective to a different category: the category of sets.
+% We will see that, in some sense, 
+
+% In category theory, a change in perspective is formalized by the notion 
+% of a functor:
+
+% \begin{definition}[Functor]
+%   Let $\calC$ and $\calD$ be two categories. A \emph{functor} $F$ 
+%   from $\calC$ to $\calD$, written $F : \calC \Rightarrow \calD$,
+%   associates each object in $\calC$ with an object in $\calD$
+%   and each morphisms $X \xrightarrow{f} Y$ in $\calC$ 
+%   with a morphism $F(X) \xrightarrow{F(f)} F(Y)$ satisfying:
+%   \begin{itemize}
+%     \item \emph{Preservation of identity}: $F(\id_X) = \id_{F(X)}$ 
+%     for every object $X$ in $\calC$;
+%     \item \emph{Naturality}: For morphisms $X \xrightarrow{f} Y \xrightarrow{g} Z$ in $\calC$,
+%     we have that $F(g \circ f) = F(g) \circ F(f)$.
+%   \end{itemize}
+% \end{definition}
+
+
+% Intuitively, functors are structure-preserving relations between two 
+% categories. We can visualize the action of a particular functor 
+% $F$ on objects like so:
+
+% \begin{center}
+%   \includegraphics[width=200px]{fig/functor-1.png}
+% \end{center}
+
+% Here we have drawn only the functor's action on objects: $F(A) = X$, 
+% $F(B) = X$, and $F(C) = Y$. By fixing this particular action on 
+% objects, we are forced to conclude what its action on 
+% morphisms must be:
+% \begin{itemize}
+%   \item Preservation of identity says $F(\id_A) = \id_X$, $F(\id_B) = \id_X$, 
+%   and $F(\id_C) = \id_Y$.
+%   \item By ``type tetris'', $F(f)$ must be $\id_X$, $F(h)$ must $q$, and 
+%   $F(g)$ must be $q$.
+%   \item By naturality, $F(f \circ h) = F(f) \circ F(h) = \id_X \circ q = q$. 
+% \end{itemize}
+
+% Intuitively, naturality imposes that ``a picture of $\calC$ lives inside 
+% $\calD$'', or put another way, ``$\calD$ is an abstraction of $\calC$''
+% in the sense that it over-approximates the the reachability relations in 
+% $\calC$ when it is thought of as a graph.
+
+\section{Representable $\calC$-indexed sets}
+\begin{definition}[The representable $\calC$-indexed set at $X$]
+  The \emph{representable \(\calC\)-indexed set at \(X\)}
+  is written \(\yo X\) and defined by
+  \begin{align}
+    (\yo X)(A) &= \calC(A, X) \\
+    (\yo X)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
+  \end{align}
+\end{definition}
+
+\begin{definition}[Isomorphism of $\calC$-indexed sets]
+  Two \(\calC\)-indexed sets \(P,Q\)
+  are \emph{isomorphic}
+if there are \(\calC\)-indexed functions \(\alpha : P \Rightarrow Q\)
+and \(\beta : Q \Rightarrow P\)
+such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
+\end{definition}
+
+\begin{definition}[Representability]
+  A \(\calC\)-indexed set \(P\) is \emph{representable}
+  if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
+  for some object \(X\) of \(\calC\).
+\end{definition}
+
+\begin{proposition}
+  Products are representable in $\FinSet$
+\end{proposition}
+
+\begin{theorem}
+  An object $P$ is a product of $A$ and $B$ if and only if 
+  it represents $\yo A \times \yo B$.
+\end{theorem}
+
+\section{$\calC$-indexed sets}
+
+Let's begin by studying the category $\mathbb{N}^\infty$, the category
+constructed from the preorder formed by the natural numbers extended by
+infinity:
+
+\begin{center}
+\begin{tikzpicture}[
+]
+% Objects (circles)
+\node[minimum size=0.6cm] (o1) at (0,-1) {0};
+\node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
+\node[minimum size=0.6cm] (o3) at (3,-1) {2};
+\node (dots) at (4.2,-1) {$\cdots$};
+
+% Arrows between objects
+\draw[->] (o1) -- node[above] {$f$} (o2);
+\draw[->] (o2) -- node[above] {$g$} (o3);
+\draw[->] (o3) -- (dots);
+
+\draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
+\draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
+\draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
+\end{tikzpicture}
+\end{center}
+
+Given a category $\calC$, a $\calC$-indexed set associates each object of
+a category with a set. 
+Let's consider a concrete $\calC$-indexed set called $F$.
+We can draw $F$ as a ``balloon picture'' like this:
+
+\begin{center}
+  \includegraphics[width=175px]{fig/balloon-1.png}
+\end{center}
+
+Above each object is drawn a (in this case, finite) set. 
+$F_1$ is the set $\{a, b, c\}$, and $F_2$ is is the set 
+$\{d, e\}$. 
+In addition to associating each object with a set, 
+a $\calC$-indexed set also associates each morphism $X \mor{f} Y$
+with a function $F_Y \to F_X$, which we can draw on the balloon 
+picture like so:
+
+\begin{center}
+\includegraphics[width=175px]{fig/balloon-2.png}
+\end{center}
+
+Intuitively, we can see that $F$ is describing a relation between two 
+categories: our category of interest $\calC$, and an ``external''
+category of sets and functions. This relation is called a \textbf{functor}.
+Functors have actions on objects 
+
+% \begin{tikzpicture}[
+%   node distance=1.5cm,
+%   morphism/.style={-Stealth, thick}
+% ]
+
+% % Top row of labels
+% \node (v) at (0,2) {$v$};
+% \node (c) at (3,2) {$c$};
+
+% % Middle row
+% \node (y) at (-1.5,1) {$y$};
+% \node (w) at (0,1) {$w$};
+% \node (a) at (3,1) {$a$};
+
+% % Bottom row (just above the objects)
+% \node (x) at (-1.5,0) {$x$};
+% \node (h) at (0,0) {$h$};
+% \node (b) at (3,0) {$b$};
+
+% % Objects (circles)
+% \node[circle, draw, minimum size=0.6cm] (o1) at (0,-1) {0};
+% \node[circle, draw, minimum size=0.6cm] (o2) at (1.5,-1) {1};
+% \node[circle, draw, minimum size=0.6cm] (o3) at (3,-1) {2};
+% \node (dots) at (4.2,-1) {$\cdots$};
+
+% % Arrows between objects
+% \draw[morphism] (o1) -- (o2);
+% \draw[morphism] (o2) -- (o3);
+% \draw[morphism] (o3) -- (dots);
+
+% \end{tikzpicture}
+
+
+
+
+% \begin{center}
+%  \begin{tikzpicture}[]
+
+% % Objects
+% \node (A) at (0,0) {$A$};
+% \node (B) at (3,0) {$B$};
+% \node (C) at (1.5,2.5) {$C$};
+
+% % Identity morphisms (loops)
+% \draw[->] (A) edge[loop left] node[left] {$\text{id}_A$} (A);
+% \draw[->] (B) edge[loop right] node[right] {$\text{id}_B$} (B);
+% \draw[->] (C) edge[loop above] node[above] {$\text{id}_C$} (C);
+
+% % Morphisms between objects
+% \draw[->] (A) -- node[below] {$f$} (B);
+% \draw[->] (A) -- node[left] {$g$} (C);
+% \draw[->] (C) -- node[right] {$h$} (B);
+% \node[draw, fit=(A)(B)(C), inner sep=1cm, rectangle] {};
+% \end{tikzpicture}
+% \end{center}
+
+
+Throughout this section we will work with an arbitrary category \(\calC\).
+
+\begin{definition}[$\calC$-indexed set]
+  A $\calC$-indexed set is a functor $F : \calC^\text{op} \Rightarrow \Set$.
 \end{definition}
 
 \begin{example}
@@ -675,6 +969,7 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
   if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
   for some object \(X\) of \(\calC\).
 \end{definition}
+
 
 \chapter{Yoneda III: universal constructions, elements, and properties}
 
