@@ -620,9 +620,12 @@ are composition of morphisms, and some are composition of functions.}
     \item A family of sets
   $F(X)$ for each object $X$ in $\calC$
     \item For each morphism $X \mor{f} Y$ in $\calC$, 
-    a function $F(f) : F(Y) \to F(X)$ satisfying 
-    (1) \emph{identity preservation}: $F(\id_X) = \id_{F(X)}$ and 
-    (2) \emph{functoriality}: for $X \mor{f} Y \mor{g} Z$, $F(g \circ f) = F(f) \circ F(g)$.
+    a function $F(f) : F(Y) \to F(X)$ satisfying
+    the following two \emph{functoriality properties}:
+    \begin{itemize}
+    \item preserves identity: $F(\id_X) = \id_{F(X)}$
+    \item preserves composition: $F(g \circ f) = F(f) \circ F(g)$ for all $X \mor{f} Y \mor{g} Z$,
+    \end{itemize}
   \end{itemize}
 \end{definition}
 
@@ -631,12 +634,10 @@ are composition of morphisms, and some are composition of functions.}
   Given a category $\calC$ and two $\calC$-indexed sets $F$ and $G$, 
   a $\calC$-indexed function $\alpha : F \Rightarrow G$ 
   is a family of functions $\alpha_X : F(X) \to G(X)$ for objects $X$ 
-  of $\calC$ satisfying the following 
-  commuting diagram called the
-  \emph{naturality condition}:
-  % for any morphism $X \mor{f} Y$, 
-  % $\alpha_X \circ F(f) = $
-
+  of $\calC$ satisfying the following naturality condition:
+  $\alpha_X \circ F(f) = G(f) \circ \alpha_Y$
+  for any morphism $X \mor{f} Y$.
+  This naturality condition can be visualized as a commutative square:
   \begin{center}
     % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEAKATQEoQAvqXSZc+QigCM5KrUYs2AcR78hI7HgJEyk2fWatEHTgA1VwkBg3ii03dX0Kjys4NkwoAc3hFQAMwAnCABbJDIQHAgkACYHeUNjP3N-INDEaQioxABmOIMlTiTBC0CQsOpIpAzHBIAdWsY0AAs6AH1uYpSyxFjMpFy5fKN6xpbWkzcBIA
 \begin{tikzcd}
@@ -647,48 +648,85 @@ are composition of morphisms, and some are composition of functions.}
 \end{definition}
 
 \begin{itemize}
-\item \(\calC\)-indexed functions can be composed:
+\item Just as there is an identity function in set theory,
+  there is an identity \(\calC\)-indexed function in \(\calC\)-indexed set theory.
+  For each \(\calC\)-indexed set \(P\),
+  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
+  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+  The naturality condition amounts to commutativity of the following diagram.
+  \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEBNEAX1PUy58hFGQCMVWoxZt2ADV78QGbHgJEx5SfWatEHbnwGrhG0hOo6Z++b0kwoAc3hFQAMwBOEALZJNIHAgkAGZLaT0QAB1IrCgcAH1geR4QagY6ACMYBgAFQTUREA8sRwALHEV3L19EMgCgxAAmMN02aNiEpM4UoxBPHyQ6wL8W6w43VJB0rNz8031isore-prm+pDRiPYJngoeIA
+\begin{tikzcd}
+FY \arrow[r, "\idt_{FY}"] \arrow[d, "Ff"'] & FY \arrow[d, "Ff"] \\
+FX \arrow[r, "\idt_{FX}"']                 & FX
+\end{tikzcd}\]
+\item \(\calC\)-indexed functions can also be composed:
   the composition of \(\alpha : Q \Rightarrow R\)
   and \(\beta: P \Rightarrow Q\),
   written \(\alpha\circ\beta : P \Rightarrow R\),
   is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
-\item For each \(\calC\)-indexed set \(P\),
-  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
-  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+  The naturality condition amounts to the commutativity of the following diagram.
+  \[
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEBNEAX1PUy58hFGQCMVWoxZt2ADV78QGbHgJEx5SfWatEIAOLc+A1cI2kJ1HTP0GFJ5YLUjkAJi3XpekAAljSipC6igeVlK6bL4OkjBQAObwRKAAZgBOEAC2SGQgOBBImhG2HCmKqRnZiLn5SB7FPgA6jQBGMDh0APoBFVl11LWIAMxekXZljul9iPWDACyjJc2MaAAWXT0gU1ULeQWIAKyLPr4TSttII3tIRw1sywxrXQrUDHRtDAAKzub6aVjxVY4cpbSqFAb7K42JqtdrPECvd4wL4-EIgf6A4E8Cg8IA
+\begin{tikzcd}
+FY \arrow[d, "Ff"] \arrow[r, "\beta_Y"] & GY \arrow[d, "Gf"] \arrow[r, "\alpha_Y"] & HY \arrow[d, "Hf"] \\
+FX \arrow[r, "\beta_X"']                & GX \arrow[r, "\alpha_X"']                & HX
+\end{tikzcd}
+\]
 \end{itemize}
 
-
+In general, \(\calC\)-indexed set theory looks
+kind of like set theory ``with shape \(\calC\)''.
+The following examples illustrate.
+\savebox0{
+\(\begin{tikzcd}
+\bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
+\end{tikzcd}\)
+}
+%% \savebox1{
+%%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12AjJhhmHCAC+pdJlz5CKAIzkqtRizacefAcPkwoAc3hFQAMwBOEALZIyIHBAvUGECGiLSAHGQOM4MeQzpcYDAAK4ngEbEZY2gAWgtT0zKyIHOxYUIIihibmiLJWNjl2Dk4ybqQeDF4+fgHB2KFSIBHRsQoJyilpGkJAA
+%% \(\begin{tikzcd}
+%% \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55] & \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
+%% \end{tikzcd}\)
+%% }
+%% \savebox2{
+%%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12AjJhhmHCAC+pdJlz5CKAIzkqtRizacefAcPkwoAc3hFQAMwBOEALZIyIHBAvUGECGiLSAHGQOM4MeQzpcYDAAK4ngEbEZY2gAWgtT0zKyIHOxYUIIihibmiLJWNjl2Dk4ybqQeDF4+fgHB2KFSIBHRsQoJyilpwqIgxma2eUi5vv5BIZLhkTEaQkA
+%% \(\begin{tikzcd}
+%% \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55] \arrow[r] & \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
+%% \end{tikzcd}\)
+%% }
 \begin{center}
-  \begin{tabular}{ccc}
+  \begin{tabular}{cccc}
     \toprule
-    $\calC$ & $\calC$-indexed set & $\calC$-indexed function \\ 
+    $\calC$ & $\calC$-indexed set & $\calC$-indexed function & picture \\
     \midrule
-    
-    
+    \usebox0 & set & function & \todo \\
+    \midrule
+    % im sorry
+    \usebox0\!\!\!\!\!\!\!\usebox0 & pair of sets & pair of functions & \todo\\
+    \midrule
+    % im sorry
+    \(\usebox0\!\!\!\!\!\!\!\!\!\longrightarrow\!\!\!\!\!\!\!\!\!\usebox0\) & function & square &\todo \\
+    \bottomrule
   \end{tabular}
 \end{center}
 
-Examples:
-\begin{itemize}
-  \item Ex 1: Single object with only identity map indexed set = set
-  \item Ex 2: Two object identity only: pairs of sets
-  \item Ex 3: arrow between two objects set: 
-\end{itemize}
-
 \begin{definition}[$\calC$-indexed product]
   \sloppy
-  Given a category $\calC$ and two indexed sets $F$ and $G$,
-  the $\calC$-indexed product of $F$ and $G$, written $F \times G$,
-  is the $\calC$-indexed set defined by:
+  Given a category $\calC$ and two \(\calC\)-indexed sets $F$ and $G$,
+  the $\calC$-indexed product of $F$ and $G$
+  is the \(\calC\)-indexed set
+  $F \times G$
+  defined by:
   \begin{itemize}
-    \item Action on objects: $(F \times G)(X) = F(X) \times G(X)$
-    \item Action on morphisms: for $X \mor{f} Y$,
-    $(F \times G)(f) : F(Y) \times G(Y) \to F(X) \times G(X)$ 
-    satisfying functoriality: $(F \times G)(f) = (x,y) \mapsto (F(f)(x), G(f)(y))$ 
+    \item On objects, $(F \times G)(X) = F(X) \times G(X)$
+    \item On morphisms $X \mor{f} Y$,
+    $(F \times G)(f)$ is the function $F(Y) \times G(Y) \to F(X) \times G(X)$
+      defined by $(F \times G)(f) = (x,y) \mapsto (F(f)(x), G(f)(y))$
   \end{itemize}
+  Functoriality follows from functoriality of \(F\) and \(G\).
 \end{definition} 
 
-Example: ``Cartesian product of two balloons'' 
+%% Example: ``Cartesian product of two balloons''
 
 % \begin{definition}[$\calC$-indexed projections]
 %   \sloppy
@@ -787,65 +825,77 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
 \end{definition}
 
 \begin{proposition}
-  Products are representable in $\FinSet$
+  The \(\FinSet\)-indexed set \(\yo X \times \yo Y\)
+  is representable.
 \end{proposition}
+\begin{proof}
+  for any finite set \(A\), there is an isomorphism of sets
+  \[
+  \alpha_A : \FinSet(A,X \times Y) \cong \FinSet(A,X) \times \FinSet(A,Y).
+  \]
+  Concretely, \(\alpha_A\) is the function that sends
+  a \(f \in \FinSet(A,X\times Y)\) to \((\pi_1 \circ f ,\pi_2,\circ f): \FinSet(A,X) \times \FinSet(A,Y) \).
+  Its inverse is defined by \(\beta_A(f,g) = \angled{f,g}\).
+  Both \(\alpha\) and \(\beta\) can be checked satisfy the naturality condition.
+  Thus \(X\times Y\) represents \(\yo X \times \yo Y\).
+\end{proof}
 
 \begin{theorem}
   An object $P$ is a product of $A$ and $B$ if and only if 
   it represents $\yo A \times \yo B$.
 \end{theorem}
 
-\section{$\calC$-indexed sets}
+%% \section{$\calC$-indexed sets}
 
-Let's begin by studying the category $\mathbb{N}^\infty$, the category
-constructed from the preorder formed by the natural numbers extended by
-infinity:
+%% Let's begin by studying the category $\mathbb{N}^\infty$, the category
+%% constructed from the preorder formed by the natural numbers extended by
+%% infinity:
 
-\begin{center}
-\begin{tikzpicture}[
-]
-% Objects (circles)
-\node[minimum size=0.6cm] (o1) at (0,-1) {0};
-\node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
-\node[minimum size=0.6cm] (o3) at (3,-1) {2};
-\node (dots) at (4.2,-1) {$\cdots$};
+%% \begin{center}
+%% \begin{tikzpicture}[
+%% ]
+%% % Objects (circles)
+%% \node[minimum size=0.6cm] (o1) at (0,-1) {0};
+%% \node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
+%% \node[minimum size=0.6cm] (o3) at (3,-1) {2};
+%% \node (dots) at (4.2,-1) {$\cdots$};
 
-% Arrows between objects
-\draw[->] (o1) -- node[above] {$f$} (o2);
-\draw[->] (o2) -- node[above] {$g$} (o3);
-\draw[->] (o3) -- (dots);
+%% % Arrows between objects
+%% \draw[->] (o1) -- node[above] {$f$} (o2);
+%% \draw[->] (o2) -- node[above] {$g$} (o3);
+%% \draw[->] (o3) -- (dots);
 
-\draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
-\draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
-\draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
-\end{tikzpicture}
-\end{center}
+%% \draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
+%% \draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
+%% \draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
+%% \end{tikzpicture}
+%% \end{center}
 
-Given a category $\calC$, a $\calC$-indexed set associates each object of
-a category with a set. 
-Let's consider a concrete $\calC$-indexed set called $F$.
-We can draw $F$ as a ``balloon picture'' like this:
+%% Given a category $\calC$, a $\calC$-indexed set associates each object of
+%% a category with a set.
+%% Let's consider a concrete $\calC$-indexed set called $F$.
+%% We can draw $F$ as a ``balloon picture'' like this:
 
-\begin{center}
-  \includegraphics[width=175px]{fig/balloon-1.png}
-\end{center}
+%% \begin{center}
+%%   \includegraphics[width=175px]{fig/balloon-1.png}
+%% \end{center}
 
-Above each object is drawn a (in this case, finite) set. 
-$F_1$ is the set $\{a, b, c\}$, and $F_2$ is is the set 
-$\{d, e\}$. 
-In addition to associating each object with a set, 
-a $\calC$-indexed set also associates each morphism $X \mor{f} Y$
-with a function $F_Y \to F_X$, which we can draw on the balloon 
-picture like so:
+%% Above each object is drawn a (in this case, finite) set.
+%% $F_1$ is the set $\{a, b, c\}$, and $F_2$ is is the set
+%% $\{d, e\}$.
+%% In addition to associating each object with a set,
+%% a $\calC$-indexed set also associates each morphism $X \mor{f} Y$
+%% with a function $F_Y \to F_X$, which we can draw on the balloon
+%% picture like so:
 
-\begin{center}
-\includegraphics[width=175px]{fig/balloon-2.png}
-\end{center}
+%% \begin{center}
+%% \includegraphics[width=175px]{fig/balloon-2.png}
+%% \end{center}
 
-Intuitively, we can see that $F$ is describing a relation between two 
-categories: our category of interest $\calC$, and an ``external''
-category of sets and functions. This relation is called a \textbf{functor}.
-Functors have actions on objects 
+%% Intuitively, we can see that $F$ is describing a relation between two
+%% categories: our category of interest $\calC$, and an ``external''
+%% category of sets and functions. This relation is called a \textbf{functor}.
+%% Functors have actions on objects
 
 % \begin{tikzpicture}[
 %   node distance=1.5cm,
@@ -904,71 +954,71 @@ Functors have actions on objects
 % \end{center}
 
 
-Throughout this section we will work with an arbitrary category \(\calC\).
+%% Throughout this section we will work with an arbitrary category \(\calC\).
 
-\begin{definition}[$\calC$-indexed set]
-  A $\calC$-indexed set is a functor $F : \calC^\text{op} \Rightarrow \Set$.
-\end{definition}
+%% \begin{definition}[$\calC$-indexed set]
+%%   A $\calC$-indexed set is a functor $F : \calC^\text{op} \Rightarrow \Set$.
+%% \end{definition}
 
-\begin{example}
-  Recall that \(\mathsf{STLC}\) is a category
-  whose objects are types and whose morphisms \(A \to B\)
-  are terms \(x : A \vdash M : B\) quotiented by \(\beta\eta\)-equivalence.
-  For each type \(A\),
-  the following defines a \(\mathsf{STLC}\)-indexed set \(\mathsf{Tm}(A)\):
-  \begin{align}
-  \mathsf{Tm}(B)(A) &= \text{the set of morphisms \(A\to B\)} \\
-  \mathsf{Tm}(B)(N : A'\to A)
-  &= (x\ofty A \vdash M : B) \mapsto (x'\ofty A' \vdash M[N/x] : B)
-  \end{align}
-\end{example}
-This example is a special case of a canonical kind of \(\calC\)-indexed set.
-\begin{definition}
-  The \emph{representable \(\calC\)-indexed set at \(X\)}
-  is written \(\yo X\) and defined by
-  \begin{align}
-    (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
-    (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
-  \end{align}
-\end{definition}
+%% \begin{example}
+%%   Recall that \(\mathsf{STLC}\) is a category
+%%   whose objects are types and whose morphisms \(A \to B\)
+%%   are terms \(x : A \vdash M : B\) quotiented by \(\beta\eta\)-equivalence.
+%%   For each type \(A\),
+%%   the following defines a \(\mathsf{STLC}\)-indexed set \(\mathsf{Tm}(A)\):
+%%   \begin{align}
+%%   \mathsf{Tm}(B)(A) &= \text{the set of morphisms \(A\to B\)} \\
+%%   \mathsf{Tm}(B)(N : A'\to A)
+%%   &= (x\ofty A \vdash M : B) \mapsto (x'\ofty A' \vdash M[N/x] : B)
+%%   \end{align}
+%% \end{example}
+%% This example is a special case of a canonical kind of \(\calC\)-indexed set.
+%% \begin{definition}
+%%   The \emph{representable \(\calC\)-indexed set at \(X\)}
+%%   is written \(\yo X\) and defined by
+%%   \begin{align}
+%%     (\yo X)(A) &= \text{the set of morphisms \(A \to X\)} \\
+%%     (\yo X)(A)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
+%%   \end{align}
+%% \end{definition}
 
-\begin{definition}
-  \sloppy
-  Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
-  A \emph{\(\calC\)-indexed function}
-  from \(P\) to \(Q\),
-  written \(\alpha : P \Rightarrow Q\),
-  is a family of functions \(\alpha_X : PX \to QX\)
-  that ``respects substitution''
-  in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
-\end{definition}
+%% \begin{definition}
+%%   \sloppy
+%%   Let \(P\) and \(Q\) be \(\calC\)-indexed sets.
+%%   A \emph{\(\calC\)-indexed function}
+%%   from \(P\) to \(Q\),
+%%   written \(\alpha : P \Rightarrow Q\),
+%%   is a family of functions \(\alpha_X : PX \to QX\)
+%%   that ``respects substitution''
+%%   in the sense that \(\alpha_{X'}(x\cdot_P p) = \alpha_X(x)\cdot_p p\).
+%% \end{definition}
 
-\begin{itemize}
-\item \(\calC\)-indexed functions can be composed:
-  the composition of \(\alpha : Q \Rightarrow R\)
-  and \(\beta: P \Rightarrow Q\),
-  written \(\alpha\circ\beta : P \Rightarrow R\),
-  is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
-\item For each \(\calC\)-indexed set \(P\),
-  there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
-  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
-\end{itemize}
-By now you may have noticed that \(\calC\)-indexed sets and functions
-look like they ought to form a category. More on this later.
+%% \begin{itemize}
+%% \item \(\calC\)-indexed functions can be composed:
+%%   the composition of \(\alpha : Q \Rightarrow R\)
+%%   and \(\beta: P \Rightarrow Q\),
+%%   written \(\alpha\circ\beta : P \Rightarrow R\),
+%%   is defined by \((\alpha\circ\beta)_X = \alpha_X \circ \beta_X\).
+%% \item For each \(\calC\)-indexed set \(P\),
+%%   there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
+%%   defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+%% \end{itemize}
+%% By now you may have noticed that \(\calC\)-indexed sets and functions
+%% look like they ought to form a category. More on this later.
 
-\begin{definition}
-  Two \(\calC\)-indexed sets \(P,Q\)
-  are \emph{isomorphic}
-if there are \(\calC\)-indexed functions \(\alpha : P \Rightarrow Q\)
-and \(\beta : Q \Rightarrow P\)
-such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
-\end{definition}
+%% \begin{definition}
+%%   Two \(\calC\)-indexed sets \(P,Q\)
+%%   are \emph{isomorphic}
+%% if there are \(\calC\)-indexed functions \(\alpha : P \Rightarrow Q\)
+%% and \(\beta : Q \Rightarrow P\)
+%% such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
+%% \end{definition}
 
-\begin{definition}
-  A \(\calC\)-indexed set \(P\) is \emph{representable}
-  if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
-  for some object \(X\) of \(\calC\).
-\end{definition}
+%% \begin{definition}
+%%   A \(\calC\)-indexed set \(P\) is \emph{representable}
+%%   if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
+%%   for some object \(X\) of \(\calC\).
+%% \end{definition}
 
 
 \chapter{Yoneda III: universal constructions, elements, and properties}
