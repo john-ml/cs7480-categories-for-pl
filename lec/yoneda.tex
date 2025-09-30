@@ -602,20 +602,32 @@ Finally, we show that the two constructions just described roundtrip to the iden
 \end{tikzcd}\)
 }
 
-``free definitions:''
+In the last chapter we saw an important example of functions indexed by objects
+in a category, which formed the components of the PL-pair. This idea of sets and
+functions indexed by objects in a category is pervasive in programming languages
+and in category theory, and in this chapter we will spend some time 
+exploring these constructions in their own right.
 
-\begin{center}
- \begin{tabular}{cc}
+Many of the notions that you are familiar with from set theory will have 
+$\calC$-indexed analogues:
+
+\begin{fullwidth}
+ \begin{center}
+ \begin{tabular}{ccc}
   \toprule
-  \textbf{Ordinary} & \textbf{$\calC$-Indexed} \\
+  \textbf{Ordinary} & \textbf{$\calC$-Indexed} & \textbf{Intuition} \\
   \midrule 
-  Sets & $\calC$-indexed sets \\
-  Functions & $\calC$-indexed functions \\
-  Cartesian products & $\calC$-indexed product \\
+  Sets & $\calC$-indexed sets & A copy of $\calC$ inside of sets \\
+  Functions & $\calC$-indexed functions & Polymorphic functions \\
+  Cartesian products & $\calC$-indexed product & Cartesian product that respects $\calC$-indexing \\
+  ... & & \\
   \bottomrule
 \end{tabular}
- 
 \end{center}
+\end{fullwidth}
+
+We will make use of these analogies extensively. But before 
+we do, here is the formal definition of a $\calC$-indexed set:
 
 \marginnote{Use your typechecker! Some of these compositions $\circ$ 
 are composition of morphisms, and some are composition of functions.}
@@ -635,32 +647,89 @@ are composition of morphisms, and some are composition of functions.}
   \end{itemize}
 \end{definition}
 
-Examples: 
+Let's see some examples of $\calC$-indexed sets:
 \begin{itemize}
-  \item \usebox0: each $\calC$-indexed set is a set, morphism mapped to identity morphism
-  \item \usebox0\!\!\!\!\!\!\!\usebox0 : pairs of sets with identity
-  \item \(\usebox0\!\!\!\!\!\!\!\!\!\longrightarrow\!\!\!\!\!\!\!\!\!\usebox0\): function
-  \item 
-\begin{tikzpicture}[
-]
-% Objects (circles)
-\node[minimum size=0.6cm] (o1) at (0,-1) {0};
-\node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
-\node[minimum size=0.6cm] (o3) at (3,-1) {2};
-\node (dots) at (4.2,-1) {$\cdots$};
+  \item Consider a category with 1 object $\bullet$ and 
+  an identity morphism $\id$: 
+  
+  \begin{equation}
+  \usebox0
+  \label{cat:1-obj}
+  \end{equation}
 
-% Arrows between objects
-\draw[->] (o1) -- node[above] {$\mathsf{succ}_0$} (o2);
-\draw[->] (o2) -- node[above] {$\mathsf{succ}_1$} (o3);
-\draw[->] (o3) -- (dots);
+  Every $\calC$-indexed set $F$ for this category is a set: 
+  for instance, we might have that 
+  $F(\bullet) = \{a, b\}$. By identity preservation, we must 
+  have that $F(\id) = \id_{\{a, b\}}$. Since there's only 
+  one morphism, composition preservation is trivial.
+  \item Next, let's explore what $\calC$-indexed sets on a more interesting 
+  indexing category, a category with two objects each with an identity morphism:
+  \begin{equation}
+\begin{tikzcd}
+X \arrow["\id_X"', loop, distance=2em, in=125, out=55] 
+& Y \arrow["\id_Y"', loop, distance=2em, in=125, out=55]
+\end{tikzcd}
+  \end{equation}
+  In this case, a $\calC$-indexed set corresponds with a 
+  pair of sets. For example, $F(X) = \{a, b\}$ and 
+  $F(Y) = \{c, d\}$. Identity preservation means $F$ maps identities to 
+  identities, as before.
+  \item Now let's see an example with a less trivial example of 
+  an indexing category with a non-identity morphism:
 
-\draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
-\draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
-\draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
-\end{tikzpicture}:
-functions over time
+  \begin{equation}
+    \begin{tikzcd}
+X \arrow["\id_X"', loop, distance=2em, in=125, out=55]  \arrow[r, "f"]
+& Y \arrow["\id_Y"', loop, distance=2em, in=125, out=55]
+\end{tikzcd}
+\label{cat:2obj}
+  \end{equation}
+
+  In this category, a $\calC$-indexed set $F$ again maps each 
+  object to 2 sets, for example $F(X) = \{a, b\}$ and $F(Y) = \{c, d\}$.
+  But now, $F$ must have an action on the morphism $f$: 
+  we can choose any function $F(f) : F(Y) \to F(X)$. Note that the 
+  direction of the function here is opposite the direction of the morphism 
+  in the indexing category.
+  For example, we may choose $F(f) = x \mapsto a$.
+  So, the $\calC$-indexed sets on this category correspond to \emph{functions
+  between sets}.
+
+
+It can be convenient to visualize $\calC$-indexed sets $F$ as 
+``balloon'' diagrams, (1) above each object $X$ in $\calC$ there is a visualization
+of the set $F(X)$, and (2) for each morphism $X \mor{f} Y$
+in $\calC$ there is an internal picture of the function $f : Y \to X$. 
+For example, we can draw $F$ above as the following balloon diagram:
+
+\begin{center}
+  \includegraphics[width=100px]{fig/balloon-0.png}
+\end{center}
+
+% \begin{tikzpicture}[
+% ]
+% % Objects (circles)
+% \node[minimum size=0.6cm] (o1) at (0,-1) {0};
+% \node[minimum size=0.6cm] (o2) at (1.5,-1) {1};
+% \node[minimum size=0.6cm] (o3) at (3,-1) {2};
+% \node (dots) at (4.2,-1) {$\cdots$};
+
+% % Arrows between objects
+% \draw[->] (o1) -- node[above] {$\mathsf{succ}_0$} (o2);
+% \draw[->] (o2) -- node[above] {$\mathsf{succ}_1$} (o3);
+% \draw[->] (o3) -- (dots);
+
+% \draw[->] (o1) edge[loop above] node[above] {$\id_0$} (o1);
+% \draw[->] (o2) edge[loop above] node[above] {$\id_1$} (o2);
+% \draw[->] (o3) edge[loop above] node[above] {$\id_2$} (o3);
+% \end{tikzpicture}:
+% functions over time
 \end{itemize}
 
+
+\section{C-indexed functions}
+Next, let's define the notion of a $\calC$-indexed function, which 
+should behave like a polymorphic function:
 
 \begin{definition}[$\calC$-indexed function]
   \sloppy
@@ -679,6 +748,33 @@ functions over time
   \end{tikzcd}
   \end{center}
 \end{definition}
+
+Once again let's work through some examples of $\calC$-indexed functions
+to get a sense for how they behave:
+
+ Returning to our one-object category, $\calC$-indexed functions 
+  are simply functions between sets. Concretely, suppose $F(\bullet) = \{a, b\}$ 
+  and $G(\bullet) = \{c, d\}$. Then, there is a $\calC$-indexed function $\alpha$ 
+  where $\alpha_\bullet : F(\bullet) \to G(\bullet)$ is a function. The naturality 
+  constraint is somewhat trivially satisfied, but is worth checking as an exercise.
+
+A much more interesting case is the 2 object category with a morphism between 
+then in (\ref{cat:2obj}). We can visualize the data 
+of a particular $\calC$-indexed function $\alpha$ in this category 
+by drawing a ``stacked balloon diagram'':
+
+\begin{center}
+\includegraphics[width=200px]{fig/balloon-3.png}
+\end{center}
+
+Here we have drawn $\alpha_X : G(X) \to F(X)$ and $\alpha_Y$ in red
+
+
+At this point, you might be smelling something categorical: 
+might it be the case that, for any category $\calC$, 
+one can form a category whose objects are $\calC$-indexed 
+sets and whose morphisms are $\calC$-indexed functions? 
+Indeed one can, but one requires the following to show this:
 
 \begin{itemize}
 \item Just as there is an identity function in set theory,
@@ -737,6 +833,7 @@ The following examples illustrate.
     \bottomrule
   \end{tabular}
 \end{center}
+
 
 \begin{definition}[$\calC$-indexed product]
   \sloppy
