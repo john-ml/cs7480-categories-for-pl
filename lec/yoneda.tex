@@ -647,6 +647,7 @@ are composition of morphisms, and some are composition of functions.}
   \end{itemize}
 \end{definition}
 
+A $\calC$-indexed set is also known as a \emph{presheaf}.
 Let's see some examples of $\calC$-indexed sets:
 \begin{itemize}
   \item Consider a category with 1 object $\bullet$ and 
@@ -740,7 +741,7 @@ A \arrow[rr, "h" description] \arrow[ru, "f" description] \arrow["\textsf{id}"',
 
 
 
-\section{C-indexed functions}
+\section{$\calC$-indexed functions}
 Next, let's define the notion of a $\calC$-indexed function, which 
 should behave like a ``polymorphic function'':
 
@@ -795,18 +796,19 @@ i.e. that $F(f) \circ \alpha_y = \alpha_X \circ G(F)$. To check this, we can pla
 follow the two possible paths that it can take, and make sure your fingers 
 end up in the same spot in $F(X)$. For instance, following the element $m$, 
 we have $\alpha_Y(m) = c$, then $F(f)(c) = a$; in the other path, 
-we have $G(f)(m) = w$, and $\alpha_X(w) = a$. So, these two paths agree, and so 
+we have $G(f)(m) = w$, and $\alpha_X(w) = a$. So, these two paths agree on 
+what to do with $m$, and so 
 do all the other choices of starting element in $G(Y)$.
 
 At this point, it's a good exercise to try to find all possible $\alpha : G \Rightarrow F$
 for the $\calC$-indexed sets $F$ and $G$ shown in (\ref{fig:2balloon}).
 
-\section{The structure of $\calC$-indexed sets}
+\section{The category of $\calC$-indexed sets}
 
 At this point, you might be smelling something categorical: 
 might it be the case that, for any category $\calC$, 
-one can form a category whose objects are $\calC$-indexed 
-sets and whose morphisms are $\calC$-indexed functions? 
+one can form a category whose objects are all possible $\calC$-indexed 
+sets and whose morphisms are all possible $\calC$-indexed functions? 
 Indeed one can, but one requires the following to show this:
 
 \begin{itemize}
@@ -818,8 +820,8 @@ Indeed one can, but one requires the following to show this:
   The naturality condition amounts to commutativity of the following diagram.
   \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEBNEAX1PUy58hFGQCMVWoxZt2ADV78QGbHgJEx5SfWatEHbnwGrhG0hOo6Z++b0kwoAc3hFQAMwBOEALZJNIHAgkAGZLaT0QAB1IrCgcAH1geR4QagY6ACMYBgAFQTUREA8sRwALHEV3L19EMgCgxAAmMN02aNiEpM4UoxBPHyQ6wL8W6w43VJB0rNz8031isore-prm+pDRiPYJngoeIA
 \begin{tikzcd}
-FY \arrow[r, "\idt_{FY}"] \arrow[d, "Ff"'] & FY \arrow[d, "Ff"] \\
-FX \arrow[r, "\idt_{FX}"']                 & FX
+F(Y) \arrow[r, "\idt_{F(Y)}"] \arrow[d, "F(f)"'] & F(Y) \arrow[d, "F(f)"] \\
+F(X) \arrow[r, "\idt_{F(X)}"']                 & F(X)
 \end{tikzcd}\]
 \item \(\calC\)-indexed functions can also be composed:
   the composition of \(\alpha : Q \Rightarrow R\)
@@ -830,15 +832,27 @@ FX \arrow[r, "\idt_{FX}"']                 & FX
   \[
   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEBNEAX1PUy58hFGQCMVWoxZt2ADV78QGbHgJEx5SfWatEIAOLc+A1cI2kJ1HTP0GFJ5YLUjkAJi3XpekAAljSipC6igeVlK6bL4OkjBQAObwRKAAZgBOEAC2SGQgOBBImhG2HCmKqRnZiLn5SB7FPgA6jQBGMDh0APoBFVl11LWIAMxekXZljul9iPWDACyjJc2MaAAWXT0gU1ULeQWIAKyLPr4TSttII3tIRw1sywxrXQrUDHRtDAAKzub6aVjxVY4cpbSqFAb7K42JqtdrPECvd4wL4-EIgf6A4E8Cg8IA
 \begin{tikzcd}
-FY \arrow[d, "Ff"] \arrow[r, "\beta_Y"] & GY \arrow[d, "Gf"] \arrow[r, "\alpha_Y"] & HY \arrow[d, "Hf"] \\
-FX \arrow[r, "\beta_X"']                & GX \arrow[r, "\alpha_X"']                & HX
+F(Y) \arrow[d, "F(f)"] \arrow[r, "\beta_Y"] & G(Y) \arrow[d, "G(f)"] \arrow[r, "\alpha_Y"] & H(Y) \arrow[d, "H(f)"] \\
+F(X) \arrow[r, "\beta_X"']                & G(X) \arrow[r, "\alpha_X"']                & H(X)
 \end{tikzcd}
 \]
 \end{itemize}
 
+From this we can define conclude the following definition 
+is well-formed:
+
+\begin{definition}[Category of $\calC$-indexed sets]
+  \sloppy
+  Let $\calC$ be a category. Then, the \emph{category of $\calC$-indexed sets}
+  is the category whose objects are $\calC$-indexed 
+  sets and whose morphisms are $\calC$-indexed functions, 
+  where identities and composition of morphisms are defined as above.
+\end{definition}
+
+This category is also called the category of presheaves on $\calC$.
 In general, \(\calC\)-indexed set theory looks
 kind of like set theory ``with shape \(\calC\)''.
-The following examples illustrate.
+
 
 
 \begin{definition}[$\calC$-indexed product]
@@ -856,6 +870,11 @@ The following examples illustrate.
   \end{itemize}
   Functoriality follows from functoriality of \(F\) and \(G\).
 \end{definition} 
+
+The category of $\calC$-indexed sets has fantastically rich structure: in fact, 
+it is something called a \emph{topos}, an idea that we will return to later. 
+For now, the most exciting thing we can say about this category is that it 
+is Cartesian-closed.
 
 %% Example: ``Cartesian product of two balloons''
 
@@ -932,6 +951,14 @@ The following examples illustrate.
 % $\calC$ when it is thought of as a graph.
 
 \section{Representable $\calC$-indexed sets}
+The crucial idea of the Yoneda lemma is that a copy of $\calC$ lives 
+inside of its corresponding $\calC$-indexed category.
+This lets ideas,
+definitions, and intuitions from the $\calC$-indexed category 
+-- which, as we've already described, has fantastically rich structure, including products, exponentials, etc. -- 
+be reflected back into the indexing category $\calC$. 
+
+
 \begin{definition}[The representable $\calC$-indexed set at $X$]
   The \emph{representable \(\calC\)-indexed set at \(X\)}
   is written \(\yo X\) and defined by
