@@ -726,10 +726,23 @@ For example, we can draw $F$ above as the following balloon diagram:
 % functions over time
 \end{itemize}
 
+At this point it might be a good exercise to consider a few more 
+cases of $\calC$-indexed sets. In particular, try to 
+draw a balloon diagram that shows an example of a $\calC$-indexed set for the
+following 3-object category:
+\begin{equation}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBBEAX1PU1z5CKcqWLU6TVuwBCPPiAzY8BIgCYKEhizaIQAYR4SYUAObwioAGYAnCAFskZEDghINknewAWIGo3oAIxhGAAUBFWEQLDBsWHlrO0dEZ1ckUU9pPSs-EADgsIihdhi4tl5Eh3SaNMQPfJDw5WK9Uqx4mm0skFMEkFsqxAzajMYICDQicgAOMismOBgJBsLm1T0bLFNvHFyu3RAAHUOcGAAPHDgrYHbuPoHkj1r68cmUOYWl-yDGovWQTbbXadKQHY6nC5XG5QO4VfpJJw1NwpfyvIgfRiLZY-VaCf6AnZ7UHscHnS7XW5GbhAA
+\begin{tikzcd}
+  & B \arrow[rd, "g" description] \arrow["\textsf{id}"', loop, distance=2em, in=125, out=55] &                                                               \\
+A \arrow[rr, "h" description] \arrow[ru, "f" description] \arrow["\textsf{id}"', loop, distance=2em, in=305, out=235] &                                                                                          & C \arrow["\textsf{id}"', loop, distance=2em, in=305, out=235]
+\end{tikzcd} 
+\end{equation}
+
+
 
 \section{C-indexed functions}
 Next, let's define the notion of a $\calC$-indexed function, which 
-should behave like a polymorphic function:
+should behave like a ``polymorphic function'':
 
 \begin{definition}[$\calC$-indexed function]
   \sloppy
@@ -750,25 +763,45 @@ should behave like a polymorphic function:
 \end{definition}
 
 Once again let's work through some examples of $\calC$-indexed functions
-to get a sense for how they behave:
+to get a sense for how they behave.
 
- Returning to our one-object category, $\calC$-indexed functions 
-  are simply functions between sets. Concretely, suppose $F(\bullet) = \{a, b\}$ 
-  and $G(\bullet) = \{c, d\}$. Then, there is a $\calC$-indexed function $\alpha$ 
-  where $\alpha_\bullet : F(\bullet) \to G(\bullet)$ is a function. The naturality 
-  constraint is somewhat trivially satisfied, but is worth checking as an exercise.
+Returning to the one-object category in (\ref{cat:1-obj}), $\calC$-indexed functions are simply
+functions between sets. Concretely, suppose $F(\bullet) = \{a, b\}$ and
+$G(\bullet) = \{c, d\}$. Then, there is a $\calC$-indexed function $\alpha$ 
+where $\alpha_\bullet : F(\bullet) \to G(\bullet)$ is a function. The naturality
+constraint is somewhat trivially satisfied, but is worth checking as an
+exercise. Note that there are 4 possible of $\alpha$ here, one for each possible 
+function between the sets $F(\bullet)$ and $G(\bullet)$.
 
 A much more interesting case is the 2 object category with a morphism between 
 then in (\ref{cat:2obj}). We can visualize the data 
 of a particular $\calC$-indexed function $\alpha$ in this category 
 by drawing a ``stacked balloon diagram'':
 
-\begin{center}
+\begin{equation}
 \includegraphics[width=200px]{fig/balloon-3.png}
-\end{center}
+\label{fig:2balloon}
+\end{equation}
 
-Here we have drawn $\alpha_X : G(X) \to F(X)$ and $\alpha_Y$ in red
+In this picture, 
+we have $G(X) = \{w, z\}$, $G(Y) = \{m, n, o\}$, $F(X) = \{b, a\}$, 
+and $F(Y) = \{c, d\}$. 
+Then, a particular $\calC$-indexed function $\alpha : G \Rightarrow F$ is a family 
+of functions $\alpha_X : G(X) \to F(X)$  and $\alpha_Y : G(Y) \to F(Y)$;
+an example of one such choice of $\alpha$ is shown in red. To check that this is a valid 
+choice of $\alpha$, we need to check that it satisfies the naturality condition, 
+i.e. that $F(f) \circ \alpha_y = \alpha_X \circ G(F)$. To check this, we can play the 
+``two finger game'': put your finger on each particular element of $G(Y)$ and 
+follow the two possible paths that it can take, and make sure your fingers 
+end up in the same spot in $F(X)$. For instance, following the element $m$, 
+we have $\alpha_Y(m) = c$, then $F(f)(c) = a$; in the other path, 
+we have $G(f)(m) = w$, and $\alpha_X(w) = a$. So, these two paths agree, and so 
+do all the other choices of starting element in $G(Y)$.
 
+At this point, it's a good exercise to try to find all possible $\alpha : G \Rightarrow F$
+for the $\calC$-indexed sets $F$ and $G$ shown in (\ref{fig:2balloon}).
+
+\section{The structure of $\calC$-indexed sets}
 
 At this point, you might be smelling something categorical: 
 might it be the case that, for any category $\calC$, 
@@ -806,33 +839,6 @@ FX \arrow[r, "\beta_X"']                & GX \arrow[r, "\alpha_X"']             
 In general, \(\calC\)-indexed set theory looks
 kind of like set theory ``with shape \(\calC\)''.
 The following examples illustrate.
-%% \savebox1{
-%%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12AjJhhmHCAC+pdJlz5CKAIzkqtRizacefAcPkwoAc3hFQAMwBOEALZIyIHBAvUGECGiLSAHGQOM4MeQzpcYDAAK4ngEbEZY2gAWgtT0zKyIHOxYUIIihibmiLJWNjl2Dk4ybqQeDF4+fgHB2KFSIBHRsQoJyilpGkJAA
-%% \(\begin{tikzcd}
-%% \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55] & \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
-%% \end{tikzcd}\)
-%% }
-%% \savebox2{
-%%   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12AjJhhmHCAC+pdJlz5CKAIzkqtRizacefAcPkwoAc3hFQAMwBOEALZIyIHBAvUGECGiLSAHGQOM4MeQzpcYDAAK4ngEbEZY2gAWgtT0zKyIHOxYUIIihibmiLJWNjl2Dk4ybqQeDF4+fgHB2KFSIBHRsQoJyilpwqIgxma2eUi5vv5BIZLhkTEaQkA
-%% \(\begin{tikzcd}
-%% \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55] \arrow[r] & \bullet \arrow["\idt"', loop, distance=2em, in=125, out=55]
-%% \end{tikzcd}\)
-%% }
-\begin{center}
-  \begin{tabular}{cccc}
-    \toprule
-    $\calC$ & $\calC$-indexed set & $\calC$-indexed function & picture \\
-    \midrule
-    \usebox0 & set & function & \todo \\
-    \midrule
-    % im sorry
-    \usebox0\!\!\!\!\!\!\!\usebox0 & pair of sets & pair of functions & \todo\\
-    \midrule
-    % im sorry
-    \(\usebox0\!\!\!\!\!\!\!\!\!\longrightarrow\!\!\!\!\!\!\!\!\!\usebox0\) & function & square &\todo \\
-    \bottomrule
-  \end{tabular}
-\end{center}
 
 
 \begin{definition}[$\calC$-indexed product]
