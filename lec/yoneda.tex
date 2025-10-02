@@ -594,7 +594,7 @@ Finally, we show that the two constructions just described roundtrip to the iden
 %% If you want to learn more about this perspective, check out
 %% Tom Leinster's ``\href{https://webhomes.maths.ed.ac.uk/~tl/elements.pdf}{Doing without diagrams}''.
 
-\chapter{Yoneda II: indexed set theory and representability}
+\chapter{Yoneda II: indexed set theory}
 
 \savebox0{
 \(\begin{tikzcd}
@@ -646,8 +646,11 @@ are composition of morphisms, and some are composition of functions.}
     \end{itemize}
   \end{itemize}
 \end{definition}
-
-A $\calC$-indexed set is also known as a \emph{presheaf}.
+\marginnote{We will see soon that a $\calC$-indexed set is an 
+instance of a general phenomenon called a \emph{functor}, 
+which can be thought of us a structure-preserving map 
+between categories.}
+A $\calC$-indexed set is also known as a \textbf{presheaf}.
 Let's see some examples of $\calC$-indexed sets:
 \begin{itemize}
   \item Consider a category with 1 object $\bullet$ and 
@@ -743,16 +746,19 @@ A \arrow[rr, "h" description] \arrow[ru, "f" description] \arrow["\textsf{id}"',
 
 \section{$\calC$-indexed functions}
 Next, let's define the notion of a $\calC$-indexed function, which 
-should behave like a ``polymorphic function'':
+should behave like a ``polymorphic function'':\footnote{We will see 
+soon that a $\calC$-indexed function is an instance of a general phenomenon called 
+a \emph{natural transformation}
+between functors $F$ and $G$.}
 
 \begin{definition}[$\calC$-indexed function]
   \sloppy
   Given a category $\calC$ and two $\calC$-indexed sets $F$ and $G$, 
   a $\calC$-indexed function $\alpha : F \Rightarrow G$ 
   is a family of functions $\alpha_X : F(X) \to G(X)$ for objects $X$ 
-  of $\calC$ satisfying the following naturality condition:
+  of $\calC$ satisfying the following \emph{naturality condition}:
   $\alpha_X \circ F(f) = G(f) \circ \alpha_Y$
-  for any morphism $X \mor{f} Y$.
+  for any $\calC$ morphism $X \mor{f} Y$.
   This naturality condition can be visualized as a commutative square:
   \begin{center}
     % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEAKATQEoQAvqXSZc+QigCM5KrUYs2AcR78hI7HgJEyk2fWatEHTgA1VwkBg3ii03dX0Kjys4NkwoAc3hFQAMwAnCABbJDIQHAgkACYHeUNjP3N-INDEaQioxABmOIMlTiTBC0CQsOpIpAzHBIAdWsY0AAs6AH1uYpSyxFjMpFy5fKN6xpbWkzcBIA
@@ -803,7 +809,7 @@ do all the other choices of starting element in $G(Y)$.
 At this point, it's a good exercise to try to find all possible $\alpha : G \Rightarrow F$
 for the $\calC$-indexed sets $F$ and $G$ shown in (\ref{fig:2balloon}).
 
-\section{The category of $\calC$-indexed sets}
+\section{The category of $\calC$-indexed sets (presheaf categories)}
 
 At this point, you might be smelling something categorical: 
 might it be the case that, for any category $\calC$, 
@@ -816,7 +822,7 @@ Indeed one can, but one requires the following to show this:
   there is an identity \(\calC\)-indexed function in \(\calC\)-indexed set theory.
   For each \(\calC\)-indexed set \(P\),
   there is a \(\calC\)-indexed function \(\idt_P : P \Rightarrow P\)
-  defined by \(\idt_{P,X} = \left(PX \xrightarrow{\idt_{PX}} PX\right)\).
+  defined by \(\idt_{P,X} = \left(P(X) \xrightarrow{\idt_{P(X)}} P(X)\right)\).
   The naturality condition amounts to commutativity of the following diagram.
   \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEBNEAX1PUy58hFGQCMVWoxZt2ADV78QGbHgJEx5SfWatEHbnwGrhG0hOo6Z++b0kwoAc3hFQAMwBOEALZJNIHAgkAGZLaT0QAB1IrCgcAH1geR4QagY6ACMYBgAFQTUREA8sRwALHEV3L19EMgCgxAAmMN02aNiEpM4UoxBPHyQ6wL8W6w43VJB0rNz8031isore-prm+pDRiPYJngoeIA
 \begin{tikzcd}
@@ -838,9 +844,11 @@ F(X) \arrow[r, "\beta_X"']                & G(X) \arrow[r, "\alpha_X"']         
 \]
 \end{itemize}
 
-From this we can define conclude the following definition 
-is well-formed:
-
+From this we can conclude the following definition 
+is well-formed:\footnote{This definition technically runs afoul of some cardinality 
+limitations in our original definition of a category (\cref{def:category}). 
+Do not worry; the original definition of category can adjusted to account 
+for this fact without invalidating anything we have done so far.}
 \begin{definition}[Category of $\calC$-indexed sets]
   \sloppy
   Let $\calC$ be a category. Then, the \emph{category of $\calC$-indexed sets}
@@ -849,11 +857,24 @@ is well-formed:
   where identities and composition of morphisms are defined as above.
 \end{definition}
 
-This category is also called the category of presheaves on $\calC$.
-In general, \(\calC\)-indexed set theory looks
-kind of like set theory ``with shape \(\calC\)''.
-
-
+This category is also called the \textbf{category of presheaves on $\calC$}.  In
+general, \(\calC\)-indexed set theory looks kind of like set theory ``with shape
+\(\calC\)''.
+The category of $\calC$-indexed sets has fantastically rich structure: in fact, 
+it is something called a \emph{topos}, an idea that we will return to later. 
+For now, the most exciting thing we can say about this category is that it 
+is Cartesian-closed, meaning that it has products. 
+Let's show this fact:
+\begin{theorem}
+  Let $\calC$ be a category. Then, the category of presheaves on $\calC$ 
+  has products.
+\end{theorem}
+\begin{proof}
+We prove this using the familiar internal argument involving the 
+universal property of products.  
+We begin by identifying a candidate $\calC$-indexed set, 
+and then we prove that it satisfies the universal property of products
+in the category of presheaves on $\calC$:
 
 \begin{definition}[$\calC$-indexed product]
   \sloppy
@@ -863,18 +884,89 @@ kind of like set theory ``with shape \(\calC\)''.
   $F \times G$
   defined by:
   \begin{itemize}
-    \item On objects, $(F \times G)(X) = F(X) \times G(X)$
+    \item On objects $X \in \calC$, $(F \times G)(X) = F(X) \times G(X)$
     \item On morphisms $X \mor{f} Y$,
     $(F \times G)(f)$ is the function $F(Y) \times G(Y) \to F(X) \times G(X)$
       defined by $(F \times G)(f) = (x,y) \mapsto (F(f)(x), G(f)(y))$
   \end{itemize}
-  Functoriality follows from functoriality of \(F\) and \(G\).
+
+  Alongside $F \times G$ there are $\calC$-indexed functions $\pi_1 : F \times G \Rightarrow F$ 
+  and $\pi_2 : F \times G \Rightarrow G$ defined:
+  \begin{align*}
+    \pi_{1, X} &: (F \times G)(X) \to F(X) \\
+    &=(x, y) \mapsto x
+  \end{align*}
+  and
+  \begin{align*}
+    \pi_{2, X} &: (F \times G)(X) \to G(X) \\
+    &=(x, y) \mapsto y
+  \end{align*}
+
+
+
 \end{definition} 
 
-The category of $\calC$-indexed sets has fantastically rich structure: in fact, 
-it is something called a \emph{topos}, an idea that we will return to later. 
-For now, the most exciting thing we can say about this category is that it 
-is Cartesian-closed.
+First we need to show $F \times G$ is a $\calC$-indexed set:
+\begin{itemize}
+  \item \emph{Preserves identity}: 
+  \begin{align*}
+  (F \times G)(\id_X) &= (x, y) \mapsto (\id_{F(X)}(x), \id_{G(X)}(y)) \\
+  &=(x, y) \mapsto  \id_{F(X) \times G(Y)} (x, y).
+  \end{align*}
+  \item \emph{Preserves composition}: For morphisms $X \mor{f} Y \mor{g} Z$:
+  \begin{fullwidth}
+   \begin{align*}
+    (F \times G )(g \circ f) 
+    &= (F(g \circ f), G(g \circ f)) & \text{Def} \\
+    &= \big(F(f) \circ F(g), G(f) \circ G(g)\big) & \text{Functoriality of $F$ and $G$} \\
+    &= \big[ (F \times G)(f) \big] \circ \big[ (F \times G) (g)\big] & \text{Def}
+  \end{align*}
+   
+  \end{fullwidth}
+\end{itemize}
+
+We also need to show that $\pi_1$ and $\pi_2$ are $\calC$-indexed functions.
+Let $X \mor{f} Y$ be a morphism in $\calC$. Then, we must show the naturality
+diagram commutes:
+
+\begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAAoAxAAgB1e8AW3jcA4gEp2ATXEgAvqXSZc+QijIBGKrUYs2XPgKzC4YyQA1ZCpdjwEiG8tvrNWiEJ2lXFIDLdUOpFrULnrunpby2jBQAObwRKAAZgBOEIJIZCA4EEgATCG6biD8aFgA+sCOUnLyPqnpSI7ZuYgAzIWubKUVVaTmtdYgDRmIWTlN1Ax0AEYwDAAKynZqIFhg2LAgnWEcPPxCIhLsSd7JaaMFLUgdINNzi8sB7uubrDvFnqdRckA
+\begin{tikzcd}
+  (F \times G)(Y) \arrow[r, "{\pi_{1,Y}}"] \arrow[d, "(F \times G)(f)"] & F(Y) \arrow[d, "F(f)" ] \\
+  (F \times G)(X) \arrow[r, "{\pi_{1,X}}"]                                          & F(X)                              
+  \end{tikzcd}
+\end{center}
+
+We can show this by simple calculation.
+Let $(a,b) \in (F \times G)(Y)$. Then, $\big[F(f) \circ \pi_{1,Y}\big](a,b)  = f(a)$.
+For the other path, we have $\big[(F \times G)(f) \big](a, b) = (f(a), (f(b)))$, 
+so clearly $\pi_{1,X} \circ \big[(F \times G)(f) \big](a, b) = f(a)$.
+
+Next, we need to show that $(F \times G, \pi_1, \pi_2)$ satisfies the universal
+property for products. Suppose there is a $\calC$-indexed set $\Gamma$ 
+with $\calC$-indexed functions $\Gamma \mor{f} F$ and $\Gamma \mor{g} G$. 
+Then, we must show there exists a unique $\calC$-indexed set $\Gamma \mor{\langle f, g \rangle}
+F \times G$ such that the relevant diagram commutes.
+Let's define $\langle f, g \rangle : \Gamma \Rightarrow F \times G$ as:
+\begin{align*}
+  \langle f, g \rangle_X &: \Gamma(X) \to (F \times G)(X) \\ 
+  &= x \mapsto \Big(f_X(x), g_X(x)\Big)
+\end{align*}
+
+Then we have, for any indexing object $X$:
+\begin{align*}
+  \pi_{1,X} \circ \langle f, g \rangle_X = f_X, 
+  \qquad
+  \pi_{2,X} \circ \langle f, g \rangle_X = g_X.
+\end{align*}
+
+Now all that remains is to show uniqueness of $\langle f, g \rangle$. 
+This follows immediately from function extensionality.
+\end{proof}
+
+
+
+
 
 %% Example: ``Cartesian product of two balloons''
 
@@ -950,7 +1042,8 @@ is Cartesian-closed.
 % in the sense that it over-approximates the the reachability relations in 
 % $\calC$ when it is thought of as a graph.
 
-\section{Representable $\calC$-indexed sets}
+\chapter{Yoneda III: Representability}
+
 The crucial idea of the Yoneda lemma is that a copy of $\calC$ lives 
 inside of its corresponding $\calC$-indexed category.
 This lets ideas,
@@ -1002,6 +1095,8 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
   An object $P$ is a product of $A$ and $B$ if and only if 
   it represents $\yo A \times \yo B$.
 \end{theorem}
+
+\section{The category of elements}
 
 %% \section{$\calC$-indexed sets}
 
