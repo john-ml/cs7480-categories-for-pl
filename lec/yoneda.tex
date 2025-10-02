@@ -910,16 +910,18 @@ First we need to show $F \times G$ is a $\calC$-indexed set:
 \begin{itemize}
   \item \emph{Preserves identity}: 
   \begin{align*}
-  (F \times G)(\id_X) &= (x, y) \mapsto (\id_{F(X)}(x), \id_{G(X)}(y)) \\
-  &=(x, y) \mapsto  \id_{F(X) \times G(Y)} (x, y).
+  (F \times G)(\id_X) &= (a, b) \mapsto (\id_{F(X)}(a), \id_{G(X)}(b)) \\
+  &=(a, b) \mapsto  \id_{F(X) \times G(X)} (a, b) \\
+  &=\id_{F(X)\times G(X)}.
   \end{align*}
   \item \emph{Preserves composition}: For morphisms $X \mor{f} Y \mor{g} Z$:
   \begin{fullwidth}
    \begin{align*}
     (F \times G )(g \circ f) 
-    &= (F(g \circ f), G(g \circ f)) & \text{Def} \\
-    &= \big(F(f) \circ F(g), G(f) \circ G(g)\big) & \text{Functoriality of $F$ and $G$} \\
-    &= \big[ (F \times G)(f) \big] \circ \big[ (F \times G) (g)\big] & \text{Def}
+    &= (a,b) \mapsto (F(g \circ f)(a), G(g \circ f)(b)) & \text{Def} \\
+    &= (a,b) \mapsto \big((F(f) \circ F(g))(a), (G(f) \circ G(g))(b)\big) & \text{Functoriality of $F$ and $G$} \\
+    &= (a,b) \mapsto \big[ (F \times G)(f) \circ (F \times G) (g)\big](a,b) & \text{Def} \\
+    &= (F \times G)(f) \circ (F \times G) (g).
   \end{align*}
    
   \end{fullwidth}
@@ -938,31 +940,49 @@ diagram commutes:
 \end{center}
 
 We can show this by simple calculation.
-Let $(a,b) \in (F \times G)(Y)$. Then, $\big[F(f) \circ \pi_{1,Y}\big](a,b)  = f(a)$.
-For the other path, we have $\big[(F \times G)(f) \big](a, b) = (f(a), (f(b)))$, 
-so clearly $\pi_{1,X} \circ \big[(F \times G)(f) \big](a, b) = f(a)$.
+Let $(a,b) \in (F \times G)(Y)$. Then, $\big[F(f) \circ \pi_{1,Y}\big](a,b)  = F(f)(a)$.
+For the other path, we have that $\big[(F \times G)(f) \big]$ applied to $(a, b)$ is the pair $(F(f)(a), F(f)(b))$,
+so $\pi_{1,X} \circ \big[(F \times G)(f) \big]$ applied to $(a, b)$ is the first component $F(f)(a)$.
 An identical argument holds for $\pi_{2,X}$.
 
 Next, we need to show that $(F \times G, \pi_1, \pi_2)$ satisfies the universal
 property for products. Suppose there is a $\calC$-indexed set $\Gamma$ 
-with $\calC$-indexed functions $\Gamma \mor{f} F$ and $\Gamma \mor{g} G$. 
-Then, we must show there exists a unique $\calC$-indexed set $\Gamma \mor{\langle f, g \rangle}
+with $\calC$-indexed functions $f : \Gamma \Rightarrow F$ and $g : \Gamma \Rightarrow G$.
+Then, we must show there exists a unique $\calC$-indexed function $\angled{f,g} : \Gamma \Rightarrow
 F \times G$ such that the relevant diagram commutes.
 Let's define $\langle f, g \rangle : \Gamma \Rightarrow F \times G$ as:
 \begin{align*}
   \langle f, g \rangle_X &: \Gamma(X) \to (F \times G)(X) \\ 
-  &= x \mapsto \Big(f_X(x), g_X(x)\Big)
+  &= a \mapsto \Big(f_X(a), g_X(a)\Big)
 \end{align*}
-
-Then we have, for any indexing object $X$:
+The naturality of this definition follows from the naturality of \(f\) and \(g\):
+for any morphism \(Y \mor{s} X\) of \(\calC\),
+we have that
+\[
+(F\times G)(s) \circ \angled{f,g}_X
+=
+\angled{f,g}_Y \circ \Gamma(s)
+\]
+because, for any input \(a \in \Gamma(X)\), it holds that
+\begin{align*}
+  \text{LHS}(a)
+  &= \big[(F \times G)(s)\big](f_X(a),g_X(a)) & \text{Def. of \(\angled{f,g}_X\)} \\
+  &= (F(s)(f_X(a)),G(s)(g_X(a))) & \text{Def. of \((F \times G)(s)\)} \\
+  &= (f_Y(\Gamma(s)(a)),g_X(\Gamma(s)(a))) & \text{Naturality of \(f\) and \(g\)} \\
+  &= \angled{f,g}_Y(\Gamma(s)(a)) & \text{Def. of \(\angled{f,g}_Y\)} \\
+  &= \text{RHS}(a).
+\end{align*}
+Next we have the following for any indexing object $X$, establishing that the relevant product diagram commutes.
 \begin{align*}
   \pi_{1,X} \circ \langle f, g \rangle_X = f_X, 
   \qquad
   \pi_{2,X} \circ \langle f, g \rangle_X = g_X.
 \end{align*}
-
-Now all that remains is to show uniqueness of $\langle f, g \rangle$. 
-This follows immediately from function extensionality.
+Finally, all that remains is to show uniqueness of $\langle f, g \rangle$.
+This follows immediately from function extensionality:
+if \(\angled{f,g}\) is to satisfy \(\pi_{1,X} \circ \angled{f,g}_X = f_X\)
+and \(\pi_{2,X} \circ \angled{f,g}_X = g_X\) for all \(X\),
+then it must be defined as above.
 \end{proof}
 
 
