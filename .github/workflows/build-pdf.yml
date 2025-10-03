@@ -10,9 +10,26 @@ jobs:
         uses: xu-cheng/latex-action@v4
         with:
           root_file: main.tex
-      - name: Upload PDF file
-        uses: actions/upload-artifact@v4
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
         with:
-          name: PDF
-          path: main.pdf
-
+          name: github-pages
+          path: .
+      # - name: Upload PDF file
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: github-pages
+      #     path: main.pdf
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_latex
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
