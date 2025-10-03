@@ -10,6 +10,11 @@ jobs:
         uses: xu-cheng/latex-action@v4
         with:
           root_file: main.tex
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
+        with:
+          name: github-pages
+          path: .
       # - name: Upload PDF file
       #   uses: actions/upload-artifact@v4
       #   with:
