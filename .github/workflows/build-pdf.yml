@@ -17,6 +17,7 @@ jobs:
           path: main.pdf
   deploy:
     runs-on: ubuntu-latest
+    needs: build_latex
     permissions:
       pages: write
       id-token: write
