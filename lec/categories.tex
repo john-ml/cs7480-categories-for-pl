@@ -1167,7 +1167,7 @@ a basic concept from set theory: subset inclusion.
 Suppose \(U\) and \(V\) are subsets of a finite set \(X\).
 Then \(U \subseteq V\) if and only if
 there exists a dashed \(\FinSet\)-morphism \(f\)
-such that \(f \circ v = u\),
+such that \(v \circ f = u\),
 where \(u\) and \(v\) are the \(\FinSet\)-morphisms
 corresponding to the inclusion functions\footnote{A function $f : X \to Y$ 
 is an \emph{inclusion function} (also called an ``injective map'') if 
@@ -1231,7 +1231,7 @@ U \arrow[rd, "u"'] \arrow[rr, "f"] &   & V \arrow[ld, "v"] \\
   to \((V,v)\) in the category \(\mathsf{Sub}(X)\),
   witnessing the fact that \((U,u)\) is ``less than or equal to'' \((V,v)\).
 
-\item Algebraically, it says that the equation \(u = f \circ v\)
+\item Algebraically, it says that the equation \(u = v \circ f\)
   has a solution in the unknown \(f\).
 \end{itemize}
 Let's see each of these in action on the following proof.
