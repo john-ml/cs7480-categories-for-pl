@@ -1065,22 +1065,93 @@ then it must be defined as above.
 
 \chapter{Yoneda III: Representability}
 
-The crucial idea of the Yoneda lemma is that a copy of $\calC$ lives 
-inside of its corresponding $\calC$-indexed category.
-This lets ideas,
-definitions, and intuitions from the $\calC$-indexed category 
--- which, as we've already described, has fantastically rich structure, including products, exponentials, etc. -- 
+The crucial idea of the Yoneda lemma is that a copy of $\calC$ lives inside of
+its corresponding presheaf category.  This lets ideas, definitions, and
+intuitions from the $\calC$-indexed category 
+-- which, as we've already described, has fantastically rich structure,
+-- including products, exponentials, etc. -- 
 be reflected back into the indexing category $\calC$. 
 
+\section{Representables}
+
+Our first step towards understanding this picture is to come up 
+with a way of injecting a category $\calC$ into its presheaf 
+category. Here is an inscrutable definition that explains how to 
+do this:
 
 \begin{definition}[The representable $\calC$-indexed set at $X$]
   The \emph{representable \(\calC\)-indexed set at \(X\)}
-  is written \(\yo X\) and defined by
-  \begin{align}
+  is written \(\yo X\) (pronounced ``yo $X$'') and defined by
+  \begin{align*}
     (\yo X)(A) &= \calC(A, X) \\
-    (\yo X)(s : A' \to A) &= (f : A \to X) \mapsto (f \circ s : A' \to X)
-  \end{align}
+    (\yo X)(s : A' \to A) &: (\yo A) \to (\yo A') \\
+    &= (f : A \to X) \mapsto (f \circ s : A' \to X)
+  \end{align*}
 \end{definition}
+
+This definition, on first glance, is very hard to unpack. So we will spend some
+time with it. The intuition you should have for $\yo X$ is that it is ``the
+external view of the object $X$ in the category $\calC$''. 
+Let's start by drawing a balloon diagram to picture one of these 
+representables. Consider the following example category:
+
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0B9ARhAF9S6TLnyEU3clVqMWbLgCZ+gkBmx4CReZOr1mrRB04BmJULWiiE7lN2yDALX5SYUAObwioAGYAnCAFskMhAcCCQjHRl9EC8eUxi-QMQJELDECOk9NljFAW9EpC1U8Misg1iTPISAoOpQpBTbaNc4qt8a5Lq0oqa2FtyKPiA
+\begin{tikzcd}
+  X_1 \arrow[rd, "f_1"] \arrow[r, "g_1"] & X_2 \arrow[d, "f_2"] \arrow[r, "g_2"] & X_3 \arrow[ld, "f_3"] \\
+                                         & Z                                     &                      
+  \end{tikzcd}
+\end{equation}
+
+Let's draw a balloon diagram that visualizes $\yo Z$:
+
+\begin{center}
+  \includegraphics[width=300px]{fig/yo-1.png}
+\end{center}
+
+To build intuition, you should think of $\yo Z$ as describing ``the perspective
+every other object in $\calC$ has on $Z$.'' Unpacking this more:
+\begin{itemize}
+  \item Let's look at the action of $\yo Z$ on $Z$ first.
+  Unfolding the definition, we have:
+  \begin{align*}
+    (\yo Z)(Z) = \calC(Z, Z) = \{\id_Z\}
+  \end{align*}
+  So, somewhat vacuously, we might say: ``the perspective $Z$ has on itself 
+  is the identity morphism''.
+  And, for $X_1$, we have:
+  \begin{align*}
+    (\yo Z)(X_1) = \calC(X_1, Z) = \{f_1, f_2 \circ g_1, f_3 \circ g_2 \circ g_1 \}
+  \end{align*}
+  This is slightly more interesting: we would say, ``the perspective $X_1$ 
+  has on $Z$ is through the $f_1$ morphism.''
+  \item Now let's look at the action on morphisms. These will correspond 
+  to ``changes in perspective''. Let's examine the action of $\yo Z$ 
+  on the morphism $f_1$:
+  \begin{align*}
+    (\yo Z)(f_1 : X_1 \to Z) &: \yo Z \to \yo X_1\\
+    &= \id_Z \mapsto \id_z \circ f_1 = f_1
+  \end{align*}
+  One can understand this as: ``to move from ``$X_1$'s perspective on $Z$ 
+  to $Z$'s perspective on $Z$, follow the $f_1$ morphism''. Somewhat 
+  more interestingly, we can also shift perspectives between $X_1$
+  and $X_2$ via the $g_1$ morphism:
+  \begin{align*}
+    (\yo Z)(g_1 : X_1 \to X_2) &: \yo(X_2) \to \yo_X(X_1)\\
+    &=
+    \begin{cases}
+      f_2 \mapsto f_2 \circ g_1 \\
+      f_3 \circ g_2 \mapsto f_3 \circ g_2 \circ g_1
+    \end{cases}
+  \end{align*}
+  
+\end{itemize}
+
+\subsection{Representables in the divisibility category}
+
+\subsection{Representables in STLC}
+
+\section{Representability}
 
 \begin{definition}[Isomorphism of $\calC$-indexed sets]
   Two \(\calC\)-indexed sets \(P,Q\)
@@ -1091,6 +1162,7 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
 \end{definition}
 
 \begin{definition}[Representability]
+  \sloppy
   A \(\calC\)-indexed set \(P\) is \emph{representable}
   if there is an isomorphism \(\alpha : P \cong \yo X : \beta\)
   for some object \(X\) of \(\calC\).
@@ -1295,7 +1367,7 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
 %% \end{definition}
 
 
-\chapter{Yoneda III: universal constructions, elements, and properties}
+\chapter{Yoneda IV: universal constructions, elements, and properties}
 
 \begin{definition}
   \sloppy
