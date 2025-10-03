@@ -411,7 +411,7 @@
   boils down to the following true statement:
   if \(\llbr{M} = \llbr{M'}\)
   and \(\llbr{N} = \llbr{N'}\)
-  then \(\angled{\llbr{M},\llbr{M'}} = \angled{\llbr{N},\llbr{N'}}\).
+  then \(\angled{\llbr{M},\llbr{N}} = \angled{\llbr{M'},\llbr{N'}}\).
   The other cases are similarly straightforward.
 
   The rules in group (3) follow from the definition of categorical product.
@@ -434,7 +434,7 @@
   All that's left is \textsc{Let-Sub}---the rule stating that let-binding is equivalent to substitution.
   Validating this rule boils down to showing the following:
   \begin{lemma}[``Let is substitution''] \label{lem:let-is-subst}
-    For all contexts \(\Gamma\), types \(A\),
+    For all contexts \(\Gamma\), types \(A\), \(B\)
     and terms \(M\) and \(N\)
     such that \(\Gamma \vdash M : A\)
     and \(\Gamma,x\ofty A \vdash N : B\),
