@@ -648,7 +648,7 @@ are composition of morphisms, and some are composition of functions.}
 \end{definition}
 \marginnote{We will see soon that a $\calC$-indexed set is an 
 instance of a general phenomenon called a \emph{functor}, 
-which can be thought of us a structure-preserving map 
+which can be thought of as a structure-preserving map 
 between categories.}
 A $\calC$-indexed set is also known as a \textbf{presheaf}.
 Let's see some examples of $\calC$-indexed sets:
@@ -666,7 +666,7 @@ Let's see some examples of $\calC$-indexed sets:
   $F(\bullet) = \{a, b\}$. By identity preservation, we must 
   have that $F(\id) = \id_{\{a, b\}}$. Since there's only 
   one morphism, composition preservation is trivial.
-  \item Next, let's explore what $\calC$-indexed sets on a more interesting 
+  \item Next, let's explore what $\calC$-indexed sets look like on a more interesting 
   indexing category, a category with two objects each with an identity morphism:
   \begin{equation}
 \begin{tikzcd}
@@ -777,11 +777,11 @@ functions between sets. Concretely, suppose $F(\bullet) = \{a, b\}$ and
 $G(\bullet) = \{c, d\}$. Then, there is a $\calC$-indexed function $\alpha$ 
 where $\alpha_\bullet : F(\bullet) \to G(\bullet)$ is a function. The naturality
 constraint is somewhat trivially satisfied, but is worth checking as an
-exercise. Note that there are 4 possible of $\alpha$ here, one for each possible 
+exercise. Note that there are 4 possible choices of $\alpha$ here, one for each possible 
 function between the sets $F(\bullet)$ and $G(\bullet)$.
 
-A much more interesting case is the 2 object category with a morphism between 
-then in (\ref{cat:2obj}). We can visualize the data 
+A much more interesting case is the 2-object category with a morphism between 
+them in (\ref{cat:2obj}). We can visualize the data 
 of a particular $\calC$-indexed function $\alpha$ in this category 
 by drawing a ``stacked balloon diagram'':
 
@@ -847,7 +847,7 @@ F(X) \arrow[r, "\beta_X"']                & G(X) \arrow[r, "\alpha_X"']         
 From this we can conclude the following definition 
 is well-formed:\footnote{This definition technically runs afoul of some cardinality 
 limitations in our original definition of a category (\cref{def:category}). 
-Do not worry; the original definition of category can adjusted to account 
+Do not worry; the original definition of category can be adjusted to account 
 for this fact without invalidating anything we have done so far.}
 \begin{definition}[Category of $\calC$-indexed sets]
   \sloppy
