@@ -1106,7 +1106,7 @@ which we know must look like:
   \dbracket{\Gamma \vdash \pllam{x : A}{M} : {A \plto B}} : \dbracket{\Gamma} \to \dbracket{B}^{\dbracket{A}}
 \end{align}
 We are gathering clues: the above tells us that there must exist some 
-morphism $\dbracket{\Gamma}$ into the special object $\dbracket{B}^{\dbracket{A}}$. 
+morphism from $\dbracket{\Gamma}$ into the special object $\dbracket{B}^{\dbracket{A}}$. 
 Let's suggestively call this morphism $\dbracket{\Gamma} \mor{\lambda \dbracket{M}} \dbracket{B}^{\dbracket{A}}$:
 \begin{align}
   \dbracket{\Gamma \vdash \pllam{x : A}{M} : B} = \dbracket{\Gamma} \mor{\lambda \dbracket{M}} 
@@ -1129,14 +1129,14 @@ With this special morphism we can give an interpretation to application:
 \begin{fullwidth}
 \begin{align}
   \dbracket{\dfrac{\Gamma \vdash M : A \to B \quad \Gamma \vdash N : A}{\Gamma \vdash M~N : B}}
-  = \dbracket{\Gamma} \mor{\langle \lambda M, \id \rangle} \dbracket{B}^{\dbracket{A}} \times \dbracket{\Gamma}
+  = \dbracket{\Gamma} \mor{\langle \lambda \dbracket{M}, \id \rangle} \dbracket{B}^{\dbracket{A}} \times \dbracket{\Gamma}
   \mor{\langle \pi_1, \dbracket{N} \circ\pi_2\rangle } \dbracket{B}^{\dbracket{A}} \times \dbracket{A}
   \mor{\app{}} \dbracket{B}
 \end{align}
 \end{fullwidth}
 
 Now, the closure morphism $\lambda \dbracket{M}$ 
-and the application morphism $\app$ needs to satisfy the equational 
+and the application morphism $\app$ need to satisfy the equational 
 laws. We can package up these laws into a diagram that must commute:
 
 \begin{center}
