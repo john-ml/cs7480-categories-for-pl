@@ -1218,7 +1218,7 @@ order theory: it is called the \textbf{principal ideal} of 12. Formally:
 \end{definition}
 
 So, we can summarize:
-the representable $\yo 12$ is a representation of $\downarrow 12$, i.e.,
+the representable $\yo 12$ is the principal ideal $\downarrow 12$, i.e.,
 it contains exactly as much information as is contained in the principal ideal of 12. In general,
 for any category formed by a preorder, it is the case that the representable of an 
 element is a principal ideal in the preorder.
@@ -1533,7 +1533,14 @@ and $B$ internally if and only if if behaves like a product externally.
 Now we are ready to appreciate the Yoneda lemma:
 
 \begin{theorem}[Baby Yoneda]
-  
+  Let $\calC$ be a category, $X$ be an object in $\calC$, and $P$ 
+  be a $\calC$-indexed set. Then, there is a bijective correspondence:\footnote{This 
+  is called the ``baby Yoneda lemma'' because the full Yoneda lemma further stipulates 
+  that this isomorphism satisfies additional naturality conditions. The baby Yoneda 
+  lemma is still quite strong, however, and is much easier to prove.}
+  \begin{align*}
+    \{\text{$\calC$-indexed functions }\yo X \Rightarrow P\} \cong P(X)
+  \end{align*}
 \end{theorem}
 
 \begin{definition}
