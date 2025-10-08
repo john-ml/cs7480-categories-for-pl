@@ -1123,8 +1123,9 @@ every other object in $\calC$ has on $Z$.'' Unpacking this more:
   \begin{align*}
     (\yo Z)(X_1) = \calC(X_1, Z) = \{f_1, f_2 \circ g_1, f_3 \circ g_2 \circ g_1 \}
   \end{align*}
-  This is slightly more interesting: we would say, ``the perspective $X_1$ 
-  has on $Z$ is through the $f_1$ morphism.''
+  This is slightly more interesting: we would say, ``$X_1$ 
+  has 3 perspectives on $Z$: (1) $f_1$ morphism, (2) by following 
+  $f_2 \circ g_1$; (3) by following $f_3 \circ g_2 \circ g_1$''.
   \item Now let's look at the action on morphisms. These will correspond 
   to ``changes in perspective''. Let's examine the action of $\yo Z$ 
   on the morphism $f_1$:
@@ -1147,10 +1148,154 @@ every other object in $\calC$ has on $Z$.'' Unpacking this more:
 \end{itemize}
 
 \subsection{Representables in the divisibility category}
+Let's consider what representables look like in a familiar
+category to get a better sense of their properties. Consider 
+the following subset of the natural numbers ordered by 
+divisibility:
 
-\subsection{Representables in STLC}
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZAJgBoAGAXVJADcBDAGwFcYkQBGYkAX1PUy58hFB1IdqdJq3YA2XvxAZseAkXKlikhizaIQ3PgJXCiZLTR0z9AZgXGhalDc3bpekAFZ7SwapEkpDZuuuwcvJIwUADm8ESgAGYAThAAtkieNDgQSGRSofoAxj7JaRlZOYgu+dYgAEYlKemImSDZSAAsNIz0dTCMAAp+pvqMMAk4IJbu7PSNZYh57YhiNR5Q883Vy6tWHmxGIKXNq8saa+wJETxAA
+\begin{tikzcd}
+  &                   & 12                                                &   \\
+  & 6 \arrow[ru, "f"] &                                                   &   \\
+2 \arrow[ru, "d"] &                   & 3 \arrow[lu, "e"]                                 & 5 \\
+  &                   & 1 \arrow[llu, "c"] \arrow[u, "b"] \arrow[ru, "a"] &  
+\end{tikzcd}
+\end{center}
+
+Let's consider the representables of each element in this category.
+First let's inspect $\yo 12$. We can compute its action on objects:
+\begin{align*}
+  (\yo 12)(12) = \{\id_{12}\} \quad&
+  (\yo 12)(6) = \{f\} \quad&
+  (\yo 12)(3) = \{f \circ e\} \\
+  (\yo 12)(2) = \{f \circ d\} \quad&
+  (\yo 12)(1) = \{f \circ d \circ c\} \quad &
+  (\yo 12)(5) = \{\}
+\end{align*}
+
+Note that in this category there is at most 1 morphism between any 2 objects
+(i.e., we have that the morphisms $f \circ d \circ c = f \circ e \circ b$, 
+so we only include 1 of them in $(\yo 12)(1)$).  So, each representable $\yo X$ is either a singleton (meaning, $X \preceq
+12$), or it is an empty set (meaning $X \not\preceq 12$). The action of $\yo 12$
+on morphisms is not complicated, let's see what it is by unfolding definitions:
+\begin{align*}
+  (\yo 12)(c) &: (\yo 12)(2) \to (\yo 12) (1) \\
+  &= (f \circ d) \mapsto (f \circ d) \circ c
+\end{align*}
+
+In this case we see that to shift perspective from $1$ to $2$, we should 
+precompose by the $c$ morphism.
+From this, we can observe that there is single morphism $\yo Y \to \yo X$ 
+if and only if there is a morphism $X \to Y$ in $\calC$.
+
+Now, let's closely examine the structure of a representable $\yo 12$ and try 
+to gain a more global picture of what data it contains. We can summarize 
+$\yo 12$ by the following balloon, where we've replaced each object 
+by its balloon:
+
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZAJgBoAGAXVJADcBDAGwFcYkQBGYkAX1PUy58hFB1IdqdJq3YA2XvxAZseAkXKlikhizaIQ3PgJXCiZLTR0z9AZgXGhalDc3bpekAFZ7SwapEkpDZuuuwcvJIwUADm8ESgAGYAThAAtkieNDgQSGRSofoAxj7JaRlZOYgu+dYgAEYlKemImSDZSAAsNIz0dTCMAAp+pvqMMAk4IJbu7PSNZYh57YhiNR5Q883Vy6tWHmxGIKXNq8saa+wJETxAA
+\begin{tikzcd}
+  &                   & \{\star\}                                                &   \\
+  & \{\star\} \arrow[ru] &                                                   &   \\
+\{\star\} \arrow[ru] &                   & \{\star\} \arrow[lu]                                 & \{\} \\
+  &                   & \{\star\} \arrow[llu] \arrow[u] \arrow[ru] &  
+\end{tikzcd}
+\end{center}
+
+We see that the collection of objects with a $\star$ in them are exactly those objects 
+that are at or below 12 in the order. This collection of objects has a name in 
+order theory: it is called the \textbf{principal ideal} of 12. Formally:
+
+\begin{definition}[Principal ideal]
+  Let $(X, \le)$ be a preorder. Then, the \textbf{principal ideal} 
+  of an element $a \in X$, written $\downarrow a$, 
+  is the smallest collection of all elements less than or equal to $a$ 
+  in $X$, i.e. 
+  $\downarrow a = \{x \in X \mid x \le a\}$.
+\end{definition}
+
+So, we can summarize:
+the representable $\yo 12$ is a representation of $\downarrow 12$, i.e.,
+it contains exactly as much information as is contained in the principal ideal of 12. In general,
+for any category formed by a preorder, it is the case that the representable of an 
+element is a principal ideal in the preorder.
+This order-theoretic viewpoint sheds some light on the intuition that the representable of an 
+element is ``all the ways of viewing the element in the category''. One can imagine 
+``peering up'' at an element $X$ from all the other objects: $\yo X$ is then all the vantage points below $X$ from 
+which it can be seen.
+
+\section{Representables in STLC}
+So far we've been studying representables in thin categories, where there is a 
+very pleasant order-theoretic understanding what they mean in terms of principal ideals.
+Let's see an example of representables in a category with more than 1 morphism 
+between objects.
+Recall the syntax of \textsc{stlc}:
+\begin{gather}
+  \begin{aligned}
+   A,B &::= \plkw{Unit}
+     \mid A \pltimes B
+     \mid A \plto B
+  \\
+  M,N &::= \plunit{}
+      \mid \plpair{M}{N}
+      \mid \plfst{M}
+      \mid \plsnd{M}
+      \mid \pllam{x}{M}
+      \mid \plapp{M}{N}
+      \mid x
+  \end{aligned}
+  \tag{\textsc{stlc}}
+\end{gather}
+
+Recall the category of simply-typed lambda calculus terms quotiented by 
+equations:
+\begin{definition}[The category STLC]
+  The category of simply-typed lambda calculus terms (\textsc{stlc}) 
+  is the category where:
+  \begin{itemize}
+    \item Objects are types $A$;
+    \item Morphisms $A \to B$ are equivalence classes of terms $[x : A \vdash e : B]$ 
+    where equality is given by the equational theory of the $\beta$ and $\eta$ laws;
+    \item Composition is given by substitution:
+    \begin{align*}
+      [b : B \vdash N : C] \circ [a : A \vdash M : B] = [a : A \vdash N[M/b] : C]
+    \end{align*}
+    \item The identity morphism is the class of terms $[a : A \vdash a : A]$.
+  \end{itemize}
+\end{definition}
+
+Let's see the representables in this category. 
+For example, what do the representables $\yo (\plUnit \times \plUnit)$ look like?
+Considering a concrete example:
+\begin{align*}
+  \yo (\plUnit \times \plUnit)(\plUnit) 
+  &= \{\text{the ways of viewing terms of type $\plUnit \times \plUnit$ from terms of type $\plUnit$}\} \\ 
+  &= \{[a : \plUnit \vdash M : \plUnit \times \plUnit] \mid a \text{ an stlc term}\}\\ 
+  &= [a : \plUnit \vdash \plpair{a}{a} : \plUnit \times \plUnit]
+\end{align*}
+
+In the case above, there is only 1 element of the set $\yo (\plUnit \times \plUnit)(\plUnit)$: 
+this is a quirk of our choice of types.
+Intuitively, the representables $(\yo B)(A)$ for two types $A$ and $B$ 
+is the collection of all equivalence classes of terms $M$ of type $A \to B$.
+Then, naturally, the action on morphisms $(\yo X)(f : A \to B) : \yo B \to \yo A$ 
+ought to be the ways of shifting viewpoints from $B$ to $A$,
+i.e.:
+
+\begin{align*}
+  (\yo X)([a : A \vdash M : B]) &: (\yo X)(B) \to (\yo X)(A) \\
+  &= [b : B \vdash N : X] \mapsto [b : B \vdash N : X] \circ [a : A \vdash O : B]  \\
+  &= [b : B \vdash N : X] \mapsto [a : A \vdash N[O/b] : X]
+\end{align*}
+
+Carefully check all the types in the above equations.
 
 \section{Representability}
+
+There can be many $\calC$-indexed sets for a category, but a few of them 
+are special: they come about 
 
 \begin{definition}[Isomorphism of $\calC$-indexed sets]
   Two \(\calC\)-indexed sets \(P,Q\)
@@ -1188,7 +1333,7 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
   it represents $\yo A \times \yo B$.
 \end{theorem}
 
-\section{The category of elements}
+% \section{The category of elements}
 
 %% \section{$\calC$-indexed sets}
 
@@ -1368,6 +1513,12 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
 
 \chapter{Yoneda IV: universal constructions, elements, and properties}
 
+Now we are 
+
+\begin{theorem}[Baby Yoneda]
+  
+\end{theorem}
+
 \begin{definition}
   \sloppy
   Given two \(\calC\)-indexed sets \(P\) and \(Q\),
@@ -1428,7 +1579,15 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
   factors uniquely through it---precisely the universal property of exponents.
 \end{itemize}
 
-\chapter{Yoneda IV}
+\chapter{Functors and natural transformations}
+
+\section{Functors}
+
+\section{Natural transformations}
+
+\section{Functor categories}
+
+
 
 %% - Grothendieck universes
 %% - The category Set
