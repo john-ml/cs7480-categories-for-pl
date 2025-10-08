@@ -1087,6 +1087,7 @@ do this:
     (\yo X)(s : A' \to A) &: (\yo A) \to (\yo A') \\
     &= (f : A \to X) \mapsto (f \circ s : A' \to X)
   \end{align*}
+
 \end{definition}
 
 This definition, on first glance, is very hard to unpack. So we will spend some
@@ -1294,8 +1295,11 @@ Carefully check all the types in the above equations.
 
 \section{Representability}
 
-There can be many $\calC$-indexed sets for a category, but a few of them 
-are special: they come about 
+There can be many $\calC$-indexed sets for a category, but the representables
+are very special due to their relationship with the indexing category.
+As usual in category theory, we are concerned not with particular objects 
+but rather with equivalence classes of objects up to isomorphism,
+a notion we make formal here:
 
 \begin{definition}[Isomorphism of $\calC$-indexed sets]
   Two \(\calC\)-indexed sets \(P,Q\)
@@ -1304,6 +1308,9 @@ if there are \(\calC\)-indexed functions \(\alpha : P \Rightarrow Q\)
 and \(\beta : Q \Rightarrow P\)
 such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
 \end{definition}
+
+With this definition in hand we can make precise the set of $\calC$-indexed 
+sets that are tied to the indexing category:
 
 \begin{definition}[Representability]
   \sloppy
@@ -1328,10 +1335,20 @@ such that \(\alpha\circ\beta=\idt_Q\) and \(\beta\circ\alpha=\idt_P\).
   Thus \(X\times Y\) represents \(\yo X \times \yo Y\).
 \end{proof}
 
+Representability is the bridge between
+the internal view and the external view of a category: it lets us reflect 
+properties presheaf category on $\calC$ back into $\calC$ itself. Concretely,
+in the next chapter, we will use the Yoneda lemma in full to show:
+
 \begin{theorem}
-  An object $P$ is a product of $A$ and $B$ if and only if 
-  it represents $\yo A \times \yo B$.
+  Let $P,A,B$ be objects in a category $\calC$.  Then, $P$ is a product of $A$
+  and $B$ if and only if it represents the product in the presheaf category $\yo A \times \yo B$.
 \end{theorem}
+
+We will not prove this theorem here -- it is a direct consequence of the 
+Yoneda lemma, which we are now ready to appreciate -- but
+one can understand this theorem as: an object $P$ is a product of $A$ 
+and $B$ internally if and only if if behaves like a product externally.
 
 % \section{The category of elements}
 
