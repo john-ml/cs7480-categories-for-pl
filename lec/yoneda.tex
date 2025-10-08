@@ -1607,10 +1607,260 @@ Now we are ready to appreciate the Yoneda lemma:
 
 \section{Functors}
 
+\begin{definition}[Functor]
+  Given two categories \(\calC\) and \(\calD\),
+  a \emph{functor \(F\) from \(\calC\) to \(\calD\)},
+  written
+  \(F : \calC \to \calD\),
+  consists of \begin{itemize}
+    \item An ``action on objects'', which is a function sending each object \(X\) of \(\calC\) to an object \(F(X)\) of \(\calD\)
+    \item An ``action on morphisms'', which is a function sending each morphism \(X \mor{f} Y\) of \(\calC\) to a morphism \(F(X) \mor{F(f)} F(Y)\)
+      of \(\calD\)
+  \end{itemize}
+  such that the following \emph{functoriality conditions} are satisfied:
+  \begin{itemize}
+  \item Identity preservation: for all objects \(X\) of \(\calC\) it holds that \(F(\idt_X) = \idt_{F(X)}\)
+  \item Composition preservation: for all composable pairs of morphisms \(X \mor{f} Y \mor{g} Z\) of \(\calC\)
+    it holds that \(F(g \circ f) = F(g) \circ F(f)\).
+  \end{itemize}
+\end{definition}
+
+Think back to \(\calC\)-indexed sets. We drew these as Balloon diagrams, with sets lying above objects of \(\calC\).
+It may help to think of the definition of functor as an ``abstract Balloon diagram'', where balloons are replaced by objects of \(\calD\):
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRMsXEMWbRCABiXXvyVCio9TU1Sdu2d3EwoAc3hFQAMwBOEALZIyIHAgkUQktdjcQGkZ6ACMYRgAFAWVhEA8sRwALHDl3L19EACYaQKQAZgtJbT0Iu24gA
+\begin{tikzcd}
+FX \arrow[r, "Ff"] & FY \\
+X \arrow[r, "f"']  & Y
+\end{tikzcd}\]
+
+Examples:
+\begin{itemize}
+\item Functors between two preorders are montone functions
+\item Denotational semantics of STLC is a functor \(\mathsf{STLC} \to \FinSet\)
+\item You may wonder: is a \(\calC\)-indexed set a functor? Hold that thought
+\end{itemize}
+
+Note that for each functor \(F : \calC \to \calD\) and each pair of objects \(X,Y\) in \(\calC\),
+you get a function \(\calC(X,Y) \to \calD(FX,FY)\).
+\begin{itemize}
+\item A functor is \emph{full} if this function is surjective: for any morphism \(FX \mor{\hat f} FY\) in \(\calD\),
+  there exists a morphism \(X \mor{f} Y\) in \(\calC\) such that \(\hat f = F(f)\).
+\item A functor is \emph{faithful} if this function is injective: for any morphism for any morphisms \(f,g : X \to Y\) in \(\calC\),
+  if \(Ff = Fg\) as morphisms \(FX\to FY\) in \(\calD\), then \(f = g\).
+\end{itemize}
+In particular, if a functor is \emph{full and faithful}, then each function \(\calC(X,Y) \to \calD(FX,FY)\) is a bijection,
+showing that \(\calD(FX,FY) \cong \calC(X,Y)\) for all objects \(X,Y\) of \(\calC\).
+
 \section{Natural transformations}
+
+\begin{definition}[Natural transformation]
+  Given two categories \(\calC\) and \(\calD\),
+  and two functors \(F,G : \calC \to \calD\),
+  a \emph{natural transformation \(\alpha\) from \(F\) to \(G\)},
+  written
+  \(\alpha : F \Rightarrow G\),
+  consists of a function sending each object \(X\) of \(\calC\) to a \emph{morphism} \(F(X) \mor{\alpha_X} G(X)\) of \(\calD\)
+  such that the following \emph{naturality condition} is satisfied:
+  for each morphism \(X \mor{f} Y\) of \(\calC\), the following square commutes:
+  \[
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEANEAX1PUy58hFGQCMVWoxZt2ATV78QGbHgJEx5SfWatEIAOLc+A1cI2kJ1HTP0GFPSTCgBzeEVAAzAE4QAtkhkIDgQSJpSurKeINQMdABGMAwACoJqIiDeWC4AFjiKXr4BiOEhSADM1tJ6IAA6tYxoOXQA+gqxCUmpZur6Wbn5JiA+-kgATNRliJURtobRQyPFQVMTszX1jc0txhQ8QA
+\begin{tikzcd}
+FX \arrow[d, "Ff"'] \arrow[r, "\alpha_X"] & GX \arrow[d, "Gf"] \\
+FY \arrow[r, "\alpha_Y"']                 & GY
+\end{tikzcd}
+  \]
+  In other words, \(\alpha_Y \circ Ff = Gf \circ \alpha_X\) for all \(X \mor{f} Y\).
+\end{definition}
+
+Think back to \(\calC\)-indexed functions. We drew these as squares involving two Balloon diagrams stacked together.
+It may help to think of the naturality condition as an abstraction of such a picture, where Balloons are replaced by
+objects of \(\calD\):
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBmAXVJADcBDAGwFcYkQANEAX1PU1z5CKAIwVqdJq3YBNHnxAZseAkTIiJDFm0QgAYl179lQtaWKapOkAHFDCpYNWjSGmlum69co4oErhZDELdyt2Gx8JGCgAc3giUAAzACcIAFskMhAcCCQxSW12RPkk1IzEACYaHKQAFlDCr2KaRnoAIxhGAAV-U11krBiACxwSkBT0pHJq3MQAVgbPW2LfCfKq7NnpgqWAHV2mNCH6AH17UsnEes2kBZ3rfcPjk4BPEBb2zp6TZxAB4dG3Eo3CAA
+\begin{tikzcd}
+GX \arrow[r, "Gf"]                        & GY                        \\
+FX \arrow[r, "Ff"'] \arrow[u, "\alpha_X"] & FY \arrow[u, "\alpha_y"'] \\
+                                          &                           \\
+X \arrow[r, "f"]                          & Y
+\end{tikzcd}\]
+
+\begin{definition}[Identity natural transformation]
+  Let \(F : \calC \to \calD\) be a functor between two categories \(\calC,\calD\).
+  The identity natural transformation \(\idt_F : F \Rightarrow F\)
+  is defined by \(\idt_{F,X} = \idt_{F(X)}\).
+  Naturality is verified by the following ``abstract balloon diagram'':
+  \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBmAXVJADcBDAGwFcYkQANEAX1PU1z5CKAIwVqdJq3YBNHnxAZseAkTIiJDFm0QgAYl179lQomI00t03XrlHFAlcJKlimqTv2GFSwatGu7trstjwSMFAA5vBEoABmAE4QALZIZCA4EEhiksG6cfLxSamIACw0mUgArJYeIQX2iSlIAEwVWYjktXn6DQpNJW0ZHeW51iAAOhNYUDgA+sAG3IUgA0hdw9Xd41Mz84syy9yU3EA
+\begin{tikzcd}
+FX \arrow[r, "Ff"]                        & FY                        \\
+FX \arrow[r, "Ff"] \arrow[u, "\idt_{FX}"] & FY \arrow[u, "\idt_{FY}"] \\
+                                          &                           \\
+X \arrow[r, "f"]                          & Y
+\end{tikzcd}\]
+\end{definition}
+
+\begin{definition}[Composition of natural transformations]
+  Given \(\alpha : F \Rightarrow G\) and \(\beta : G \Rightarrow H\),
+  the composition \(\beta\circ \alpha : F \Rightarrow H\) is defined by
+  \((\beta\circ\alpha)_{X} = \beta_X \circ \alpha_X\).
+  Naturality is verified by the following ``abstract balloon diagram'':
+  \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoAWAXVJADcBDAGwFcYkQANEAX1PU1z5CKAIwVqdJq3YBNHnxAZseAkTIAmCQxZtEIAGJde-ZUKJjNNbdL365xxQJXCSpEVqm6QAcSMKlgqqibh467N72-k5mKGTEoTYgABJ+JoEuYvFWnuxJ9hIwUADm8ESgAGYAThAAtkhkIDgQSGKSYXrl8hXVdYjkNE1IAKzZ7T6dDlW1SOoDzYgAzKOJ+hMKU72zjfP9bYkAOvtMaAAW9AD6qSAbSEvbw8teh8dn53I0jPQARjCMAArRIIgSpYIonHBda49JC7QaIABsj3Yhx+OAuVxuiBG90QAHYkXoUTA0W8QB9vr8AaYgSCwRDJtCEXMkPi9l4khNKNwgA
+\begin{tikzcd}
+HX \arrow[r, "Hf"]                       & HY                        \\
+GX \arrow[r, "Gf"] \arrow[u, "\beta_X"]  & GY \arrow[u, "\beta_Y"']  \\
+FX \arrow[r, "Ff"] \arrow[u, "\alpha_X"] & FY \arrow[u, "\alpha_Y"'] \\
+                                         &                           \\
+X \arrow[r, "f"]                         & Y
+\end{tikzcd}\]
+\end{definition}
+
+Examples
+\begin{itemize}
+\item Suppose you have two functors \(F,G : X \to Y\) between preorders \(X,Y\), aka two monotone functions.
+  There is at most one natural transformation \(\alpha : F \Rightarrow G\), which exists if and only if \(F(x) \le G(x)\) for all \(x\in X\).
+\item Mind-bending example: there is an identity functor \(\mathsf{id} : \FinSet \to \FinSet\).
+  What does a natural transformation \(\alpha : \mathsf{id} \Rightarrow \mathsf{id}\) look like?
+  Think polymorphism: intuitively, \(\alpha\) must have type ``\(\forall X. \FinSet(\mathsf{id}(X),\mathsf{id}(X))\)'',
+  aka ``\(\forall X. X \to X\)''.
+  This suggests that \(\alpha\) is the identity, i.e., \(\alpha_X = \idt_X\) for all objects \(X\) of \(\FinSet\).
+  Indeed, we can verify this follows from \(\alpha\) being natural, as follows.
+  \begin{itemize}
+  \item Let \(X\) be an arbitrary object of \(\FinSet\). We will show \(\alpha_X\) is the identity function on \(X\).
+  \item By function extensionality it's enough to show that for all \(x \in X\) it holds that \(\alpha_X(x) = x\).
+  \item Fix \(x \in X\) arbitrary. We saw in a homework that \(x\) corresponds to a \(\FinSet\) morphism \(\hat x : 1 \to X\),
+    where \(1\) is the terminal object of \(\FinSet\) (aka the one-point set).
+    Now, by naturality of \(\alpha\), the following square commutes:
+    \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkRyQBfU9TXfIRTkK1Ok1btOPPtjwEiZYmIYs2iEAA1uvEBjmCiI5TVWSN2rmJhQA5vCKgAZgCcIAWyRkQOCEhHiauwAOsFMaAAW9AD6nDSM9ABGMIwACvzyQiAuWLYRODrObp6I3r5IAEymEuogAB6FIK4e-jTliADM1UEaDfFJKekGCho5eQUyTcWVbX6d3eYgoeFR0ZaUXEA
+\begin{tikzcd}
+X \arrow[r, "\alpha_X"]                 & X                 \\
+1 \arrow[r, "\alpha_1"'] \arrow[u, "x"] & 1 \arrow[u, "x"']
+\end{tikzcd}\]
+    Because \(1\) is terminal, there can only be one morphism \(1\to 1\), namely the identity. Hence \(\alpha_1 = \idt_1\).
+    Thus this square collapses to the following triangle:
+    \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkRyQBfU9TXfIRRli1Ok1bsAGt14gM2PASLlSomgxZtEIGVzEwoAc3hFQAMwBOEALZIyIHBCSrxW9gA9ZF63cSunJAAmDQltEAAdCKY0AAt6AH09OStbexpAxBC3SR0vGkZ6ACMYRgAFfiUhEEssI1icbkouIA
+\begin{tikzcd}
+X \arrow[r, "\alpha_X"]           & X \\
+1 \arrow[u, "x"] \arrow[ru, "x"'] &
+\end{tikzcd}\]
+But now this triangle expresses the fact that \(\alpha_X(x) = x\), which is exactly what was to be shown.
+  \end{itemize}
+\end{itemize}
 
 \section{Functor categories}
 
+\begin{definition}[Functor category]
+  Let \(\calC\) and \(\calD\) be categories.
+  Suppose that
+  \begin{enumerate}
+    \item The collection of functors from \(\calC\) to \(\calD\) forms a set
+    \item For any two functors \(F,G : \calC \to \calD\), the collection of natural transformations from \(F\) to \(G\) forms a set
+  \end{enumerate}
+  Then there is a \emph{functor category}, written \([F;G]\), whose
+  \begin{itemize}
+  \item Objects are functors \(\calC\) to \(\calD\)
+  \item Morphisms from \(F\) to \(G\) are natural transformations \(\alpha : F \Rightarrow G\)
+  \end{itemize}
+  Identity morphism is the identity natural transformation, and composition is composition of natural transformations.
+\end{definition}
+
+Examples
+\begin{itemize}
+\item As you can see, there are small set-theoretic nuisances with this definition. We will come back to this
+\item \(\FinSet^{\mathsf{loop}}\) is a functor category! It's the functor category \([\calC;\FinSet]\) where \(\calC\) is the
+  category with one object \(\star\), a special non-identity morphism \(f\), and all composites one can make from this (aka \(f^n\) for \(n\in \N\)).
+  (In other words, \(\calC\) is the category you get from the monoid \((\N,+,0)\) of natural numbers under addition.)
+\item \(\FinSet^{\bullet\to\bullet}\), the category of finite functions, is a functor category! It's \([(\bullet \to\bullet); \FinSet]\)
+  where \(\bullet\to\bullet\) is the category with two objects and one non-identity arrow between them.
+\item As you can see, functor categories are kind of like ``categories of diagrams'': the objects of a functor category look like
+  diagrams whose shape is given by the domain category. Keep this in mind; it'll come back later (limits and colimits)
+\item You may wonder: are \(\calC\)-indexed sets a functor category? Hold that thought...
+\end{itemize}
+
+\section{The category of sets}
+
+Naive definition, paralleling \Cref{def:finset}: the category \(\Set\) consists of
+\begin{itemize}
+\item Objects: the set of all sets
+\item Morphisms: tuples \((A,f,B)\) where \(A,B\) are sets and \(f : A \to B\) is a function
+\end{itemize}
+Obviously this definition is unworkable: there is no set of all sets.
+We have to finally confront the set-theoretic minutiae that we have swept under the rug so far.
+Russell famously showed that the collection of all sets does not form a set; it is ``too big''.
+We will adopt a way out which has become standard when doing highly categorical things:
+postulate the existence of a ``very big set'' that contains ``enough sets to look like the set of all sets''.
+\begin{definition}[Grothendieck universe]
+  A Grothendieck universe is a set \(U\) satisfying the following properties:
+  \begin{itemize}
+    \item Copy from Definition 2.1 of \href{https://ncatlab.org/nlab/show/Grothendieck+universe}{the nLab page}
+  \end{itemize}
+\end{definition}
+Every Grothendieck universe \(\calU\) is a model of ZFC, hence ``looks like the set of all sets''.
+From now on we assume the following axiom.
+\begin{axiom}
+  There exists a Grothendieck universe \(\calU\).
+\end{axiom}
+The set \(\calU\) splits the world of sets into two halves:
+\begin{itemize}
+\item On one side there are the sets \(X\) such that \(X \in \calU\). These sets are ``small enough to fit into \(\calU\)'', so called \emph{\(\calU\)-small}.
+\item On the other side there aer sets \(X\) such that \(X \notin \calU\). these sets are ``too large to fit'', so called \emph{\(\calU\)-large}.
+\end{itemize}
+
+The key point is that, we cannot define a category of \emph{all} sets, we  can define a category of \emph{\(\calU\)-small} ones.
+\begin{definition}[the category of (\(\calU\)-small) sets]
+  \(\Set\) is the category whose
+  \begin{itemize}
+    \item Objects are elements of \(\calU\), aka \(\calU\)-small sets
+    \item Morphisms from \(X\) to \(Y\) are functions \(f : X \to Y\)
+  \end{itemize}
+\end{definition}
+Just as sets can be \(\calU\)-small or \(\calU\)-large, so too can categories.
+There are actually three tiers of ``small''-ness for categories.
+First, a category can fit perfectly inside of the universe \(\calU\).
+\begin{definition}
+  A category \(\calC\) is \emph{\(\calU\)-small} if both of its sets of objects and morphisms are.
+\end{definition}
+More generally, a category could be too large to fit inside of \(\calU\), but it could be the case that for any two objects,
+the collection of \emph{morphisms} between those two objects does fit inside of \(\calU\).
+Intuitively, this is like saying the category is \(\calU\)-small if you zoom in on the morphisms betwen two given objects;
+hence this condition is called being ``locally'' small.
+\begin{definition}
+  A category \(\calC\) is \emph{\(\calU\)-locally-small} if, for each pair of objects \(X,Y\),
+  the set \(\calC(X,Y)\) is \(\calU\)-small.
+\end{definition}
+Finally, a category is \(\calU\)-large if it is neither small nor locally small.
+
+\subsection{Indexed set theory as a category}
+Now we can show that \(\calC\)-indexed sets form a category.
+\begin{definition}[category of \(\calC\)-indexed sets]
+  Let \(\calC\) be a locally \(\calU\)-small category.
+  Then \(\calC\)-indexed sets and functions between them form a functor category \([\calC^{\mathsf{op}};\Set]\).
+\end{definition}
+
+\begin{proposition}
+  Let \(\calC\) be a locally \(\calU\)-small category.
+  The Yoneda embedding defines a functor \(\yo : \calC \to [\calC^{\mathsf{op}};\Set]\),
+  and this functor is full and faithful.
+\end{proposition}
+
+%% \subsection{The Yoneda lemma in full generality}
+
+%% We finally have enough language to state the non-baby version of the Yoneda lemma.
+%% \begin{definition}
+%%   Let \(\calC\) be a \(\calU\)-locally small category.
+%%   Then
+%%   \[
+%%     [\calC^{\mathsf{op}}](\yo X, F) \cong F(X)
+%%   \]
+%%   natural in \(F,X\),
+%%   which means that there is a natural isomorphism between two functors
+%%   \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRGQB0OBjRgYQB6wLgFs6OABZwAZsAhoAvgoDcXAMowcFAARc8I+Lp78ho8VNnylIBaXSZc+QigBM5KrUYs26zTY8wUADm8ESg0gBOECJIZCA4EEgAjNQARjBgUEgAtADMcfTMrIggejAAHjjAAEoAEmoKINQMdOkMAAoOeARsEVhBEjg2diCR0bHUCclpGVmI+dSF3iVllcAAMvWNChQKQA
+%% \begin{tikzcd}
+%% {[\calC^{\mathsf{op}};\Set] \times \calC^{\mathsf{op}}} \arrow[rr, "\text{RHS}"', bend right] \arrow[rr, "\text{LHS}", bend left] &  & \Set
+%% \end{tikzcd}\]
+%% where \(\text{LHS}\) is the functor defined by
+%% \begin{itemize}
+%% \item On objects, \(\text{LHS}(F,X) = [\calC^{\mathsf{op}}](\yo X, F)\)
+%% \item On morphisms \(\), \(\text{LHS}(F,X) = [\calC^{\mathsf{op}}](\yo X, F)\)
+%% \end{itemize}
+%% \end{definition}
 
 
 %% - Grothendieck universes
