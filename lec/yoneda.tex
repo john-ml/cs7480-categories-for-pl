@@ -1543,71 +1543,198 @@ Now we are ready to appreciate the Yoneda lemma:
   \end{align*}
 \end{theorem}
 
-\begin{definition}
-  \sloppy
-  Given two \(\calC\)-indexed sets \(P\) and \(Q\),
-  their \emph{product} \(P\times Q\)
-  is the \(\calC\)-indexed set defined by
-  \((P\times Q)(X) = P(X)\times Q(X)\),
-  with substitution defined by
-  \((x,y)\cdot_{P\times Q} p = (x\cdot_P p, y\cdot_Q p)\).
-\end{definition}
+On first glance this theorem is profoundly mysterious because it stipulates 
+that there is a very strong relationship between two very different-seeming 
+things. Let's unpack this slowly to really understand what is going on 
+by instantiating the Yoneda lemma to a specific category and 
+$\calC$-indexed set.
+Let's consider a finite category with 3 objects:
 
-\begin{proposition}
-  Let \(X\) and \(Y\) be two objects of a category \(\calC\).
-  An object \(P\) is a product of \(X\) and \(Y\)
-  if and only if \(\yo P\) is isomorphic to \(\yo X \times \yo Y\).
-\end{proposition}
+\begin{equation}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRQBGclVqMWbAJrdeIDNjwEiAJjHV6zVohAAtbuJhQA5vCKgAZgCcIAWyRkQOCEmE8rth4lHPXiVS4KLiA
+\begin{tikzcd}
+  X \arrow[r, "f"] & Y \arrow[r, "g"] & Z
+  \end{tikzcd}
+\end{equation}
 
-\begin{definition}
-  Given two objects \(X\) and \(Y\) of a category \(\calC\),
-  there is a \(\calC\)-indexed set of \emph{closures},
-  written \(\mathsf{Clos}(X,Y)\),
-  defined by \(\mathsf{Clos}(X,Y)(\Gamma) = \calC(\Gamma\times X, Y)\),
-  with substitution defined by
-  \[
-    \mathsf{Clos}(X,Y)(s : \Gamma'\to \Gamma)(f : \Gamma\times X \to Y)
-    = \angled{\gamma',x} \mapsto f \circ \angled{s\circ \gamma', x}
-  \]
-  on generalized elements.
-\end{definition}
+Now, let's define a simple $\calC$-indexed set $P$:
+\begin{align*}
+  P(X) = \{a, b\} \quad 
+  P(Y) = \{c, d\} \quad
+  P(Z) = \{e, h\} \\
+  P(f) = \begin{cases}
+    c \mapsto a \\
+    d \mapsto b
+  \end{cases}
+  \quad 
+  P(g) = \begin{cases}
+    e \mapsto c \\
+    h \mapsto d
+  \end{cases}
+\end{align*}
 
-\begin{proposition}
-  Let \(X\) and \(Y\) be two objects of a category \(\calC\).
-  An object \(E\) is the exponential \(Y^X\)
-  if and only if \(\yo E\) is isomorphic to \(\mathsf{Clos}(X,Y)\).
-\end{proposition}
+Continuing to unpack the data, we can define $\yo Z$, which is 
+also a $\calC$-indexed set:
 
-\begin{proposition}
-  Suppose the \(\calC\)-indexed set \(P\) is represented
-  by the object \(X\).
-  Then there exists an element \(u \in PX\),
-  called the \emph{\(P\)-universal element},
-  which satisfies the following \emph{universal property}:
-  for any object \(\Gamma\) and any element \(g \in P\Gamma\),
-  there exists a unique morphism \(\hat g : \Gamma \to X\)
-  such that \(g = u \cdot_P \hat g\).
-\end{proposition}
+\begin{align*}
+  (\yo Z)(Z) = \{\id_Z\} \quad
+  (\yo Z)(Y) = \{g\} \quad
+  (\yo Z)(X) = \{g \circ f\}
+  \\
+  (\yo Z)(f) = g \mapsto f \circ g \quad
+  (\yo Z)(g) = \id_Z \mapsto f
+\end{align*}
 
+Next, let's enumerate the natural transformations $\yo X \Rightarrow P$
+If the Yoneda lemma is true, we don't have too much work to do: 
+we know there should be \emph{only two of them}, since $P(X)$ 
+has only two elements in it. Let's enumerate them on a balloon diagram:
+
+\begin{fullwidth}
+  \begin{center}
+    \includegraphics[width=400px]{fig/yo-2.png}
+  \end{center}
+\end{fullwidth}
+
+Here we've drawn the two possible natural transformations $\alpha_1$ and
+$\alpha_2$ in solid red and dashed blue respectively.  Now, let's understand why
+the Yoneda lemma holds by tracing the possible paths through this balloon
+diagram with your fingers.  Recall the two finger rule: a $\calC$-indexed
+function $\yo Z \Rightarrow P$ satisfies the naturality condition if, starting
+at any element in any balloon $\yo X$, your two fingers move in synchrony along
+all possible paths.
+So, let's start with $\yo Z = \{\id_Z\}$. Let's play the two finger game together
+to design the two possible natural transformations:
 \begin{itemize}
-\item In the case of the product, with \(\yo P \cong \yo X \times \yo Y\),
-  the universal element is an element \(u \in \calC(P,X) \times \calC(P,Y)\),
-  which is a pair of morphisms \(P\to X, P\to Y\).
-  The universal property of this pair is that any other pair \(\Gamma \to X,\Gamma\to Y\)
-  factors uniquely through it---precisely the universal property of products
-\item In the case of exponents, with \(\yo E \cong \calC(A\times(-),B)\),
-  the universal element is an element \(u \in \calC(A \times E,B)\),
-  which is a morphism \(A \times E \to B\).
-  The universal property of this morphism is that any other morphism
-  \(A \times \Gamma \to B\)
-  factors uniquely through it---precisely the universal property of exponents.
+  \item Your left finger moves to $g$. Where can your right finger go? 
+  It can go either to $e$ or $h$. So, choose $h$ and so we are designing $\alpha_1$. \emph{The rest of the 
+  moves are forced}: your right finger must now move to $c$,
+  then to $a$. Your left finger is also forced: it must move to $g$ 
+  then to $f \circ g$. Now, all other decisions are forced, and we 
+  can fill in $\alpha_1$ so that all moves are in harmony.
+  \item Next, we can choose moving our right finger to $e$, and so 
+  we are designing $\alpha_2$. \emph{Again, all moves are forced}: 
+  the right finger follows the functions in $P$, and the left finger 
+  follows the functions in $\yo Z$. Then, we are forced to choose 
+  each $\alpha$ to exactly line up exactly with how these fingers move: 
+  there is only one choice for $\alpha$ at each step.
 \end{itemize}
+
+Notice what is happening: because, in this example, 
+there is a single element in $(\yo Z)(Z)$, then there must be 
+\emph{exactly 1} natural transformation for each possible 
+element in $P(Z)$. Naturality is a very strong restraint 
+to place on $\alpha$!
+
+So, it is now hopefully quite clear that, if $\id_Z$ is the only element of $\yo
+Z$, the baby Yoneda lemma is true, since the entire action of a natural
+transformation is determined by its action on the identity morphism of $Z$. But,
+what if there is more than one morphism in $(\yo Z)(Z)$?
+
+The crux is that the choice of \emph{$(\yo Z)(\id_Z)$} fully determines the
+action of $\yo Z$ on all the other morphisms $Z \to Z$. Let's see this visually. 
+Suppose we have as our indexing category the monoid corresponding to the 
+natural numbers mod 3 under addition. This category has a single object $\star$ and 
+3 morphisms: the identity morphism $0$, $1, 2$, where $1 \circ 1 = 2, 1 \circ 2 = \id, 2 \circ 2 = 1, 2 \circ 1 = \id$.
+Let's visualize some of this data:
+
+\begin{center}
+  \includegraphics[width=250px]{fig/yo-3.png}
+\end{center}
+
+Here we've drawn an arbitrary $\calC$-indexed set $P$
+with its action on the $1$ morphism, and we've chosen arbitrarily that
+the $\calC$-indexed function
+$\alpha_1$ maps $0$ to $b$. 
+Note that we've drawn the balloon twice for the same object; this is for visualization 
+purposes only.
+Now, the key: \emph{does this choice of $\alpha$ 
+fully determine how $\alpha$ behaves on all other elements of $(\yo \star)(\star)$}?
+Indeed it does! Observe: by naturality, we have that $\alpha_1(1) = a$, which 
+we can see by composing $P(1)\circ\alpha_1$. This gives us one more piece of data 
+about $\alpha_1$. Now, what about $\alpha_1(2)$? We can get this piece of data 
+by inspecting $P(2)$ and $(\yo \star)(2)$:
+
+\begin{center}
+  \includegraphics[width=250px]{fig/yo-4.png}
+\end{center}
+
+And now here we learn the final component of $\alpha$: we conclude that $\alpha(2) = b$.
+
+\section{Proving the baby Yoneda lemma}
+
+\section{Application: Posets}
+
+\section{Application: Cayley's theorem}
+
+\section{The category of elements}
+
+% \begin{definition}
+%   \sloppy
+%   Given two \(\calC\)-indexed sets \(P\) and \(Q\),
+%   their \emph{product} \(P\times Q\)
+%   is the \(\calC\)-indexed set defined by
+%   \((P\times Q)(X) = P(X)\times Q(X)\),
+%   with substitution defined by
+%   \((x,y)\cdot_{P\times Q} p = (x\cdot_P p, y\cdot_Q p)\).
+% \end{definition}
+
+% \begin{proposition}
+%   Let \(X\) and \(Y\) be two objects of a category \(\calC\).
+%   An object \(P\) is a product of \(X\) and \(Y\)
+%   if and only if \(\yo P\) is isomorphic to \(\yo X \times \yo Y\).
+% \end{proposition}
+
+% \begin{definition}
+%   Given two objects \(X\) and \(Y\) of a category \(\calC\),
+%   there is a \(\calC\)-indexed set of \emph{closures},
+%   written \(\mathsf{Clos}(X,Y)\),
+%   defined by \(\mathsf{Clos}(X,Y)(\Gamma) = \calC(\Gamma\times X, Y)\),
+%   with substitution defined by
+%   \[
+%     \mathsf{Clos}(X,Y)(s : \Gamma'\to \Gamma)(f : \Gamma\times X \to Y)
+%     = \angled{\gamma',x} \mapsto f \circ \angled{s\circ \gamma', x}
+%   \]
+%   on generalized elements.
+% \end{definition}
+
+% \begin{proposition}
+%   Let \(X\) and \(Y\) be two objects of a category \(\calC\).
+%   An object \(E\) is the exponential \(Y^X\)
+%   if and only if \(\yo E\) is isomorphic to \(\mathsf{Clos}(X,Y)\).
+% \end{proposition}
+
+% \begin{proposition}
+%   Suppose the \(\calC\)-indexed set \(P\) is represented
+%   by the object \(X\).
+%   Then there exists an element \(u \in PX\),
+%   called the \emph{\(P\)-universal element},
+%   which satisfies the following \emph{universal property}:
+%   for any object \(\Gamma\) and any element \(g \in P\Gamma\),
+%   there exists a unique morphism \(\hat g : \Gamma \to X\)
+%   such that \(g = u \cdot_P \hat g\).
+% \end{proposition}
+
+% \begin{itemize}
+% \item In the case of the product, with \(\yo P \cong \yo X \times \yo Y\),
+%   the universal element is an element \(u \in \calC(P,X) \times \calC(P,Y)\),
+%   which is a pair of morphisms \(P\to X, P\to Y\).
+%   The universal property of this pair is that any other pair \(\Gamma \to X,\Gamma\to Y\)
+%   factors uniquely through it---precisely the universal property of products
+% \item In the case of exponents, with \(\yo E \cong \calC(A\times(-),B)\),
+%   the universal element is an element \(u \in \calC(A \times E,B)\),
+%   which is a morphism \(A \times E \to B\).
+%   The universal property of this morphism is that any other morphism
+%   \(A \times \Gamma \to B\)
+%   factors uniquely through it---precisely the universal property of exponents.
+% \end{itemize}
 
 \chapter{Functors and natural transformations}
 
 \section{Functors}
 
 \begin{definition}[Functor]
+  \sloppy
   Given two categories \(\calC\) and \(\calD\),
   a \emph{functor \(F\) from \(\calC\) to \(\calD\)},
   written
