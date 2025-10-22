@@ -125,6 +125,19 @@ W \arrow[r, "p"]                    & X \arrow[r, "f", shift left] \arrow[r, "g"
 \end{tikzcd}\]
 \end{itemize}
 
+The equalizer looks like a refinement type:
+\[
+\text{equalizer of }
+\begin{tikzcd}
+X \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & Y
+\end{tikzcd}
+\qquad\leadsto\qquad
+\{x : X \mid f(x) = g(x)\}
+\]
+
+The pullback looks like a ``fiber product'':
+\[\includegraphics[width=100px]{fig/pb.png}\]
+
 \begin{definition}[cone]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
