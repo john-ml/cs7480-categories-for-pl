@@ -1541,6 +1541,7 @@ Now we are ready to appreciate the Yoneda lemma:
   \begin{align*}
     \{\text{$\calC$-indexed functions }\yo X \Rightarrow P\} \cong P(X)
   \end{align*}
+  \label{thm:baby-yo}
 \end{theorem}
 
 On first glance this theorem is profoundly mysterious because it stipulates 
@@ -1662,12 +1663,27 @@ by inspecting $P(2)$ and $(\yo \star)(2)$:
 And now here we learn the final component of $\alpha$: we conclude that $\alpha(2) = b$.
 
 \section{Proving the baby Yoneda lemma}
+\marginnote{Thanks to Bex Golinov for these scribe notes.}
+Now we are ready to prove \cref{thm:baby-yo}. Let $\calC$ be a 
+category, $P$ be a $\calC$-indexed set, and $X$ be an object 
+in $\calC$. Then, we need to construct a bijection:
 
-\section{Application: Posets}
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13hOBfEH0uky58hFAEZyVWoxZsACgAoAGgEp+0mFADm8IqABmAJwgBbJGRA4ISSSABGMMFCQBmS-WatEIbf0Egxma21NYW1I7ObpYMdI4M8sJ4BGwMMAY4INSecj4GTGAAxho8QA
+\begin{tikzcd}
+  \{\calC\text{-indexed functions }\yo X \Rightarrow P\} \arrow[r, "g", bend left] & P(X) \arrow[l, "func", bend left]
+  \end{tikzcd}
+\end{center}
 
-\section{Application: Cayley's theorem}
+\newthought{First we construct} $func$.
 
 \section{The category of elements}
+
+\section{Calculating a universal property}
+\todo{Show how to calculate the universal property of 
+a product}
+
+% \section{Cayley's theorem}
 
 % \begin{definition}
 %   \sloppy
@@ -1730,8 +1746,16 @@ And now here we learn the final component of $\alpha$: we conclude that $\alpha(
 % \end{itemize}
 
 \chapter{Functors and natural transformations}
+We are ready to broaden our categorical perspective and language to begin 
+comparing two categories with one another. We will see how some of the notions 
+we've been encountering so far in our journey through the Yoneda 
+lemma -- in particular, the functoriality and naturality properties of 
+$\calC$-indexed sets and functions -- are special cases of more general 
+phenomena in category theory called functors and natural transformations.
+
 
 \section{Functors}
+A functor is a structure-preserving map between categories:
 
 \begin{definition}[Functor]
   \sloppy
@@ -1752,33 +1776,55 @@ And now here we learn the final component of $\alpha$: we conclude that $\alpha(
   \end{itemize}
 \end{definition}
 
-Think back to \(\calC\)-indexed sets. We drew these as Balloon diagrams, with sets lying above objects of \(\calC\).
-It may help to think of the definition of functor as an ``abstract Balloon diagram'', where balloons are replaced by objects of \(\calD\):
-\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRMsXEMWbRCABiXXvyVCio9TU1Sdu2d3EwoAc3hFQAMwBOEALZIyIHAgkUQktdjcQGkZ6ACMYRgAFAWVhEA8sRwALHDl3L19EACYaQKQAZgtJbT0Iu24gA
-\begin{tikzcd}
-FX \arrow[r, "Ff"] & FY \\
-X \arrow[r, "f"']  & Y
-\end{tikzcd}\]
+Intuitively, if there is a functor $F : \calC \to \calD$, then 
+there is an ``abstract copy of $\calC$ inside $\calD$''. 
 
-Examples:
-\begin{itemize}
-\item Functors between two preorders are montone functions
-\item Denotational semantics of STLC is a functor \(\mathsf{STLC} \to \FinSet\)
-\item You may wonder: is a \(\calC\)-indexed set a functor? Hold that thought
-\end{itemize}
+% Think back to \(\calC\)-indexed sets. We drew these as Balloon diagrams, with sets lying above objects of \(\calC\).
+% It may help to think of the definition of functor as an ``abstract Balloon diagram'', where balloons are replaced by objects of \(\calD\):
+% \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRMsXEMWbRCABiXXvyVCio9TU1Sdu2d3EwoAc3hFQAMwBOEALZIyIHAgkUQktdjcQGkZ6ACMYRgAFAWVhEA8sRwALHDl3L19EACYaQKQAZgtJbT0Iu24gA
+% \begin{tikzcd}
+% FX \arrow[r, "Ff"] & FY \\
+% X \arrow[r, "f"']  & Y
+% \end{tikzcd}\]
 
-Note that for each functor \(F : \calC \to \calD\) and each pair of objects \(X,Y\) in \(\calC\),
-you get a function \(\calC(X,Y) \to \calD(FX,FY)\).
-\begin{itemize}
-\item A functor is \emph{full} if this function is surjective: for any morphism \(FX \mor{\hat f} FY\) in \(\calD\),
-  there exists a morphism \(X \mor{f} Y\) in \(\calC\) such that \(\hat f = F(f)\).
-\item A functor is \emph{faithful} if this function is injective: for any morphism for any morphisms \(f,g : X \to Y\) in \(\calC\),
-  if \(Ff = Fg\) as morphisms \(FX\to FY\) in \(\calD\), then \(f = g\).
-\end{itemize}
-In particular, if a functor is \emph{full and faithful}, then each function \(\calC(X,Y) \to \calD(FX,FY)\) is a bijection,
-showing that \(\calD(FX,FY) \cong \calC(X,Y)\) for all objects \(X,Y\) of \(\calC\).
+
+
+\subsection{Examples of functors}
+
+As usual we begin by gaining an intuition for what functors look like 
+between categories that represent preorders. They will correspond to 
+monotone functions:
+
+\begin{definition}[Monotone function]
+  Let $(X, \le_X)$ and $(Y, \le_Y)$ be preorders. Then, a 
+  function $f : X \to Y$ is called \emph{monotone} if, 
+  for any $x_1, x_2 \in X$ such that $x_1 \le_X x_2$, 
+  it is the case that $f(x_1) \le_Y f(x_2)$.
+\end{definition}
+
+Now, let's see how functors between preorders correspond to monotone 
+functions. 
+Let $\calC$ and $\calD$ be categories corresponding to preorders
+and let $F : \calC \Rightarrow \calD$ be a functor between 
+these two categories.
+Then, functoriality of $F$ requires that,
+for any morphism $X \xrightarrow{f} Y$ in $\calC$, 
+there is a morphism $F(X) \xrightarrow{f} F(Y)$.
+This is exactly the monotonicity requirement:
+the morphism $f$, considered order-theoretically, 
+denotes that $X \le Y$; similarly, the morphism $F(f)$ 
+denotes that $F(X) \le F(Y)$.
+
+% Examples:
+% \begin{itemize}
+% \item Functors between two preorders are montone functions
+% \item Denotational semantics of STLC is a functor \(\mathsf{STLC} \to \FinSet\)
+% \item You may wonder: is a \(\calC\)-indexed set a functor? Hold that thought
+% \end{itemize}
+
 
 \section{Natural transformations}
+Natural transformations are structure-preserving maps between functors:
 
 \begin{definition}[Natural transformation]
   Given two categories \(\calC\) and \(\calD\),
@@ -1843,6 +1889,7 @@ Examples
 \begin{itemize}
 \item Suppose you have two functors \(F,G : X \to Y\) between preorders \(X,Y\), aka two monotone functions.
   There is at most one natural transformation \(\alpha : F \Rightarrow G\), which exists if and only if \(F(x) \le G(x)\) for all \(x\in X\).
+
 \item Mind-bending example: there is an identity functor \(\mathsf{id} : \FinSet \to \FinSet\).
   What does a natural transformation \(\alpha : \mathsf{id} \Rightarrow \mathsf{id}\) look like?
   Think polymorphism: intuitively, \(\alpha\) must have type ``\(\forall X. \FinSet(\mathsf{id}(X),\mathsf{id}(X))\)'',
@@ -1900,6 +1947,25 @@ Examples
   diagrams whose shape is given by the domain category. Keep this in mind; it'll come back later (limits and colimits)
 \item You may wonder: are \(\calC\)-indexed sets a functor category? Hold that thought...
 \end{itemize}
+
+\section{Full and faithful functors}
+We noted that a functor $F : \calC \to \calD$ ensures an abstract copy of 
+$\calC$ is inside $\calD$. But, what if we want \emph{more} of $\calC$ 
+to be visible inside $\calC$? We can coax more structure out by 
+enforcing that the functor does not collapse any structure.
+
+Note that for each functor \(F : \calC \to \calD\) and each pair of objects \(X,Y\) in \(\calC\),
+you get a function \(\calC(X,Y) \to \calD(FX,FY)\).
+\begin{itemize}
+\item A functor is \emph{full} if this function is surjective: for any morphism \(FX \mor{\hat f} FY\) in \(\calD\),
+  there exists a morphism \(X \mor{f} Y\) in \(\calC\) such that \(\hat f = F(f)\).
+\item A functor is \emph{faithful} if this function is injective: for any morphism for any morphisms \(f,g : X \to Y\) in \(\calC\),
+  if \(Ff = Fg\) as morphisms \(FX\to FY\) in \(\calD\), then \(f = g\).
+\end{itemize}
+In particular, if a functor is \emph{full and faithful}, then each function \(\calC(X,Y) \to \calD(FX,FY)\) is a bijection,
+showing that \(\calD(FX,FY) \cong \calC(X,Y)\) for all objects \(X,Y\) of \(\calC\).
+
+
 
 \section{The category of sets}
 
@@ -1966,6 +2032,19 @@ Now we can show that \(\calC\)-indexed sets form a category.
   The Yoneda embedding defines a functor \(\yo : \calC \to [\calC^{\mathsf{op}};\Set]\),
   and this functor is full and faithful.
 \end{proposition}
+\begin{proof}
+  Let $X$ and $Y$ be objects. To show that $\yo$ is full and faithful,
+  we must show that $\calC(X, Y) \cong [\calC^{\mathsf{op}}; \Set](\yo X, \yo Y)$.
+
+  Let $X$ and $Y$ be objects.
+  Then, 
+  by specializing the baby Yoneda lemma,
+  $\{\alpha : \yo X \Rightarrow \yo Y\} \cong \yo(Y)(X)$. 
+  We have immediately that $\{\alpha : \yo X \Rightarrow \yo Y\} = [\calC^{\mathsf{op}}; \Set](\yo X, \yo Y)$ 
+  by the definition of a functor category,
+  and that $\yo(Y)(X) = \calC(X, Y)$ by the 
+  definition of $\yo$.
+  \end{proof}
 
 %% \subsection{The Yoneda lemma in full generality}
 
