@@ -1728,7 +1728,7 @@ transformation.
 \end{remark}
 
 \section{The category of elements}
-\begin{definition}
+\begin{definition}[Category of elements]
     The \textit{category of elements} of a $\cat$-indexed set has 
     \begin{enumerate}
         \item objects : pairs $(X,p\in PX)$
@@ -1738,31 +1738,41 @@ transformation.
         original category with the \textit{additional} structure of preserving
         the points of $PX$.
     \end{enumerate}
-    Definitions of composition and identity follow immediately from the definitions in $\cat,$ with the additional restriction of point preservation. It is relatively simple to show the desired categorical properties hold.
+    Definitions of composition and identity follow immediately from the
+    definitions in $\cat,$ with the additional restriction of point
+    preservation. It is relatively simple to show the desired categorical
+    properties hold.
 \end{definition}
-The following proposition is actually in the course notes; I don't think it was mentioned in class. But it's useful to have.
 \begin{proposition}
-    Suppose $\cat-$indexed set $P$ is representable by $X$. There exists a $u\in PX$ called the \textit{P-universal element} which satisfies the following universal property : for any object $\Gamma$ of $\cat$ and any $g\in P\Gamma,$ there exists a unique $\hat{g}:\Gamma\to X$ such that $g = u \cdot_P \hat{g}$. Alternatively, $g = (P\hat{g})(u)$.
+    Suppose $\cat$-indexed set $P$ is representable by $X$. There exists a $u\in
+    PX$ called the \textit{P-universal element} which satisfies the following
+    universal property : for any object $\Gamma$ of $\cat$ and any $g\in
+    P\Gamma,$ there exists a unique $\hat{g}:\Gamma\to X$ such that $g = u
+    \cdot_P \hat{g}$. Alternatively, $g = (P\hat{g})(u)$.
+    \label{prop:univ-elem}
 \end{proposition}
-This next proposition was actually mentioned in class, but we can decipher it better with the above information:
 \begin{proposition}
-    A $\cat-$indexed set $P$ is representable if $P\cong\yo X$ for some object $X$ of $\cat$. Suppose $P$ is representable. Then there exists a \textit{universal element} $u\in PX$ and $u$ is a terminal object in the \textit{category of elements} of $P$.
+    A $\cat$-indexed set $P$ is representable if $P\cong\yo X$ for some object
+    $X$ of $\cat$. Suppose $P$ is representable. Then there exists a
+    \textit{universal element} $u\in PX$ and $u$ is a terminal object in the
+    \textit{category of elements} of $P$.
+    \label{prop:univ-terminal}
 \end{proposition}
 
-We have from Proposition 1.3 the definition of the universal property that we
+We have from \cref{prop:univ-terminal} the definition of the universal property that we
 want these mysterious universal elements to satisfy. We can think about this
-definition as stating that we can "factor" any $g\in P\Gamma$ (for any $\Gamma$)
+definition as stating that we can ``factor'' any $g\in P\Gamma$ (for any $\Gamma$)
 into $u$ and a unique $\hat{g}$.
 
 
-What does it mean for $u \in PX$ to be terminal in the category of elements of
+What does it mean for $u \in P(X)$ to be terminal in the category of elements of
 $P$? That any object has a unique morphism mapping to $(X,u)$. Explicitly, for
 any $(A, p\in PA),$ there is a unique map $f:A \to X$ such that $(Pf)(u)=p$ (or
 $p = u \cdot_P f)$. This looks pretty similar to the universal property given in
-Proposition 1.3 -- we can "factor" any $p\in PA$ into $f$ and $u$.
+\cref{prop:univ-terminal} -- we can ``factor'' any $p\in PA$ into $f$ and $u$.
 
 
-How do we get Proposition 1.4 from the Yoneda Lemma? These are the key ideas:
+How do we get \cref{prop:univ-terminal} from the Yoneda Lemma? These are the key ideas:
 \begin{itemize}
     \item $X$ representing $P$ means we have an isomorphism between $\yo X$ and $P$. This isomorphism is a $\cat-$indexed function, which we have learned is usually called a natural transformation. So technically we have a bijective natural transformation (a natural isomorphism?)
     \item The Yoneda Lemma says that for every natural transformation $\yo X \Rightarrow P,$ we should have a corresponding $u\in PX$ from which we can construct said transformation. This means the natural isomorphism between $\yo X$ and $P$ has a \textit{corresponding }$u\in PX$ (suggestively labeled). 
@@ -1785,9 +1795,6 @@ How do we get Proposition 1.4 from the Yoneda Lemma? These are the key ideas:
     %\hat{p}$ and $\alpha_A(\hat{p})=p,$ meaning $p = u \cdot_P \hat{p}$ !
 \end{itemize}
 
-
-
-\newthought{First we construct} $func$.
 
 
 \section{Calculating a universal property}
