@@ -113,27 +113,52 @@ F(Y)
 \end{tikzcd}
 \end{definition}
 
+With these in hand, we can now define how to turn a monoid
+\((M, \cdot, e)\) into a monoidal category:
+\begin{itemize}
+    \item The objects are the elements of $M$
+    \item Morphisms are only the identity morphism on each object
+    \item The tensor product $a \otimes b$ is the monoid operation 
+        $a \cdot b$
+    \item The tensor product on morphisms $f \otimes g$ is trivial
+        because both $f$ and $g$ are identity morphisms; thus, we
+        have $\text{id}_A \otimes \text{id}_B = \id_{A \otimes B}$.
+    \item We must show that the \(\otimes\) defines a functor. It clearly
+        respects identity by the definition above. showing it respects
+        composition amounts to proving the following:
+        \((f_1 \otimes f_2) \circ (g_1 \otimes g_2) 
+        =  f_1 \circ g_1 \otimes f_2 \circ g_2\).
+        This holds because all morphisms are the identity 
+    \item The objects we need to define natural transformations between are
+        exactly equal by the monoid axioms, so we just define the transformations 
+        to be the identity on each component.
+\end{itemize}
 
-\section{examples}
+\section{String Diagrams}
 
-\subsection{monoids}
+In string diagrams, we represent objects with wires and morphisms with
+boxes (including an identity). Sequential compositions correspond to
+wiring boxes together. Tensor product for objects corresponds to
+juxataposing wires next to each other, and tensor products of wires is
+putting boxes next to each other. The monoid unit corresponds to a
+``phantom wire'' which need not be drawn.
 
-Given any monoid \((M, \cdot, e)\) whose objects are the elements of
-\(M\) and whose morphisms are only the identities. The tensor product on
-objects \(a, b\) is just the monoid operation. Then the tensor product
-of morphisms just gives the corresponding identity morphism.
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-concepts.png}
+\end{center}
+Many of the laws correspond to extremely intuitive facts about diagrams:
 
-We must show that the \(\otimes\) defines a functor: - it clearly
-respects identity by the definition above - showing it respects
-composition amounts to proving the following:
-\((f_1 \otimes f_2) \circ (g_1 \otimes g_2) =  g_1 \circ g_1 \otimes f_2 \circ g_2\).
-This holds because all morphisms are the identity - by the monoid laws,
-the objects we need to define natural transformations between are
-exactly equal, so we just define the transformations to be the identity
-on each component.
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-isos.png}
+  \includegraphics[width=250px]{fig/monoidal-categories-morphisms.png}
+\end{center}
 
-\hypertarget{real-numbers}{%
-\subsection{real numbers}\label{real-numbers}}
+In any monoidal category, we have a notion of ``generating objects and
+morphisms,'' which can't be decomposed into the tensor product of other
+objects; the category is then formed by taking all the possible tensor
+products.
+
+\section{Example: Real Numbers}
 
 Consider the preorder of real numbers viewed as a category. We can
 define the tensor product on objects to be addition and the monoidal
@@ -143,68 +168,72 @@ know exists by monotonicity of addition. Similar to the monoid example,
 the natural isomorphisms are the identity on each component because the
 corresponding objects are equal.
 
-\hypertarget{string-diagrams}{%
-\subsection{string diagrams}\label{string-diagrams}}
+We can also use string diagrams to prove facts about this
+preorder. Here, we have diagrams representing proofs of \(v+x \le y\),
+\(w + u \le x + z\), \(t \le v + w\). We can then wire the boxes
+together to get a proof of \(t + u \le y + z\): 
 
-In string diagrams, we represent objects with wires, morphisms with
-boxes (including an identity). Sequential compositions correspond to
-wiring boxes together. Tensor product for objects corresponds to
-juxataposing wires next to each other, and tensor products of wires is
-putting boxes next to each other. The monoid unit corresponds to a
-``phantom wire'' which need not be drawn.
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-reals.png}
+\end{center}
 
-In any monoidal category, we have a notion of ``generating objects and
-morphisms,'' which can't be decomposed into the tensor product of other
-objects; the category is then formed by taking all the possible tensor
-products.
 
-Many of the laws correspond to extremely intuitive facts about diagrams:
-(picture).
-
-\hypertarget{real-numbers-1}{%
-\subsection{real numbers}\label{real-numbers-1}}
-
-Here, we have diagrams representing proofs of \(v+x \le y\),
-\(w + u \le x + y\), \(t \le v + w\). We can then wire the boxes
-together to get a proof of \(t + u \le y + z\) (fig.~4)
-
-\hypertarget{symmetric-monoidal-categories}{%
-\section{symmetric monoidal
-categories}\label{symmetric-monoidal-categories}}
-
-Notice that in this category, we have that the tensor product is
-commutative. The categories where this holds are called \emph{symmetric
-monoidal categories}, which come equipped with an additional natural
-transformation \(\gamma : A \otimes B \Rightarrow B \otimes A\). We get
-the following laws: (Fig. 5)
-
-\hypertarget{example-cartesian-categories}{%
-\section{example: cartesian
-categories}\label{example-cartesian-categories}}
+\section{Example: Cartesian Categories}
 
 If \(\mathcal{C}\) has a product \(\times\) and terminal object \(T\),
 then this forms a monoidal category with \(\otimes = \times\) and
 \(I = T\).
 
 The natural isomorphism for associativity was proven in Homework 1:
-\(\alpha = \langle \langle \pi_1, \pi_1 \circ \pi_2 \rangle, \pi_2 \circ \pi_2 \rangle\).
+\(\alpha = \langle \langle \pi_1, \pi_1 \circ \pi_2 \rangle, 
+\pi_2 \circ \pi_2 \rangle\).
 We also have \(\lambda = \pi_1\) and
-\(rho = \langle \star, \text{id}_A \rangle\).
+\(\rho = \langle \star, \text{id}_A \rangle\).
 
 In the typed PL perspective, we had rules for operating with products
-and the terminal object: (pair intro, unit intro).
-
-We might ask given terms \(x : A \vdash M : B\) and
-\(\langle x, y \rangle : A \times B \vdash N : C\), how can we construct
+and the terminal object. We could then use these to construct more
+complicated terms. For example, we might ask given terms \(x : A \vdash M : B\) 
+and \(\langle x, y \rangle : A \times B \vdash N : C\), how can we construct
 a term \(T\) such that \(x : A \vdash T : C\)? We can do this with our
-term language. We can also do it in string diagrams: (fig.~6). Doing
-this requires a \emph{copy} operation, which allows us to duplicate
-\(A\).
+term language. We can also do it in string diagrams: 
 
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-ccc.png}
+\end{center}
+
+
+Doing this requires a \emph{copy} operation, which allows us to duplicate \(A\).
+
+
+\section{Additional Structure}
+
+\subsection{Symmetry}
+
+Notice that in both examples given, we have that the tensor product is
+commutative. The categories where this holds are called \emph{symmetric
+monoidal categories}, which come equipped with an additional natural
+transformation \(\gamma : A \otimes B \Rightarrow B \otimes A\). We get
+the following laws: 
+
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-sym.png}
+\end{center}
+
+
+\subsection{Copy and Discard}
+
+In order to encode all the same operations we expected in our STLC
+with pairs and unit, we needed a copy operation. The copy operation
+is a morphism $A \to A \otimes A$ for each $A$.
 In general, monoidal categories won't always have a copy operation. This
 corresponds to the intuition of monoidal categories as representing
 resources -- if our resource can be copied, then our category would have
 a copier. If not, then it wouldn't.
 
-Often, when we have a copy operation, we also have a discard operation:
-(draw it). These operations will satisfy the following rules: (fig.~7)
+Often, when we have a copy operation, we also have a discard operation 
+$A \to I$. These operations will satisfy the following rules: 
+
+\begin{center}
+  \includegraphics[width=250px]{fig/monoidal-categories-cd.png}
+\end{center}
+
