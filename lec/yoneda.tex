@@ -1685,7 +1685,7 @@ transformation.
 \begin{enumerate}
     \item Constructing natural transformation from $p\in PX$
     \begin{itemize}
-        \item Recall from proof in class : given a $p\in PX,$ we defined
+        \item Given a $p\in PX$, we defined
         $\fun(p)$ via a family of functions $\fun(p)_A,$ where $\fun(p)$ is a
         natural transformation. We can think of the $\fun(p)_A$ as the
         components of $\fun(p),$ where for each object $A$ in $\cat,$ the
@@ -1908,7 +1908,38 @@ there is an ``abstract copy of $\calC$ inside $\calD$''.
 
 
 \subsection{Examples of functors}
-As usual we begin by gaining an intuition for what functors look like 
+The simplest example of a functor is one between two finite 
+categories. Consider the following example of a functor 
+between two finite categories $\calC$ and $\calD$:
+\marginnote{A good exercise: how many functors are there 
+from $\calC$ to $\calD$?}
+
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{fig/func-2.png}
+\end{center}
+
+The functor $F : \calC \to \calD$ is drawn in red; 
+we've only shown its actions on objects here. Written out, 
+we have:
+\begin{align*}
+  F(Y) = Z, \quad F(X) = W, \quad F(Z) = Z
+\end{align*}
+This action on objects defines the action on morphisms. 
+This isn't always the case; there may be more than one morphism 
+between two objects in $\calC$ and $\calD$, in which case, there may 
+be a choice on which morphisms to map to. But here, it is simple,
+and we can conclude:
+\begin{align*}
+  F(\id_Y) = \id_Z \quad F(\id_X) = \id_Z \quad F(\id_Z) = \id_Z \\
+  F(g) = \id_Z \quad F(f) = k \quad F(h) = k
+  \quad F(g \circ f) = k
+\end{align*}
+
+We need to check that the functoriality properties are 
+satisfied. Clearly, identity preservation is satisfied. The only interesting 
+case to check is the compositional property that $k = F(g \circ f) = F(g) \circ F(f) = \id_Z \circ k = k$.
+
+As usual, it's useful to gain an intuition for what functors look like 
 between categories that represent preorders. They will correspond to 
 monotone functions:
 
@@ -1946,6 +1977,7 @@ denotes that $F(X) \le F(Y)$.
 Natural transformations are structure-preserving maps between functors:
 
 \begin{definition}[Natural transformation]
+  \sloppy
   Given two categories \(\calC\) and \(\calD\),
   and two functors \(F,G : \calC \to \calD\),
   a \emph{natural transformation \(\alpha\) from \(F\) to \(G\)},
@@ -1963,6 +1995,23 @@ FY \arrow[r, "\alpha_Y"']                 & GY
   \]
   In other words, \(\alpha_Y \circ Ff = Gf \circ \alpha_X\) for all \(X \mor{f} Y\).
 \end{definition}
+
+Let's consider two functors $F$ and $G$ between finite categories and a 
+natural transformation $\alpha : F \Rightarrow G$:
+\begin{center}
+\includegraphics[width=0.8\linewidth]{fig/nat-trans1.png}
+\end{center}
+
+Breaking the data in this figure down, we have that $\alpha_X = \id_Z$, 
+$\alpha_Z = \id_Z$, and $\alpha_W = k$. Now we can 
+check the naturality square for every morphism:
+\begin{itemize}
+  \item Checking for $f$: we need to show that $\alpha_Y \circ F(f) = G(f) \circ \alpha_X$.
+  Substituting, this is $\id_Z \circ k = \id_Z \circ k$.
+\end{itemize}
+
+
+\subsection{More examples of natural transformations}
 
 Think back to \(\calC\)-indexed functions. We drew these as squares involving two Balloon diagrams stacked together.
 It may help to think of the naturality condition as an abstraction of such a picture, where Balloons are replaced by
