@@ -1541,6 +1541,7 @@ Now we are ready to appreciate the Yoneda lemma:
   \begin{align*}
     \{\text{$\calC$-indexed functions }\yo X \Rightarrow P\} \cong P(X)
   \end{align*}
+  \label{thm:baby-yo}
 \end{theorem}
 
 On first glance this theorem is profoundly mysterious because it stipulates 
@@ -1662,12 +1663,145 @@ by inspecting $P(2)$ and $(\yo \star)(2)$:
 And now here we learn the final component of $\alpha$: we conclude that $\alpha(2) = b$.
 
 \section{Proving the baby Yoneda lemma}
+\marginnote{Thanks to Bex Golinov for the scribe notes for the next two subsections. \todo{} these can be tidied 
+up a bit.}
+Now we are ready to prove \cref{thm:baby-yo}. Let $\calC$ be a 
+category, $P$ be a $\calC$-indexed set, and $X$ be an object 
+in $\calC$. Then, we need to construct a bijection:
 
-\section{Application: Posets}
+\begin{center}
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13hOBfEH0uky58hFAEZyVWoxZsACgAoAGgEp+0mFADm8IqABmAJwgBbJGRA4ISSSABGMMFCQBmS-WatEIbf0Egxma21NYW1I7ObpYMdI4M8sJ4BGwMMAY4INSecj4GTGAAxho8QA
+\begin{tikzcd}
+  \{\calC\text{-indexed functions }\yo X \Rightarrow P\} \arrow[r, "g", bend left] & P(X) \arrow[l, "func", bend left]
+  \end{tikzcd}
+\end{center}
 
-\section{Application: Cayley's theorem}
+\newcommand{\fun}{func}
+\newcommand{\cat}{\mathcal{C}}
+What does this bijective correspondence statement actually mean? We have some
+$\fun$ that, given a $p\in PX,$ can construct a natural transformation $\alpha:
+\yo X \Rightarrow P$, and some $g$ that can extract $p$ from a given natural
+transformation.
+\begin{enumerate}
+    \item Constructing natural transformation from $p\in PX$
+    \begin{itemize}
+        \item Given a $p\in PX$, we defined
+        $\fun(p)$ via a family of functions $\fun(p)_A,$ where $\fun(p)$ is a
+        natural transformation. We can think of the $\fun(p)_A$ as the
+        components of $\fun(p),$ where for each object $A$ in $\cat,$ the
+        component $\fun(p)_A$ maps from $(\yo X )(A)$ to $P(A)$. 
+    \begin{align*}
+        \fun(p)_A : &(\yo X)(A) \to PA\\
+        &f \mapsto (Pf)(p)
+    \end{align*}
+    where $f:A \to \yo X$. The element $p$ by definition has type $PX,$ and $P$ is contravariant so $Pf$ maps $PX$ to $PA,$ giving us the desired codomain.
+    \item Naturality of $\fun(p)$. Let $g:B\to A$. I don't really want to justify this but here is the square
+    \[
+\begin{tikzcd}[column sep=large, row sep=large]
+(\yo X)(A) \arrow[r, "\fun(p)_A"] \arrow[d, "(\yo X)(g)"'] & P(A) \arrow[d, "P(g)"] \\
+(\yo X)(B) \arrow[r, "\fun(p)_B"'] & P(B)
+\end{tikzcd}
+\]
+    \end{itemize}
+    \item Getting $p$ from natural transformation
+    \begin{itemize}
+    \item How did we extract $p\in PX$ from some given natural transformation $\alpha$? We know $\alpha_X$ maps $(\yo X)(X) \to PX$, so applying $\alpha_X$ to $id_X$ gives us an element of $PX,$ we can set $p:=\alpha_X(id_X)$. 
+    \item Now we need to show $\alpha_A = \fun(p)_A$. Since $\alpha_A$ acts on the elements of $(\yo X)(A)$, it suffices to show $\alpha_A(f) = \fun(p)_A = (Pf)(p)$ for every $f\in\cat(A,X)$.
+    \item We have $(Pf)(p) = (Pf)(\alpha_X(id_X))$. We will use the naturality of $\alpha$. Specifically, $Pf \circ \alpha_X = \alpha_A \circ (\yo X)(f)$.
+      \[
+\begin{tikzcd}[column sep=large, row sep=large]
+(\yo X)(X) \arrow[r, "\alpha_X"] \arrow[d, "(\yo X)(f)"'] & P(A) \arrow[d, "P(f)"] \\
+(\yo X)(A) \arrow[r, "\alpha_A"'] & P(B)
+\end{tikzcd}
+\]
+    \begin{align*}
+        (Pf)(\alpha_X (id_X)) = (Pf \circ \alpha_A)(id_X) &= (\alpha_A \circ (\yo X)(f))(id_X)\\
+        &= \alpha_A((\yo X)(f)(id_X)) = \alpha_A(id_x \circ f).\\
+        &= \alpha_A(f)
+    \end{align*}
+    So $(Pf)(p) = \alpha_A(f)$, and we are done!
+\end{itemize}
+\end{enumerate}
+
+\begin{remark}
+    Defining some natural transformation $\alpha := f(p)$ by defining how $f(p)$ acts on each object $A$ is like a "pointwise" definition of $\alpha$. 
+\end{remark}
 
 \section{The category of elements}
+\begin{definition}[Category of elements]
+    The \textit{category of elements} of a $\cat$-indexed set has 
+    \begin{enumerate}
+        \item objects : pairs $(X,p\in PX)$
+        \item morphisms : from $(X,p\in PX)$ to $(Y,q\in PY)$ are morphisms
+        $f:X\to Y$ of $\cat$ such that $(Pf)(q) = p$. Alternatively, $q \cdot_P
+        f = p$. A morphism of this category of elements is a morphism from the
+        original category with the \textit{additional} structure of preserving
+        the points of $PX$.
+    \end{enumerate}
+    Definitions of composition and identity follow immediately from the
+    definitions in $\cat,$ with the additional restriction of point
+    preservation. It is relatively simple to show the desired categorical
+    properties hold.
+\end{definition}
+\begin{proposition}
+    Suppose $\cat$-indexed set $P$ is representable by $X$. There exists a $u\in
+    PX$ called the \textit{P-universal element} which satisfies the following
+    universal property : for any object $\Gamma$ of $\cat$ and any $g\in
+    P\Gamma,$ there exists a unique $\hat{g}:\Gamma\to X$ such that $g = u
+    \cdot_P \hat{g}$. Alternatively, $g = (P\hat{g})(u)$.
+    \label{prop:univ-elem}
+\end{proposition}
+\begin{proposition}
+    A $\cat$-indexed set $P$ is representable if $P\cong\yo X$ for some object
+    $X$ of $\cat$. Suppose $P$ is representable. Then there exists a
+    \textit{universal element} $u\in PX$ and $u$ is a terminal object in the
+    \textit{category of elements} of $P$.
+    \label{prop:univ-terminal}
+\end{proposition}
+
+We have from \cref{prop:univ-terminal} the definition of the universal property that we
+want these mysterious universal elements to satisfy. We can think about this
+definition as stating that we can ``factor'' any $g\in P\Gamma$ (for any $\Gamma$)
+into $u$ and a unique $\hat{g}$.
+
+
+What does it mean for $u \in P(X)$ to be terminal in the category of elements of
+$P$? That any object has a unique morphism mapping to $(X,u)$. Explicitly, for
+any $(A, p\in PA),$ there is a unique map $f:A \to X$ such that $(Pf)(u)=p$ (or
+$p = u \cdot_P f)$. This looks pretty similar to the universal property given in
+\cref{prop:univ-terminal} -- we can ``factor'' any $p\in PA$ into $f$ and $u$.
+
+
+How do we get \cref{prop:univ-terminal} from the Yoneda Lemma? These are the key ideas:
+\begin{itemize}
+    \item $X$ representing $P$ means we have an isomorphism between $\yo X$ and $P$. This isomorphism is a $\cat-$indexed function, which we have learned is usually called a natural transformation. So technically we have a bijective natural transformation (a natural isomorphism?)
+    \item The Yoneda Lemma says that for every natural transformation $\yo X \Rightarrow P,$ we should have a corresponding $u\in PX$ from which we can construct said transformation. This means the natural isomorphism between $\yo X$ and $P$ has a \textit{corresponding }$u\in PX$ (suggestively labeled). 
+    %unsure if will include this next bullet, may give away the problem 
+    %\item Let $\alpha$ denote the natural isomorphism $\yo X \Rightarrow P$.
+    %Because $\alpha$ is bijective, and $\alpha$ can be defined component-wise,
+    %each $\alpha_A$ for each object $A$ must also be bijective. So consider
+    %this bijection $\alpha_A: (\yo X)(A)\Rightarrow PA$. From surjectivity, for
+    %any $p\in PA,$ there exists some $\hat{p}$ in $(\yo X)(A)$ such that
+    %$\alpha_A(\hat{p}) = p$. From injectivity, this $\hat{p}$ is unique. 
+   % \item How do we connect this $\hat{p}$ to the corresponding $u\in PX$ we
+   % identified? (Look at how we constructed the natural transformations
+   % $\alpha_A$ in our proof of baby yoneda).
+    % probably do not include
+    %\item From Yoneda Lemma we know we have a function $\fun(p)$ defined as a
+    %family of functions $\fun(p)_A$, where $\fun(p)_A$ maps $p$ to the
+    %component $\alpha_A$. Specifically, $\alpha_A$ is defined to take elements
+    %of $(\yo X)(A),$ e.g. some $f:A \to X,$ and map them to $(Pf)(p) = p
+    %\cdot_P f$, elements of $PA$. Then we know $\alpha_A(\hat{p}) = u \cdot_P
+    %\hat{p}$ and $\alpha_A(\hat{p})=p,$ meaning $p = u \cdot_P \hat{p}$ !
+\end{itemize}
+
+
+
+\section{Calculating a universal property}
+\todo{Show how to calculate the universal property of 
+a product}
+
+% \section{Cayley's theorem}
 
 % \begin{definition}
 %   \sloppy
@@ -1730,8 +1864,16 @@ And now here we learn the final component of $\alpha$: we conclude that $\alpha(
 % \end{itemize}
 
 \chapter{Functors and natural transformations}
+We are ready to broaden our categorical perspective and language to begin 
+comparing two categories with one another. We will see how some of the notions 
+we've been encountering so far in our journey through the Yoneda 
+lemma -- in particular, the functoriality and naturality properties of 
+$\calC$-indexed sets and functions -- are special cases of more general 
+phenomena in category theory called functors and natural transformations.
+
 
 \section{Functors}
+A functor is a structure-preserving map between categories:
 
 \begin{definition}[Functor]
   \sloppy
@@ -1752,35 +1894,90 @@ And now here we learn the final component of $\alpha$: we conclude that $\alpha(
   \end{itemize}
 \end{definition}
 
-Think back to \(\calC\)-indexed sets. We drew these as Balloon diagrams, with sets lying above objects of \(\calC\).
-It may help to think of the definition of functor as an ``abstract Balloon diagram'', where balloons are replaced by objects of \(\calD\):
-\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRMsXEMWbRCABiXXvyVCio9TU1Sdu2d3EwoAc3hFQAMwBOEALZIyIHAgkUQktdjcQGkZ6ACMYRgAFAWVhEA8sRwALHDl3L19EACYaQKQAZgtJbT0Iu24gA
-\begin{tikzcd}
-FX \arrow[r, "Ff"] & FY \\
-X \arrow[r, "f"']  & Y
-\end{tikzcd}\]
+Intuitively, if there is a functor $F : \calC \to \calD$, then 
+there is an ``abstract copy of $\calC$ inside $\calD$''. 
 
-Examples:
-\begin{itemize}
-\item Functors between two preorders are montone functions
-\item Denotational semantics of STLC is a functor \(\mathsf{STLC} \to \FinSet\)
-\item You may wonder: is a \(\calC\)-indexed set a functor? Hold that thought
-\end{itemize}
+% Think back to \(\calC\)-indexed sets. We drew these as Balloon diagrams, with sets lying above objects of \(\calC\).
+% It may help to think of the definition of functor as an ``abstract Balloon diagram'', where balloons are replaced by objects of \(\calD\):
+% \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRMsXEMWbRCABiXXvyVCio9TU1Sdu2d3EwoAc3hFQAMwBOEALZIyIHAgkUQktdjcQGkZ6ACMYRgAFAWVhEA8sRwALHDl3L19EACYaQKQAZgtJbT0Iu24gA
+% \begin{tikzcd}
+% FX \arrow[r, "Ff"] & FY \\
+% X \arrow[r, "f"']  & Y
+% \end{tikzcd}\]
 
-Note that for each functor \(F : \calC \to \calD\) and each pair of objects \(X,Y\) in \(\calC\),
-you get a function \(\calC(X,Y) \to \calD(FX,FY)\).
-\begin{itemize}
-\item A functor is \emph{full} if this function is surjective: for any morphism \(FX \mor{\hat f} FY\) in \(\calD\),
-  there exists a morphism \(X \mor{f} Y\) in \(\calC\) such that \(\hat f = F(f)\).
-\item A functor is \emph{faithful} if this function is injective: for any morphism for any morphisms \(f,g : X \to Y\) in \(\calC\),
-  if \(Ff = Fg\) as morphisms \(FX\to FY\) in \(\calD\), then \(f = g\).
-\end{itemize}
-In particular, if a functor is \emph{full and faithful}, then each function \(\calC(X,Y) \to \calD(FX,FY)\) is a bijection,
-showing that \(\calD(FX,FY) \cong \calC(X,Y)\) for all objects \(X,Y\) of \(\calC\).
+
+
+\subsection{Examples of functors}
+The simplest example of a functor is one between two finite 
+categories. Consider the following example of a functor 
+between two finite categories $\calC$ and $\calD$:
+\marginnote{A good exercise: how many functors are there 
+from $\calC$ to $\calD$?}
+
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{fig/func-2.png}
+\end{center}
+
+The functor $F : \calC \to \calD$ is drawn in red; 
+we've only shown its actions on objects here. Written out, 
+we have:
+\begin{align*}
+  F(Y) = Z, \quad F(X) = W, \quad F(Z) = Z
+\end{align*}
+This action on objects defines the action on morphisms. 
+This isn't always the case; there may be more than one morphism 
+between two objects in $\calC$ and $\calD$, in which case, there may 
+be a choice on which morphisms to map to. But here, it is simple,
+and we can conclude:
+\begin{align*}
+  F(\id_Y) = \id_Z \quad F(\id_X) = \id_Z \quad F(\id_Z) = \id_Z \\
+  F(g) = \id_Z \quad F(f) = k \quad F(h) = k
+  \quad F(g \circ f) = k
+\end{align*}
+
+We need to check that the functoriality properties are 
+satisfied. Clearly, identity preservation is satisfied. The only interesting 
+case to check is the compositional property that $k = F(g \circ f) = F(g) \circ F(f) = \id_Z \circ k = k$.
+
+As usual, it's useful to gain an intuition for what functors look like 
+between categories that represent preorders. They will correspond to 
+monotone functions:
+
+\begin{definition}[Monotone function]
+  Let $(X, \le_X)$ and $(Y, \le_Y)$ be preorders. Then, a 
+  function $f : X \to Y$ is called \emph{monotone} if, 
+  for any $x_1, x_2 \in X$ such that $x_1 \le_X x_2$, 
+  it is the case that $f(x_1) \le_Y f(x_2)$.
+\end{definition}
+
+Now, let's see how functors between preorders correspond to monotone 
+functions. 
+Let $\calC$ and $\calD$ be categories corresponding to preorders
+and let $F : \calC \Rightarrow \calD$ be a functor between 
+these two categories.
+Then, functoriality of $F$ requires that,
+for any morphism $X \xrightarrow{f} Y$ in $\calC$, 
+there is a morphism $F(X) \xrightarrow{f} F(Y)$.
+This is exactly the monotonicity requirement:
+the morphism $f$, considered order-theoretically, 
+denotes that $X \le Y$; similarly, the morphism $F(f)$ 
+denotes that $F(X) \le F(Y)$.
+
+
+
+% Examples:
+% \begin{itemize}
+% \item Functors between two preorders are montone functions
+% \item Denotational semantics of STLC is a functor \(\mathsf{STLC} \to \FinSet\)
+% \item You may wonder: is a \(\calC\)-indexed set a functor? Hold that thought
+% \end{itemize}
+
 
 \section{Natural transformations}
+Natural transformations are structure-preserving maps between functors:
 
 \begin{definition}[Natural transformation]
+  \sloppy
   Given two categories \(\calC\) and \(\calD\),
   and two functors \(F,G : \calC \to \calD\),
   a \emph{natural transformation \(\alpha\) from \(F\) to \(G\)},
@@ -1798,6 +1995,23 @@ FY \arrow[r, "\alpha_Y"']                 & GY
   \]
   In other words, \(\alpha_Y \circ Ff = Gf \circ \alpha_X\) for all \(X \mor{f} Y\).
 \end{definition}
+
+Let's consider two functors $F$ and $G$ between finite categories and a 
+natural transformation $\alpha : F \Rightarrow G$:
+\begin{center}
+\includegraphics[width=0.8\linewidth]{fig/nat-trans1.png}
+\end{center}
+
+Breaking the data in this figure down, we have that $\alpha_X = \id_Z$, 
+$\alpha_Z = \id_Z$, and $\alpha_W = k$. Now we can 
+check the naturality square for every morphism:
+\begin{itemize}
+  \item Checking for $f$: we need to show that $\alpha_Y \circ F(f) = G(f) \circ \alpha_X$.
+  Substituting, this is $\id_Z \circ k = \id_Z \circ k$.
+\end{itemize}
+
+
+\subsection{More examples of natural transformations}
 
 Think back to \(\calC\)-indexed functions. We drew these as squares involving two Balloon diagrams stacked together.
 It may help to think of the naturality condition as an abstraction of such a picture, where Balloons are replaced by
@@ -1843,6 +2057,7 @@ Examples
 \begin{itemize}
 \item Suppose you have two functors \(F,G : X \to Y\) between preorders \(X,Y\), aka two monotone functions.
   There is at most one natural transformation \(\alpha : F \Rightarrow G\), which exists if and only if \(F(x) \le G(x)\) for all \(x\in X\).
+
 \item Mind-bending example: there is an identity functor \(\mathsf{id} : \FinSet \to \FinSet\).
   What does a natural transformation \(\alpha : \mathsf{id} \Rightarrow \mathsf{id}\) look like?
   Think polymorphism: intuitively, \(\alpha\) must have type ``\(\forall X. \FinSet(\mathsf{id}(X),\mathsf{id}(X))\)'',
@@ -1900,6 +2115,25 @@ Examples
   diagrams whose shape is given by the domain category. Keep this in mind; it'll come back later (limits and colimits)
 \item You may wonder: are \(\calC\)-indexed sets a functor category? Hold that thought...
 \end{itemize}
+
+\section{Full and faithful functors}
+We noted that a functor $F : \calC \to \calD$ ensures an abstract copy of 
+$\calC$ is inside $\calD$. But, what if we want \emph{more} of $\calC$ 
+to be visible inside $\calC$? We can coax more structure out by 
+enforcing that the functor does not collapse any structure.
+
+Note that for each functor \(F : \calC \to \calD\) and each pair of objects \(X,Y\) in \(\calC\),
+you get a function \(\calC(X,Y) \to \calD(FX,FY)\).
+\begin{itemize}
+\item A functor is \emph{full} if this function is surjective: for any morphism \(FX \mor{\hat f} FY\) in \(\calD\),
+  there exists a morphism \(X \mor{f} Y\) in \(\calC\) such that \(\hat f = F(f)\).
+\item A functor is \emph{faithful} if this function is injective: for any morphism for any morphisms \(f,g : X \to Y\) in \(\calC\),
+  if \(Ff = Fg\) as morphisms \(FX\to FY\) in \(\calD\), then \(f = g\).
+\end{itemize}
+In particular, if a functor is \emph{full and faithful}, then each function \(\calC(X,Y) \to \calD(FX,FY)\) is a bijection,
+showing that \(\calD(FX,FY) \cong \calC(X,Y)\) for all objects \(X,Y\) of \(\calC\).
+
+
 
 \section{The category of sets}
 
@@ -1966,6 +2200,19 @@ Now we can show that \(\calC\)-indexed sets form a category.
   The Yoneda embedding defines a functor \(\yo : \calC \to [\calC^{\mathsf{op}};\Set]\),
   and this functor is full and faithful.
 \end{proposition}
+\begin{proof}
+  Let $X$ and $Y$ be objects. To show that $\yo$ is full and faithful,
+  we must show that $\calC(X, Y) \cong [\calC^{\mathsf{op}}; \Set](\yo X, \yo Y)$.
+
+  Let $X$ and $Y$ be objects.
+  Then, 
+  by specializing the baby Yoneda lemma,
+  $\{\alpha : \yo X \Rightarrow \yo Y\} \cong \yo(Y)(X)$. 
+  We have immediately that $\{\alpha : \yo X \Rightarrow \yo Y\} = [\calC^{\mathsf{op}}; \Set](\yo X, \yo Y)$ 
+  by the definition of a functor category,
+  and that $\yo(Y)(X) = \calC(X, Y)$ by the 
+  definition of $\yo$.
+  \end{proof}
 
 %% \subsection{The Yoneda lemma in full generality}
 
