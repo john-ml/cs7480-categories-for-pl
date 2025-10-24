@@ -103,6 +103,65 @@ morphisms in them. In the above example diagram, the tuple $(P, p)$
 is a cone where $p_L = f$ and $p_R = g$.
 
 
+Cones form a category:
+\begin{definition}
+  Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
+  in a category \(\calC\).
+  Let \((P,p)\) and \((Q,q)\) be two cones over \(D\).
+  A \emph{morphism of cones from \((P,p)\) to \((Q,q)\)}
+  is a morphism \(f : P \to Q\) such that \(f \circ p_i = q_i\)
+  for all \(i \in \mathcal I\).
+\end{definition}
+A morphism of cones can be visualized as a kind of 3d prism:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRABEAKLAShAF9S6TLnyEUZAExVajFmy4ArPoOHY8BIpNIAGGfWatEIAIoChIDOrFEdu-XKMgACgJkwoAc3hFQAMwAnCABbJDsQHAgkYlUQQJCkAGZqSKRtWUM2P3N-INDEdNTEcIN5YwBHAH0sEGoGOgAjGAZnEQ1xEACsTwALHBy4vLSUqMQyDLKQKsUB+PzkiNHwprAoMOpSpzRq2pB6ppa2m2MGGD9+2LmkkeiNxzZtmbrG5tbrTWMu3ouKfiA
+\begin{tikzcd}
+P \arrow[rr, "f"] \arrow[rd, "p_i"] \arrow[rdd, "p_j"'] &                & Q \arrow[ld, "q_i"'] \arrow[ldd, "q_j"] \\
+                                                        & D(i) \arrow[d] &                                         \\
+                                                        & D(j)           &
+\end{tikzcd}\]
+At the bottom of this prism, we have drawn a piece of the diagram \(D\).
+The ``bottom left face'' of the prism is the cone \((P,p)\); the ``bottom right face'' is the cone \((Q,q)\).
+A morphism of cones from \((P,p)\) to \((Q,q)\) is a morphism \(f : P \to Q\) as shown
+that makes all the triangles in the prism commute.
+
+Looking at specific choices of diagram \(D\) recovers the kinds of figures we were drawing.
+For example, suppose
+\(D\) is the discrete diagram on two objects \(X\) and \(Y\). We get that
+  a cone \((P,p)\) is a diagram of shape \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKAEwVqdJq3YBNHnxAZseAkXKliEhizaIQABR4SYUAObwioAGYAnCAFskYkDghIyknezQB9ciBpGegAjGEZ9ARVhEBssUwALHHlrO0dEZ1ckdU9pPV8RI24gA
+\begin{tikzcd}
+  & P \arrow[ld, "p_1"'] \arrow[rd, "p_2"] &   \\
+X &                                        & Y
+\end{tikzcd}\]
+and a morphism from one such cone \((P,p)\) to another \((Q,q)\)
+is a diagram of shape:
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRRkATFVqMWbAJrdeIDNjwEiI0gAZx9Zq0QgAinL5LBRdRq2TdIAArdxMKAHN4RUADMAThAC2SAMzUOBBIahI6bO5GIF6+oUEhiObhUnoAjgD6WCDUDHQARjAMNvzKQiCeWE4AFjjRsX6IYcFIZCnWmQBW9d6NgSAtSdSFYFBIydqpClk5IHmFxaWmegww7nU8Hr0BCa3Uk9ZoGd25BUUlJip6lTUbFFxAA
+\begin{tikzcd}
+P \arrow[rr, "f"] \arrow[rd, "p_i"] \arrow[rdd, "p_j"'] &   & Q \arrow[ld, "q_i"'] \arrow[ldd, "q_j"] \\
+                                                        & X &                                         \\
+                                                        & Y &
+\end{tikzcd}\]
+Now imagine taking the object \(P\) and ``dragging it up and to the right'', until it's in the same plane
+as the triangle involving \(Q,X,Y\):
+\[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoAmAXVJADcBDAGwFcYkQANEAX1PU1z5CKMgGZqdJq3YBNHnxAZseAkQCMpNRIYs2iEAEV5-ZUKLlSxbVL0gACjwkwoAc3hFQAMwBOEALZIojQ4EEgWkrrsnsYgPv5hwaGIZBHS+gCOAPpYIDSM9ABGMIx2AirCIN5YLgAWODFxAYjhIUgaqbZZAFYNvk1BIK3JNEVgUEgAtKIpOmmK2bkg+UUlZWb6VbX1vF59gYltNLO2aJk9eYXFpaaq+owwnvUjMGOBxNyU3EA
+\begin{tikzcd}
+  &                                         & P \arrow[ld, "f"] \arrow[lldd, "p_i"', bend right] \arrow[llddd, "p_j", bend left] \\
+  & Q \arrow[ld, "q_i"'] \arrow[ldd, "q_j"] &                                                                                    \\
+X &                                         &                                                                                    \\
+Y &                                         &
+\end{tikzcd}\]
+Hopefully this diagram looks familiar: up to a rotation, it is the kind of diagram we were drawing when examining
+the universal property of product.
+
+Together, cones over a diagram \(D\) and morphisms between them form a category:
+\begin{definition}[category of cones]
+  Let \(D :\mathcal I \to \calC\) be a diagram in a category \(\calC\) of shape \(\mathcal I\).
+  The category of cones over \(D\), written \(\mathsf{Cone}(D)\),
+  is the category whose objects are cones over \(D\) and whose morphisms are morphisms of cones.
+  (Because cone morphisms are simply morphisms of \(\calC\) satisfying a certain property,
+   the definition of composition for cone morphisms and of the identity cone morphism are inherited from
+   composition and identity in \(\calC\).)
+\end{definition}
+
 \begin{definition}[Limit]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
