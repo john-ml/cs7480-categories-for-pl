@@ -1729,7 +1729,9 @@ transformation.
 
 \section{The category of elements}
 \begin{definition}[Category of elements]
-    The \textit{category of elements} of a $\cat$-indexed set has 
+  Let $P$ be a $\calC$-indexed set.
+    The \textit{category of elements} of $P$, written $\int_C P$, is a 
+    category where:
     \begin{enumerate}
         \item objects : pairs $(X,p\in PX)$
         \item morphisms : from $(X,p\in PX)$ to $(Y,q\in PY)$ are morphisms
@@ -1777,29 +1779,61 @@ How do we get \cref{prop:univ-terminal} from the Yoneda Lemma? These are the key
     \item $X$ representing $P$ means we have an isomorphism between $\yo X$ and $P$. This isomorphism is a $\cat-$indexed function, which we have learned is usually called a natural transformation. So technically we have a bijective natural transformation (a natural isomorphism?)
     \item The Yoneda Lemma says that for every natural transformation $\yo X \Rightarrow P,$ we should have a corresponding $u\in PX$ from which we can construct said transformation. This means the natural isomorphism between $\yo X$ and $P$ has a \textit{corresponding }$u\in PX$ (suggestively labeled). 
     %unsure if will include this next bullet, may give away the problem 
-    %\item Let $\alpha$ denote the natural isomorphism $\yo X \Rightarrow P$.
-    %Because $\alpha$ is bijective, and $\alpha$ can be defined component-wise,
-    %each $\alpha_A$ for each object $A$ must also be bijective. So consider
-    %this bijection $\alpha_A: (\yo X)(A)\Rightarrow PA$. From surjectivity, for
-    %any $p\in PA,$ there exists some $\hat{p}$ in $(\yo X)(A)$ such that
-    %$\alpha_A(\hat{p}) = p$. From injectivity, this $\hat{p}$ is unique. 
-   % \item How do we connect this $\hat{p}$ to the corresponding $u\in PX$ we
-   % identified? (Look at how we constructed the natural transformations
-   % $\alpha_A$ in our proof of baby yoneda).
+    \item Let $\alpha$ denote the natural isomorphism $\yo X \Rightarrow P$.
+    Because $\alpha$ is bijective, and $\alpha$ can be defined component-wise,
+    each $\alpha_A$ for each object $A$ must also be bijective. So consider
+    this bijection $\alpha_A: (\yo X)(A)\Rightarrow PA$. From surjectivity, for
+    any $p\in PA,$ there exists some $\hat{p}$ in $(\yo X)(A)$ such that
+    $\alpha_A(\hat{p}) = p$. From injectivity, this $\hat{p}$ is unique. 
+   \item How do we connect this $\hat{p}$ to the corresponding $u\in PX$ we
+   identified? (Look at how we constructed the natural transformations
+   $\alpha_A$ in our proof of baby yoneda).
     % probably do not include
-    %\item From Yoneda Lemma we know we have a function $\fun(p)$ defined as a
-    %family of functions $\fun(p)_A$, where $\fun(p)_A$ maps $p$ to the
-    %component $\alpha_A$. Specifically, $\alpha_A$ is defined to take elements
-    %of $(\yo X)(A),$ e.g. some $f:A \to X,$ and map them to $(Pf)(p) = p
-    %\cdot_P f$, elements of $PA$. Then we know $\alpha_A(\hat{p}) = u \cdot_P
-    %\hat{p}$ and $\alpha_A(\hat{p})=p,$ meaning $p = u \cdot_P \hat{p}$ !
+    \item From Yoneda Lemma we know we have a function $\fun(p)$ defined as a
+    family of functions $\fun(p)_A$, where $\fun(p)_A$ maps $p$ to the
+    component $\alpha_A$. Specifically, $\alpha_A$ is defined to take elements
+    of $(\yo X)(A),$ e.g. some $f:A \to X,$ and map them to $(Pf)(p) = p
+    \cdot_P f$, elements of $PA$. Then we know $\alpha_A(\hat{p}) = u \cdot_P
+    \hat{p}$ and $\alpha_A(\hat{p})=p,$ meaning $p = u \cdot_P \hat{p}$ !
 \end{itemize}
 
 
 
 \section{Calculating a universal property}
-\todo{Show how to calculate the universal property of 
-a product}
+Let's bring all these ideas together to find an object of a category that
+\emph{internalizes} a $\calC$-indexed set. 
+This is an essential application of the Yoneda lemma: sometimes it is 
+easier to describe objects by how they behave externally, and the Yoneda 
+lemma lets us bring those external descriptions back to objects of the category.
+Let's use this idea to calculate the universal property of an \emph{equalizer}.
+
+Externally, an equalizer behaves as follows. Given two morphisms \(% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRQBGclVqMWbAJrdxMKAHN4RUADMAThAC2SMiBwQkokHAAWWNTmPV6zVohCKQ1BnQBGMBgAV+eAmwaWIpm1jzqWrqI+oY2phZWSAC0JnZSjmpyXEA
+\begin{tikzcd}
+X \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & Y
+\end{tikzcd}\)
+in a category $\calC$, one can define a $\calC$-indexed set:
+\begin{align}
+  \mathsf{Eq}(f,g)_\Gamma = \{ \Gamma \xrightarrow{h} X \mid f \circ h = g \circ h \}
+\end{align}
+The action of $\mathsf{Eq}(f,g)$ on morphisms is given
+by precomposition, i.e., 
+given $h \in \mathsf{Eq}(f, g)_\Gamma$ and a morphism $\Gamma' \mor{s} \Gamma$ in 
+$\calC$, 
+we have that $\mathsf{Eq}(f,g)(s) = h \circ s$.
+A representation of $\mathsf{Eq}(f, g)$ is called an equalizer.
+
+Let's call this representation $E$. So, there is an isomorphism:
+\begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFEQBfU9TXfIRQBGclVqMWbdgEcAFADNSAAgDmASm7iYUVfCKgFAJwgBbJGRA4ISUROatEIADrPGaABZ0Q1AEYwwKCQAZmIeQxNzRDtrCz8AoMRQ6noHNld-HG8uCi4gA
+\begin{tikzcd}
+  {\yo E} \arrow[r, "\alpha", bend left] & {\mathsf{Eq}(f, g)} \arrow[l, "\beta", bend left]
+\end{tikzcd} 
+\end{center}
+
+The Yoneda lemma tells us that $\{ \yo E \Rightarrow \mathsf{Eq}(f, g)\} \cong \mathsf{Eq}(f, g)(E)$.
+So, there is exactly one element in $\mathsf{Eq}(f, g)$ that corresponds with 
+$\alpha$ above; this is the universal element for $\alpha$.
+
 
 % \section{Cayley's theorem}
 
