@@ -217,7 +217,7 @@ W' \arrow[rdd, "q"', bend right] \arrow[rrd, "q'", bend left] \arrow[rd, "w"] & 
 X \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & Y
 \end{tikzcd}\),
 their \emph{equalizer} is the largest way of mapping into \(f,g\)
-in other words the largest way of filling in the questino marks in this
+in other words the largest way of filling in the question marks in this
 diagram:
 \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKAEwVqdJq3YBNHnxAZseAkXKliEhizaIQAfh4SYUAObwioAGYAnCAFskZEDghJ1IOAAssVnO5ptaT1TEBpGegAjGEYABQEVYRAbLFMvf15rO0dEZ1cAyR12KzDPHz8kAFpyTJBbByQxFzdcwKldA1KI6LiEoXYUtIyFepym-MQPII7DbkpuIA
 \begin{tikzcd}
@@ -337,6 +337,20 @@ which is equivalent to having a representation for \(P\).
 
 \subsection{Some important facts}
 
+\begin{definition}[Limit preservation]
+  \sloppy
+  Let $\calC$ and $\calD$ be categories, let $F : \calD \to \calD$,
+  and let $D : \calI \to \calC$ 
+  be a diagram in $\calC$. 
+  Suppose $D$ has a limit $X$ in $\calC$. Then,
+  the functor $F$ \emph{preserves the limit of $D$}
+  if
+  the diagram $\tilde{D} = F \circ D$ in $\calD$
+  has limit
+  $F(X)$ in $\tilde{D}$.
+\end{definition}
+
+
 \begin{proposition}
   A category with all products and a terminal objects has all limits.
 \end{proposition}
@@ -346,7 +360,8 @@ which is equivalent to having a representation for \(P\).
 \end{proposition}
 
 \begin{proposition}
-  Any full and faithful functor preserves limits and colimits.
+  Any full and faithful functor preserves limits.
+  
   Consequently,
   the Yoneda embedding preserves these as well.
 \end{proposition}
