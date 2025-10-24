@@ -154,6 +154,71 @@ The pullback looks like a ``fiber product'':
   A \emph{limit} of \(D\) is a terminal cone.
 \end{definition}
 
+There is an equivalent way of defining cones, that requires a bit more machinery.
+
+\begin{definition}
+  Given an object \(X\) of a category \(\calC\),
+  and an arbitrary category \(\mathcal I\),
+  the \emph{constant functor at \(X\) from \(\mathcal I\) to \(\calC\)},
+  written \(\Delta(X) : \mathcal I \to \calC\),
+  is the functor defined by
+  \(\Delta(X)(i) = X\) on objects \(i\) of \(\mathcal I\)
+and by \(\Delta(X)(i \mor{f} j) = \mathsf{id}_X\) on morphisms.
+\end{definition}
+
+\begin{proposition}
+  A cone over \(D : \mathcal I \to \calC\) is equivalent to a pair \((P,\alpha)\)
+  where \(P\) is an object of \(\calC\) and \(\alpha\) is a natural transformation
+  \(\Delta(P) \Rightarrow D\).
+\end{proposition}
+\begin{proof}
+  Unwinding definitions, the natural transformation \(\alpha\) is a \(\mathcal I\)-indexed family
+  of morphisms \((\alpha_i : \Delta(P)(i) \to D(i))_{i\in \mathcal I}\)
+  satisfying the following naturality square for all morphisms \(i\mor{f} j\) of \(\mathcal I\):
+  \[
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12ARGBnOgBQAFAJQCsIkAF9S6TLnyEUZAIxVajFm048+g0QIBWkmXOx4CRFaTXV6zVohBcjJ2SAznFV8uvtanFwlpdRgoAHN4IlAAMwAnCABbJDIQHAgkaw0HbW5efmExGMlqBjoAI14heQslEDiscIALHGl3eKSU6nSkAGY7TUcOdkY0JroAfSw22ITkxCyexAAmAZynTlHxicMQUoqqmu8nBubW0xAO+f60jJW1gOcBYpCpIA
+\begin{tikzcd}
+\Delta(P)(i) \arrow[d, "\Delta(P)(f)"'] \arrow[r, "\alpha_i"] & D(i) \arrow[d, "D(f)"] \\
+\Delta(P)(j) \arrow[r, "\alpha_j"']                           & D(j)
+\end{tikzcd}
+  \]
+  But by definition of \(\Delta(P)\), it holds that \(\Delta(P)(i) = \Delta(P)(j) = P\)
+  and \(\Delta(P)(f) = \mathsf{id}_P\).
+  Hence the left arrow in this commutative square is the identity,
+  and the square can be collapsed into the following triangle which has to commute for all \(i\mor{f} j\) in \(\mathcal I\):
+  \[
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQAFEAX1PU1z5CKcqWLU6TVuwAiACiwBKHnxAZseAkVEAmCQxZtEIeQCtl3CTCgBzeEVAAzAE4QAtkjIgcEJKMmG7AA6QUxoABb0APpYKk6uHohePkg6NAbSxiFhkVGmIDSM9ABGMIwcAprCIM5YNuE4cSAu7n40KYhpAZkmco4WlNxAA
+\begin{tikzcd}
+                                                 & D(i) \arrow[dd, "D(f)"] \\
+P \arrow[ru, "\alpha_i"] \arrow[rd, "\alpha_j"'] &                         \\
+                                                 & D(j)
+\end{tikzcd}
+  \]
+  Hence the natural transformation \(\alpha : \Delta(P) \Rightarrow D\)
+  amounts to a family of morphisms \((\alpha_i : P \to D(i))_{i\in \mathcal I}\)
+  satisfying the property that \(D(f) \circ \alpha_i = \alpha_j\) for all \(i \mor{f} j\) in \(\mathcal I\).
+  This is precisely the property of being a cone over \(D\).
+\end{proof}
+
+Last time we saw by the Yoneda lemma that a representation for a \(\calC\)-indexed set \(P\)
+is equivalent to a terminal object in \(\int P\), the category of elements of \(P\).
+This fact provides an interesting equivalent definition of limit:
+\begin{proposition}
+  Let \(\mathcal I\) be a \(\calU\)-small category.
+  A limit of a diagram \(D : \mathcal I \to \calC\)
+  is equivalent to a reprsentation for the \(\calC\)-indexed set \(P\) defined by
+  \[
+     P(X) = \text{the set of natural transformations }\Delta(X) \Rightarrow D.
+  \]
+\end{proposition}
+\begin{proof}
+  The \(\calC\)-indexed set \(P\) is designed so that
+  the category of cones over \(D\) is equivalent to the category of elements of \(P\).
+  Hence, to have a terminal cone is to have a terminal object in this category of elements,
+which is equivalent to having a representation for \(P\).
+\end{proof}
+
+
 \subsection{Some important facts}
 
 \begin{proposition}
