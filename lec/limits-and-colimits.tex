@@ -72,7 +72,7 @@ what a diagram is:
   The category $\calI$ is called the \emph{shape of the diagram}.
 \end{definition}
 
-It is typical for the shape of a diagram to be a simple discrete category with
+It is typical for the shape of a diagram to be a simple category with
 only a few objects and morphisms.  For example, we can consider $\calI = \bullet
 \quad \bullet$; then, a diagram of shape $\calI$ in some category $\calC$ would
 pick out a pair of two objects in $\calC$. Here is a simple example of a
@@ -104,12 +104,12 @@ is a cone where $p_L = f$ and $p_R = g$.
 
 
 Cones form a category:
-\begin{definition}
+\begin{definition}[Morphism of cones]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
   Let \((P,p)\) and \((Q,q)\) be two cones over \(D\).
   A \emph{morphism of cones from \((P,p)\) to \((Q,q)\)}
-  is a morphism \(f : P \to Q\) such that \(f \circ p_i = q_i\)
+  is a morphism \(f : P \to Q\) such that \(p_i = f \circ q_i\)
   for all \(i \in \mathcal I\).
 \end{definition}
 A morphism of cones can be visualized as a kind of 3d prism:
@@ -162,11 +162,23 @@ Together, cones over a diagram \(D\) and morphisms between them form a category:
    composition and identity in \(\calC\).)
 \end{definition}
 
+The category of cones is designed so that it captures all the ways of 
+mapping into a diagram.
+Recall our motivation that a limit ought to be the biggest way to map into a 
+diagram. This hints at our final definition: the ``biggest'' object in a category is 
+the terminal object, 
+
 \begin{definition}[Limit]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
-  A \emph{limit} of \(D\) is a terminal cone.
+  A \emph{limit} of \(D\) is a terminal object in $\mathsf{Cone}(D)$.
 \end{definition}
+
+Now we can see how products are terminal in the categories of cones 
+of shape $\calI = \bullet \quad \bullet$.
+In this category, objects look like this:
+
+
 
 
 
