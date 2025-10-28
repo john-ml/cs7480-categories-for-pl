@@ -72,7 +72,7 @@ what a diagram is:
   The category $\calI$ is called the \emph{shape of the diagram}.
 \end{definition}
 
-It is typical for the shape of a diagram to be a simple discrete category with
+It is typical for the shape of a diagram to be a simple category with
 only a few objects and morphisms.  For example, we can consider $\calI = \bullet
 \quad \bullet$; then, a diagram of shape $\calI$ in some category $\calC$ would
 pick out a pair of two objects in $\calC$. Here is a simple example of a
@@ -104,12 +104,12 @@ is a cone where $p_L = f$ and $p_R = g$.
 
 
 Cones form a category:
-\begin{definition}
+\begin{definition}[Morphism of cones]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
   Let \((P,p)\) and \((Q,q)\) be two cones over \(D\).
   A \emph{morphism of cones from \((P,p)\) to \((Q,q)\)}
-  is a morphism \(f : P \to Q\) such that \(f \circ p_i = q_i\)
+  is a morphism \(f : P \to Q\) such that \(p_i = q_i \circ f\)
   for all \(i \in \mathcal I\).
 \end{definition}
 A morphism of cones can be visualized as a kind of 3d prism:
@@ -154,6 +154,7 @@ the universal property of product.
 
 Together, cones over a diagram \(D\) and morphisms between them form a category:
 \begin{definition}[category of cones]
+  \sloppy
   Let \(D :\mathcal I \to \calC\) be a diagram in a category \(\calC\) of shape \(\mathcal I\).
   The category of cones over \(D\), written \(\mathsf{Cone}(D)\),
   is the category whose objects are cones over \(D\) and whose morphisms are morphisms of cones.
@@ -162,11 +163,23 @@ Together, cones over a diagram \(D\) and morphisms between them form a category:
    composition and identity in \(\calC\).)
 \end{definition}
 
+The category of cones is designed so that it captures all the ways of 
+mapping into a diagram.
+Recall our motivation that a limit ought to be the biggest way to map into a 
+diagram. This hints at our final definition: the ``biggest'' object in a category is 
+the terminal object, 
+
 \begin{definition}[Limit]
   Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
   in a category \(\calC\).
-  A \emph{limit} of \(D\) is a terminal cone.
+  A \emph{limit} of \(D\) is a terminal object in $\mathsf{Cone}(D)$.
 \end{definition}
+
+Now we can see how products are terminal in the categories of cones 
+of shape $\calI = \bullet \quad \bullet$.
+In this category, objects look like this:
+
+
 
 
 
@@ -205,7 +218,7 @@ W' \arrow[rdd, "q"', bend right] \arrow[rrd, "q'", bend left] \arrow[rd, "w"] & 
 X \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & Y
 \end{tikzcd}\),
 their \emph{equalizer} is the largest way of mapping into \(f,g\)
-in other words the largest way of filling in the questino marks in this
+in other words the largest way of filling in the question marks in this
 diagram:
 \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKAEwVqdJq3YBNHnxAZseAkXKliEhizaIQAfh4SYUAObwioAGYAnCAFskZEDghJ1IOAAssVnO5ptaT1TEBpGegAjGEYABQEVYRAbLFMvf15rO0dEZ1cAyR12KzDPHz8kAFpyTJBbByQxFzdcwKldA1KI6LiEoXYUtIyFepym-MQPII7DbkpuIA
 \begin{tikzcd}
@@ -325,12 +338,44 @@ which is equivalent to having a representation for \(P\).
 
 \subsection{Some important facts}
 
-\begin{itemize}
-\item Homework 2 Problem 3
-\item Universal element definition of limit
-\item Every limit is an equalizer of a product.
-\item Equalizers as refinement types; limits as refinement types + indexed products
-\item Limits in Set
-\item The Yoneda embedding preserves limits
-\item Any full and faithful functor reflects limits and colimits.
-\end{itemize}
+\begin{definition}[Limit preservation] \label{def:limit-preservation}
+  \sloppy
+  Let $\calC$ and $\calD$ be categories, let $F : \calC \to \calD$,
+  and let $D : \calI \to \calC$ 
+  be a diagram in $\calC$. 
+  Suppose $D$ has a limit $(P,p)$ in $\calC$. Then,
+  the functor $F$ \emph{preserves} this limit
+  if
+  the diagram $\tilde{D} = F \circ D$ in $\calD$
+  has limit
+  $(F(P), (F(p_i) : P \to D(i))_{i\in \calI})$.
+\end{definition}
+
+\begin{proposition}
+  The Yoneda embedding preserves limits.
+\end{proposition}
+
+We say a functor \emph{reflects} limits if the converse of \cref{def:limit-preservation} holds.
+
+\begin{definition}[Limit reflection]
+  \sloppy
+  Let $\calC$ and $\calD$ be categories, let $F : \calC \to \calD$,
+  and let $D : \calI \to \calC$
+  be a diagram in $\calC$.
+  Let \((P,p)\) be a cone of shape \(D\) in \(\calC\),
+  and suppose the $\tilde{D} = F \circ D$
+  has limit $(F(P), (F(p_i) : P \to D(i))_{i\in \calI})$ in \(\calD\).
+  We say this limit is \emph{reflected} into \(\calC\)
+  if the cone $(P,p)$ is limiting in $\calC$.
+\end{definition}
+
+\begin{proposition}
+  Any full and faithful functor reflects limits.
+\end{proposition}
+
+\begin{proposition}
+  Every limit is an equalizer of an indexed product.
+\end{proposition}
+Consequently, a category with indexed products and equalizers has all limits.
+
+\section{Colimits}
