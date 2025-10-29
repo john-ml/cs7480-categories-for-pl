@@ -1747,6 +1747,8 @@ transformation.
     preservation. It is relatively simple to show the desired categorical
     properties hold.
 \end{definition}
+
+
 \begin{proposition}
     Suppose $\cat$-indexed set $P$ is representable by $X$. There exists a $u\in
     PX$ called the \textit{P-universal element} which satisfies the following
@@ -1755,6 +1757,7 @@ transformation.
     \cdot_P \hat{g}$. Alternatively, $g = (P\hat{g})(u)$.
     \label{prop:univ-elem}
 \end{proposition}
+
 \begin{proposition}
     A $\cat$-indexed set $P$ is representable if $P\cong\yo X$ for some object
     $X$ of $\cat$. Suppose $P$ is representable. Then there exists a
@@ -1762,6 +1765,22 @@ transformation.
     \textit{category of elements} of $P$.
     \label{prop:univ-terminal}
 \end{proposition}
+
+\begin{example}[Category of elements of the terminal presheaf]
+  For any category $\calC$, the presheaf category on $\calC$ has a 
+  terminal object $\mathbf{1}$ defined:
+  \begin{align*}
+    \mathbf{1}(X) &= \{\star\} \\
+    \mathbf{1}(X \mor{h} Y) &= \star \mapsto \star
+  \end{align*}
+  The category of elements $\int \mathbf{1}$ has objects $(X, p)$  
+  where $p = \star$ and $X$ are objects of $\calC$, 
+  and has morphisms $(X, p) \mor{h} (Y, q)$ where $F(h)(p) = q$; 
+  this point preservation is clearly trivially satisfied since 
+  $p = q = \star$. So, we can conclude that $\int \mathbf{1} = \calC$,
+  i.e., the category of elements of the terminal object in $\calC$ 
+  is the original category $\calC$.
+\end{example}
 
 We have from \cref{prop:univ-terminal} the definition of the universal property that we
 want these mysterious universal elements to satisfy. We can think about this
