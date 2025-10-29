@@ -1807,32 +1807,87 @@ easier to describe objects by how they behave externally, and the Yoneda
 lemma lets us bring those external descriptions back to objects of the category.
 Let's use this idea to calculate the universal property of an \emph{equalizer}.
 
-Externally, an equalizer behaves as follows. Given two morphisms \(% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRQBGclVqMWbAJrdxMKAHN4RUADMAThAC2SMiBwQkokHAAWWNTmPV6zVohCKQ1BnQBGMBgAV+eAmwaWIpm1jzqWrqI+oY2phZWSAC0JnZSjmpyXEA
+\begin{definition}[External definition of equalizer]
+  A equalizer of
 \begin{tikzcd}
-X \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & Y
-\end{tikzcd}\)
-in a category $\calC$, one can define a $\calC$-indexed set:
+A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B
+\end{tikzcd}
+is a representation for the $\calC$-indexed set with action on 
+objects:
 \begin{align}
-  \mathsf{Eq}(f,g)_\Gamma = \{ \Gamma \xrightarrow{h} X \mid f \circ h = g \circ h \}
+  \mathsf{Eq}(f,g)(X) &= \{ X \xrightarrow{p} A \mid f \circ h = g \circ h \} \\
 \end{align}
-The action of $\mathsf{Eq}(f,g)$ on morphisms is given
-by precomposition, i.e., 
-given $h \in \mathsf{Eq}(f, g)_\Gamma$ and a morphism $\Gamma' \mor{s} \Gamma$ in 
-$\calC$, 
-we have that $\mathsf{Eq}(f,g)(s) = h \circ s$.
-A representation of $\mathsf{Eq}(f, g)$ is called an equalizer.
+and action on morphisms works by precomposition:
+\begin{align}
+  \mathsf{Eq}(X \xrightarrow{h} Y) &: \mathsf{Eq}(f,g)(Y) \to \mathsf{Eq}(f,g)(X)\\
+  &= (Y \xrightarrow{p} A \mid f \circ p = g \circ p) \mapsto 
+  (X \mor{h} Y \mor{p} A \mid f \circ p \circ h = g \circ p \circ h) 
+\end{align}
+\end{definition}
 
-Let's call this representation $E$. So, there is an isomorphism:
+From this external definition, we can calculate the universal 
+property for an internal definition of equalizer by 
+computing a terminal object in the category of elements $\int \mathsf{Eq}(f,g)$.
+Let's calculate what it is.
+The objects are pairs $(X, p)$ where $X \mor{p} A$ and $f \circ p = g \circ p$ (i.e., $p \in \mathsf{Eq}(f,g)(X)$.
+Morphisms from $(X, p)$ to $(Y, q)$ 
+is a $\calC$-morphism $X \mor{h} Y$ such that 
+$\mathsf{Eq}(f, g)(h)(q) = p$. Unfolding $\mathsf{Eq}(f, g)(h) = q \circ h$, 
+we have that $q \circ h = p$.
+
+Now we have a clearer picture of what objects in this category 
+of elements looks like. They are exactly this configuration of objects:
+
+% not sure here, had trouble keeping up a bit
 \begin{center}
- % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFEQBfU9TXfIRQBGclVqMWbdgEcAFADNSAAgDmASm7iYUVfCKgFAJwgBbJGRA4ISUROatEIADrPGaABZ0Q1AEYwwKCQAZmIeQxNzRDtrCz8AoMRQ6noHNld-HG8uCi4gA
-\begin{tikzcd}
-  {\yo E} \arrow[r, "\alpha", bend left] & {\mathsf{Eq}(f, g)} \arrow[l, "\beta", bend left]
-\end{tikzcd} 
+  \begin{tikzcd}
+E \arrow[r, "h"] & A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B
+\end{tikzcd}
 \end{center}
 
-The Yoneda lemma tells us that $\{ \yo E \Rightarrow \mathsf{Eq}(f, g)\} \cong \mathsf{Eq}(f, g)(E)$.
-So, there is exactly one element in $\mathsf{Eq}(f, g)$ that corresponds with 
-$\alpha$ above; this is the universal element for $\alpha$.
+Say we have another object in this category of elements:
+\begin{center}
+  \begin{tikzcd}
+Q \arrow[r, "h"] & A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B
+\end{tikzcd}
+\end{center}
+
+Then, morphisms in the category of elements are morphisms $Q \mor{f} P$:
+\begin{center}
+  \begin{tikzcd}
+R \arrow[r, "h"] & A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B \\
+Q \arrow[u, "f"] \arrow[ur]
+\end{tikzcd}
+\end{center}
+where the above diagram commutes.
+We call the terminal object in the category of elements $\int \mathsf{Eq}(f,g)$
+the equalizer. 
+From this we can finally calcuate the internal definition of 
+an equalizer: it is the terminal object in this category of elements.
+
+\begin{proposition}
+  Let $(E, E \mor{p} A)$ be an equalizer of 
+\begin{tikzcd}
+A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B
+\end{tikzcd}. Then,
+$\yo E \cong \mathsf{Eq}(f, g)$.
+\end{proposition}
+
+
+% A representation of $\mathsf{Eq}(f, g)$ is called an equalizer.
+% Let's call this representation $E$. So, there is an isomorphism:
+% \begin{center}
+%  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFEQBfU9TXfIRQBGclVqMWbdgEcAFADNSAAgDmASm7iYUVfCKgFAJwgBbJGRA4ISUROatEIADrPGaABZ0Q1AEYwwKCQAZmIeQxNzRDtrCz8AoMRQ6noHNld-HG8uCi4gA
+% \begin{tikzcd}
+%   {\yo E} \arrow[r, "\alpha", bend left] & {\mathsf{Eq}(f, g)} \arrow[l, "\beta", bend left]
+% \end{tikzcd} 
+% \end{center}
+
+% The Yoneda lemma tells us that $\{ \yo E \Rightarrow \mathsf{Eq}(f, g)\} \cong \mathsf{Eq}(f, g)(E)$.
+% So, there is exactly one element in $\mathsf{Eq}(f, g)$ that corresponds with 
+% $\alpha$ above; this is the universal element for $\alpha$.
+
+
 
 
 % \section{Cayley's theorem}

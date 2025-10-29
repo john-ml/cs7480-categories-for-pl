@@ -373,9 +373,31 @@ We say a functor \emph{reflects} limits if the converse of \cref{def:limit-prese
   Any full and faithful functor reflects limits.
 \end{proposition}
 
-\begin{proposition}
+
+\section{Every limit is the equalizer of a product}
+We've seen two important examples of simple diagrams:
+the discrete diagram where there are no non-identity morphisms,
+and the equalizer diagram where there are exactly 
+two morphisms between exactly two objects. 
+These are both simple enough on their own, but what is 
+interesting and powerful is that \emph{all limits can be 
+built out of these two simple diagrams}:
+
+\begin{theorem}
   Every limit is an equalizer of an indexed product.
-\end{proposition}
+\end{theorem}
+
 Consequently, a category with indexed products and equalizers has all limits.
+Let's see how this decomposition works for pullbacks.
+\todo{get this from the blackboard or someone's notes}
 
 \section{Colimits}
+The essence of colimits is essentially to flip the direction of all the arrows
+of limits. This seems simple at first, but surprisingly, colimits 
+behave quite differently than limits.
+
+\begin{definition}[Colimit]
+  Let $\calD : \calI \to \calC$ be a diagram of shape $\calI$ in 
+  $\calC$. A \emph{colimit} of $\mathcal{D}$ is a cocone 
+  $(P, p)$ that is initial in $\mathsf{CoCone}(\mathcal{D})$.
+\end{definition}
