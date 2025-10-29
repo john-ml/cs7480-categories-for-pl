@@ -1663,7 +1663,7 @@ by inspecting $P(2)$ and $(\yo \star)(2)$:
 And now here we learn the final component of $\alpha$: we conclude that $\alpha(2) = b$.
 
 \section{Proving the baby Yoneda lemma}
-\marginnote{Thanks to Bex Golinov for the scribe notes for the next two subsections. \todo{} these can be tidied 
+\marginnote{Thanks to Bex Golovanov for the scribe notes for the next two subsections. \todo{} these can be tidied 
 up a bit.}
 Now we are ready to prove \cref{thm:baby-yo}. Let $\calC$ be a 
 category, $P$ be a $\calC$-indexed set, and $X$ be an object 
@@ -1728,6 +1728,8 @@ transformation.
 \end{remark}
 
 \section{The category of elements}
+
+
 \begin{definition}[Category of elements]
   Let $P$ be a $\calC$-indexed set.
     The \textit{category of elements} of $P$, written $\int_C P$, is a 
@@ -1807,29 +1809,30 @@ easier to describe objects by how they behave externally, and the Yoneda
 lemma lets us bring those external descriptions back to objects of the category.
 Let's use this idea to calculate the universal property of an \emph{equalizer}.
 
-\begin{definition}[External definition of equalizer]
-  A equalizer of
+\begin{definition}[Equalizer]
+  \sloppy
+  An equalizer of
 \begin{tikzcd}
 A \arrow[r, "g"', shift right] \arrow[r, "f", shift left] & B
 \end{tikzcd}
 is a representation for the $\calC$-indexed set with action on 
 objects:
-\begin{align}
-  \mathsf{Eq}(f,g)(X) &= \{ X \xrightarrow{p} A \mid f \circ h = g \circ h \} \\
-\end{align}
+\begin{align*}
+  \mathsf{Eq}(f,g)(X) &= \{ X \xrightarrow{p} A \mid f \circ p = g \circ p \}
+\end{align*}
 and action on morphisms works by precomposition:
-\begin{align}
+\begin{align*}
   \mathsf{Eq}(X \xrightarrow{h} Y) &: \mathsf{Eq}(f,g)(Y) \to \mathsf{Eq}(f,g)(X)\\
-  &= (Y \xrightarrow{p} A \mid f \circ p = g \circ p) \mapsto 
-  (X \mor{h} Y \mor{p} A \mid f \circ p \circ h = g \circ p \circ h) 
-\end{align}
+  &= (Y \xrightarrow{p} A \mid f \circ p = g \circ p) \mapsto  \\
+  & \qquad (X \mor{h} Y \mor{p} A \mid f \circ p \circ h = g \circ p \circ h) 
+\end{align*}
 \end{definition}
 
 From this external definition, we can calculate the universal 
 property for an internal definition of equalizer by 
 computing a terminal object in the category of elements $\int \mathsf{Eq}(f,g)$.
 Let's calculate what it is.
-The objects are pairs $(X, p)$ where $X \mor{p} A$ and $f \circ p = g \circ p$ (i.e., $p \in \mathsf{Eq}(f,g)(X)$.
+The objects are pairs $(X, p)$ where $X \mor{p} A$ and $f \circ p = g \circ p$ (i.e., $p \in \mathsf{Eq}(f,g)(X)$).
 Morphisms from $(X, p)$ to $(Y, q)$ 
 is a $\calC$-morphism $X \mor{h} Y$ such that 
 $\mathsf{Eq}(f, g)(h)(q) = p$. Unfolding $\mathsf{Eq}(f, g)(h) = q \circ h$, 
