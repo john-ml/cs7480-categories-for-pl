@@ -394,7 +394,34 @@ Let's see how this decomposition works for pullbacks.
 \section{Colimits}
 The essence of colimits is essentially to flip the direction of all the arrows
 of limits. This seems simple at first, but surprisingly, colimits 
-behave quite differently than limits.
+behave quite differently than limits. Let's quickly state the relevant 
+definitions:
+
+\begin{definition}[Cocone]
+  \sloppy
+  Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
+  in a category \(\calC\).
+  A \emph{cocone} over \(D\) is a pair \((P,p)\)
+  where \(P\) is an object of \(\calC\)
+  and \(p\) is a family of morphisms \((p_i : D(i) \to P)_{i\in I}\)
+  such that \(p_i \circ D(f) = p_j\) for all morphisms \(f : i \to j\)
+  of \(\mathcal I\).
+\end{definition}
+
+\begin{definition}[Morphism of cocones]
+  Let \(D : \mathcal I \to \calC\) be a diagram of shape \(\mathcal I\)
+  in a category \(\calC\).
+  Let \((P,p)\) and \((Q,q)\) be two cocones over \(D\).
+  A \emph{morphism of cocones from \((P,p)\) to \((Q,q)\)}
+  is a morphism \(f : P \to Q\) such that \(f \circ p_i = q_i\)
+  for all \(i \in \mathcal I\).
+\end{definition}
+
+Then, the category of cocones for a diagram $\mathcal{D}$ is 
+written $\mathsf{CoCone}(\mathcal{D})$, analogous to the case for 
+the category of cones
+$\mathsf{Cone}(\mathcal{D})$. Now we can state the 
+definition of colimit:
 
 \begin{definition}[Colimit]
   Let $\calD : \calI \to \calC$ be a diagram of shape $\calI$ in 
