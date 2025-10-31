@@ -1,6 +1,232 @@
-\chapter{Adjoints}
+\chapter{Adjunctions}
 
+\begin{itemize}
+  \item So far we've mostly focussed on characterizing properties 
+  of an individual category. Now let's broaden our focus to discuss 
+  in more detail
+  relationships between categories.
+  \item First, let's study the strongest possible relationship between
+  two categories: does it mean for two categories to be equivalent? 
+  Following intuition from set isomorphism, we will want to design 
+  two functors between the categories that behave like inverses.
+  \item For this definition we will need a way of talking equivalence 
+  of functors:
+  \begin{definition}[Natural isomorphism of functors]
+    Let $\calC$ and $\calD$ be categories and $F, G : \calC \to \calD$ 
+    be functors. Then, $F$ and $G$ are \emph{naturally isomorphic},
+    written $F \cong G$, if there is a natural transformation $\alpha : F \Rightarrow G$
+    whose components are isomorphisms.
 
+  \end{definition}
+  % todo: make this just be X x Y
+
+  % \begin{example}
+  %   Let $\calC$ be the preorder category on natural numbers, and let 
+  %   $\calD$ be a category whose objects are pairs of natural numbers 
+  %   and where there is a morphism $(x,y) \to (z, w)$
+  %   if and only if $x \le z$ or $y \le w$.
+
+  %   Then, let $F : \calC \to \calD$ be $F = X \mapsto (0, X)$  and 
+  %   $G : \calC \to \calD$ be $G  = X \mapsto (X, 0)$. Then,
+  %   these two functors are naturally isomorphic along the natural 
+  %   transformation
+  %   $\alpha : F \Rightarrow G$ where components $\alpha_X : F(X) \to G(X)$
+  %   swap the order of tules, $\alpha_X = (0, X) \to (X, 0)$.
+  % \end{example}
+
+  \item Now, to give an equivalence of categories, we must show that there exists a pair of functors $F$ and 
+  $G$ between them whose compositions are naturally isomorphic to 
+  the identity functors on each category:
+  \begin{definition}[Equivalence of categories]
+    \sloppy
+    Let $\calC$ and $\calD$ be categories. Then, $\calC$ is equivalent
+    to $\calD$, written $\calC \cong \calD$, if there are two functors 
+    $F : \calC \to \calD$ and $G: \calC \to \calD$ satisfying
+    $F \circ G \cong \id_\calC$ and $G \circ F \cong \id_\calD$, where $\id_\calC$ 
+    and $\id_\calD$ are the identity functors on $\calC$ and $\calD$ respectively.
+  \end{definition}
+  \item There are some surprising categorical equivalences that are worth 
+  thinking about:
+  \begin{proposition}
+    The category of finite pointed sets $\mathsf{FinSet}^*$ is equivalent to the category 
+    of finite sets and partial functions $\mathsf{FinSet}_\text{par}$. 
+  \end{proposition}
+
+  The intuition behind this equivalence is interesting. First let's identify 
+  the functors that form the equivalence. Let $F :
+  \mathsf{FinSet}_\text{par} \to \mathsf{FinSet}^*$. The action 
+  on objects is straightforward: $F(X) = (X \uplus \{\star\}, \star)$
+  i.e., $F$ sends a set $X$ to a pointed set with $X$ extended by 
+  some element $\star$ with $\star$ as the point.
+  The action on morphisms is interesting. Let $f : X \to Y$ be a partial 
+  function. Then, we define:
+  \begin{align*}
+    F(f) &: (X \uplus \{\star\}, \star) \to (Y \uplus \{\star\}, \star) \\
+    &= x \mapsto \begin{cases}
+      \star \quad& \text{if }f(x)~\text{undefined} \\ 
+      f(x) \quad& \text{otherwise.}
+    \end{cases}
+  \end{align*}
+  Intuitively, the $\star$ stands in for the subset of $X$ on which $f$ is undefined.
+  The inverse $G$ is also straightforward: its action on objects is to 
+  forget remove point, $G((X, \star)) = X \setminus \star$. Then, its action on morphisms
+  map the point to undefined:
+  \begin{align*}
+    G(g) &: X \setminus \star \to Y \setminus \star \\ 
+    &= x \mapsto 
+    \begin{cases}
+      \bot \quad&\text{if }g(x) = \star \\
+      g(x) \quad&\text{otherwise}
+    \end{cases}
+  \end{align*}
+
+  Now, show that there is a natural isomorphism $\alpha : F \circ G \Rightarrow \id_{\textsf{FinSet}^*}$.
+  This is not too hard and a good exercise. 
+  It requires showing that there is a $\mathsf{FinSet}^*$ isomorphism 
+  $(X, a) \cong ((X \setminus a) \uplus \star, \star)$. 
+
+  \item Categorical equivalences are very powerful when they arise but 
+  the condition is often too strong. 
+  A natural weakening of this notion will be an \emph{adjunction}, which will be pairs of 
+  functors between categories are a form of ``weak equivalence''. 
+
+  \item The natural notion of weakening here will be as follows. Let $\calC$ and $\calD$ 
+  be categories and $F : \calC \to \calD$ and $G : \calD \to \calC$ be functors. 
+  Then, instead of requiring that round-trips of $F$ and $G$ be naturally isomorphic identity functors, 
+  an adjunction will require instead that there simply exist some pair of natural transformations:
+  \begin{align}
+    \eta : \id_\calC \Rightarrow G \circ F  \qquad
+    \epsilon :  F \circ G \Rightarrow \id_\calD 
+    \label{eq:adjoint-units}
+  \end{align}
+
+  The natural transformation $\eta$ is called the \textbf{unit} of the adjunction and 
+  $\epsilon$ is called the \textbf{counit}, the functor $F$ is called 
+  the \textbf{left adjoint}, and the functor $G$ the \textbf{right adjoint}.
+
+  \item There is one more coherence requirement we place on these natural
+  transformations in order for them to form an adjunction. But, before we do
+  that, let's examine this notion of notion of ``weak equivalence'' in a 
+  simple preorder category to understand what it means before we give the 
+  full definition of adjoint functors for general categories.
+\end{itemize}
+
+\section{Adjunctions for preorder categories: Galois connections}
+\begin{itemize}
+  \item As usual it's very useful to study new category theory definitions in 
+  pre-order categories to gain order-theoretic intuition about them before 
+  generalizing to the general setting where there can be more than one morphism 
+  between any two objects.
+  
+  \item Let $(X, \le_X)$, $(Y, \le_Y)$ be preorders. Recall that a \emph{monotone map}
+  is a function $f : X \to Y$ that respects the preorder, i.e., 
+  if $x_1 \le_X x_2$ then $f(x_1) \le_Y f(x_2)$. Recall that functors between 
+  preorder categories are exactly monotone maps.
+
+  \item Let's interpret the definition of adjoint in this setting. First, 
+  let's give two example functors between two preorder categories:
+
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYABEAviDGl0mXPkIoAjOSq1GLNgEFJ0kBmx4CRAEwrq9Zq0QgAQjpkH5RAMxm1ltgGF7e2YYUkpIqqFhrWnDz8QgzAnhJSDnJGSkEh6lYgij76SQGmwebpbMbZfk4orgXuYSDOpY7JyAAsbqEZIvW5RC1VbWxNkqowUADm8ESgAGYAThBcSMogOBBIxgkgM3Or1MtIzuub84gArDsriABsB7NHF2dIAOzXW4iuS+cAHM9HD-eIAJzfBZ-O4gABGMDAUCQxCBlz+pnBkOhr1hukO23eSFBEKhezRUxuSFOWMQiNxKIJGyJiF+pK+6Jp-z+H2oFPxcLeuwBcNZpOZSLxqLEFDEQA
+\begin{tikzcd}
+  \mathcal{D} & A \arrow[r] \arrow[red, rd] & B \arrow[r] \arrow[red, dr, bend left] & C \arrow[red, d] \\
+  \mathcal{C} & 1 \arrow[r] \arrow[blue, u] & 2 \arrow[r] \arrow[blue, ul, bend left] & 3 \arrow[blue, ul]
+  \end{tikzcd}
+
+  Here we've drawn $F : \calC \to \calD$ in blue and $G : \calD \to \calC$ in red.
+
+  \item Let's check if these functors satisfy the adjoint requirement as we've seen it 
+  so far. First, let's try to find a unit by finding a natural transformation
+  $\eta : \id_\calC \Rightarrow G \circ F$. 
+  Then, $\eta$ is a $\calC$-indexed family of morphisms in $\calC$:
+  \begin{align*}
+    \eta_1 = 1 \to 2 \quad \eta_2 = \id_2 \quad \eta_3 = \id_3
+  \end{align*}
+
+  We can also build the counit, which is a $\calD$-indexed family of morphisms in $\calD$:
+
+  \begin{align*}
+    \epsilon_D = \id_A \quad \epsilon_B = \id_B \quad \epsilon_C = B \to C 
+  \end{align*}
+
+  Intuitively, these two natural transformations are characterizing what happens 
+  after round trips of following $F$ and $G$. The unit $\eta$ says that, after 
+  following a round trip of $F$ and then $G$, we must end up ``in a higher place'' than we started;
+  dually, the counit $\epsilon$ is saying that after a round trip of $G$ then $F$ 
+  we must end up ``in a lower place'' than we started.
+
+  \item Now we can reverse engineer an order-theoretic understanding for the 
+  unit and the counit of the adjunctions $F$ and $G$.
+  This relationship has a name in order theory:
+
+  \begin{definition}[Galois connection]
+    Let $(X, \le_X)$ and $(Y, \le_Y)$  be preorders and let $\alpha : X \to Y$ 
+    and $\gamma : Y \to X$ be monotone functions. Then, $\alpha$ and 
+    $\gamma$ form a \emph{Galois connection} if, for all $x \in X$ and $y \in Y$:
+    \begin{align*}
+      x \le \gamma(\alpha(x))  \qquad \text{and} \qquad \alpha(\gamma(y)) \le y
+    \end{align*}
+  \end{definition}
+
+  \item Pause for a moment to absorb how close a Galois connection is to an identity. 
+  If $\gamma$ and $\alpha$ above were inverses, then indeed this would be 
+  identity.
+
+  \item An equivalent definition to the above is that, for all $x \in X, y \in Y$, 
+  it holds that:
+  \begin{align}
+    \alpha(x) \le y \text{ if and only if } x \le \gamma(y)
+    \label{eq:galois-hom}
+  \end{align}
+
+  Why is this equivalence true? 
+
+  \item A programming languages example: Galois connections are important in defining 
+  abstract interpreters. The map $\alpha$ is called the \emph{abstraction function} and 
+  $\gamma$ is called the \emph{concretization function}, and $\alpha$ is left adjoint to $\gamma$.
+
+\end{itemize}
+
+\subsection{Adjoints preserve structure}
+\begin{itemize}
+  \item An important property of adjoints is that left adjoints preserve colimits 
+  and right adjoints preserve limits. This property is of course true for 
+  Galois connections, so let's see what it means in that setting first:
+  \begin{theorem}
+    Let $(X, \le)$ and $(Y, \le)$ be complete partial orders (i.e., they both have all 
+    meets and joins) and let $\alpha : X \to Y$ and $\gamma : Y
+    \to X$ be monotone functions where $\alpha$ is left adjoint to $\gamma$. Then,
+    for any $x_1, x_2 \in X$ we have that:
+    \begin{align}
+    \alpha(x_1 \sqcup x_1) = \alpha(x_1) \sqcup \alpha(x_2)
+    \end{align}
+    and, for any $y_1, y_2 \in Y$ we have that:
+    \begin{align}
+      \gamma(y_1 \sqcap y_2) = \gamma(y_1) \sqcap \gamma(y_2)
+    \end{align}
+  \end{theorem}
+  \begin{proof}
+    Let's prove that the left adjoint preserves meets; the other 
+    one is a good exercise.
+    By monotonicity, $\alpha(x_1) \sqcup \alpha(x_2) \le \alpha(x_1 \sqcup x_2)$. 
+    So, we need to show $\alpha(x_1 \sqcup x_2) \le \alpha(x_1) \sqcup \alpha(x_2)$.
+    We will use \cref{eq:galois-hom} to show this. 
+    Let $m = x_1 \sqcup x_2$ and $m^* = \alpha(x_1)\sqcup \alpha(x_2)$. Then,
+    \begin{align*}
+      \alpha(m) \le m^* \iff m \le \gamma(m^*)
+    \end{align*}
+    Proceeding on the right hand side, 
+    we use the fact that $\gamma$ is monotone to build an intermediate inequality:
+    \begin{align*}
+    \gamma(\alpha(x_1)) \sqcup \gamma(\alpha(x_2)) \le \gamma(\alpha(x_1)\sqcup \alpha(x_2))
+    \end{align*}
+
+    So, if we can show $x_1 \sqcup x_2 \le \gamma(\alpha(x_1)) \sqcup \gamma(\alpha(x_2))$, 
+    we are done. This follows directly from adjoint closure: $x \le \gamma(\alpha(x))$ for all $x$.
+  \end{proof}
+
+\end{itemize}
+
+\section{Adjunctions generally}
 
 % \begin{itemize}
 % \item We've seen three examples of ``inverses to product'':
