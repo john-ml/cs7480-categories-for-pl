@@ -1582,8 +1582,8 @@ also a $\calC$-indexed set:
   (\yo Z)(Y) = \{g\} \quad
   (\yo Z)(X) = \{g \circ f\}
   \\
-  (\yo Z)(f) = g \mapsto f \circ g \quad
-  (\yo Z)(g) = \id_Z \mapsto f
+  (\yo Z)(f) = g \mapsto g \circ f \quad
+  (\yo Z)(g) = \id_Z \mapsto g
 \end{align*}
 
 Next, let's enumerate the natural transformations $\yo X \Rightarrow P$
@@ -1635,8 +1635,9 @@ what if there is more than one morphism in $(\yo Z)(Z)$?
 The crux is that the choice of \emph{$(\yo Z)(\id_Z)$} fully determines the
 action of $\yo Z$ on all the other morphisms $Z \to Z$. Let's see this visually. 
 Suppose we have as our indexing category the monoid corresponding to the 
-natural numbers mod 3 under addition. This category has a single object $\star$ and 
-3 morphisms: the identity morphism $0$, $1, 2$, where $1 \circ 1 = 2, 1 \circ 2 = \id, 2 \circ 2 = 1, 2 \circ 1 = \id$.
+natural numbers mod 3 under addition, the category $\mathbb{Z}_3$. This category has a single object $\star$ and 
+3 morphisms: the identity morphism $0$, and morphisms $1$ and  $2$, 
+together which equations stipulating that $1 \circ 1 = 2, 1 \circ 2 = \id, 2 \circ 2 = 1, 2 \circ 1 = \id$.
 Let's visualize some of this data:
 
 \begin{center}
@@ -1646,21 +1647,44 @@ Let's visualize some of this data:
 Here we've drawn an arbitrary $\calC$-indexed set $P$
 with its action on the $1$ morphism, and we've chosen arbitrarily that
 the $\calC$-indexed function
-$\alpha_1$ maps $0$ to $b$. 
+$\alpha_1$ maps $0$ to $a$.
 Note that we've drawn the balloon twice for the same object; this is for visualization 
 purposes only.
+
 Now, the key: \emph{does this choice of $\alpha$ 
 fully determine how $\alpha$ behaves on all other elements of $(\yo \star)(\star)$}?
-Indeed it does! Observe: by naturality, we have that $\alpha_1(1) = a$, which 
-we can see by composing $P(1)\circ\alpha_1$. This gives us one more piece of data 
-about $\alpha_1$. Now, what about $\alpha_1(2)$? We can get this piece of data 
-by inspecting $P(2)$ and $(\yo \star)(2)$:
+Indeed it does! Observe: by naturality, we have that $P(1) \circ \alpha = \alpha \circ (\yo \star)(\star)$.
+This gives us a system of constraints that uniquely defines $\alpha$. Observe:
+\begin{align*}
+  & ((P(1) \circ \alpha)(1))(0) = b = (\alpha \circ (\yo \star)(1))(0) \\ 
+  & \Rightarrow b = \alpha((\yo \star)(1)) \\
+  & \Rightarrow b = \alpha(1).
+\end{align*}
+A similar chain of logic lets us derive $\alpha(2) = c$. Notice what is happening 
+here: $P$ is a functor, so it must ``behave like the monoid'': i.e., 
+it has the same equations and morphism compositions. Here, the choice of 
+$\alpha(0)$ is \emph{picking an element of $P$ that behaves like the identity}. 
 
-\begin{center}
-  \includegraphics[width=250px]{fig/yo-4.png}
-\end{center}
+Now, how do we see that there are exactly 4 natural transformations $\alpha :
+\yo \star \Rightarrow P$? Let's look at $P$. Since $P$ is a functor, it has
+copies of the $\mathbb{Z}_3$ in its codomain. We can see two copies: the
+$\{a,b,c\}$ subset is an exact copy -- the elements $a,b,$ and $c$ correspond to
+distinct numbers, and $\alpha$ will pick an arbitrary 0 point -- and the $\{d\}$
+subset is a denerate copy with only a single number $0$.
+So, there are 3 natural transformations that send $0$ to $\{a, b, c\}$, 
+each picking a different 0 point, and 1 natural transformation into $\{d\}$
+that sends all elements of $(\yo \star)(\star)$ to $d$.
 
-And now here we learn the final component of $\alpha$: we conclude that $\alpha(2) = b$.
+
+
+% $\alpha_1(1) = b$, which 
+% we can see by naturality: $P(1)\circ\alpha_1$. This gives us one more piece of data 
+% about $\alpha_1$. Now, what about $\alpha_1(2)$? This is also forced: we learned that 
+% $\alpha_1(1) = b$, so by naturality we have $(P(1) \circ \alpha_1)()$
+
+% Another way of understanding what is going on is that, by functoriality $P$ is
+% ``a copy of the monoid upstairs'': functoriality says that $P$ must behave 
+% like some number of copies of the monoid. 
 
 \section{Proving the baby Yoneda lemma}
 \marginnote{Thanks to Bex Golovanov for the scribe notes for the next two subsections. \todo{} these can be tidied 
