@@ -184,6 +184,8 @@
   abstract interpreters. The map $\alpha$ is called the \emph{abstraction function} and 
   $\gamma$ is called the \emph{concretization function}, and $\alpha$ is left adjoint to $\gamma$.
 
+
+
 \end{itemize}
 
 \subsection{Adjoints preserve structure}
@@ -223,10 +225,225 @@
     So, if we can show $x_1 \sqcup x_2 \le \gamma(\alpha(x_1)) \sqcup \gamma(\alpha(x_2))$, 
     we are done. This follows directly from adjoint closure: $x \le \gamma(\alpha(x))$ for all $x$.
   \end{proof}
-
 \end{itemize}
 
-\section{Adjunctions generally}
+\section{Adjunctions for preorders, continued}
+\marginnote{Notes from John's lecture}
+\begin{itemize}
+  \item Recall the Galois connection example:
+
+  \begin{center}
+  \includegraphics[width=300px]{fig/galois.png}
+  \end{center}
+  \item We defined a pair of functions $\alpha : \calC \to \calA$
+  and $\gamma : \calD \to \calC$, where $\alpha$ is 
+  left-adjoint to $\gamma$.
+  We defined an example $\gamma$ as follows (shown in red):
+   \begin{center}
+  \includegraphics[width=300px]{fig/galois-2.png}
+  \end{center}
+ 
+  \item To get to the general definition of preorder,
+  we will study the properties of $\alpha$ 
+  and $\gamma$. We will want our general definition of 
+  adjoint to preserve \emph{all} of this structure
+
+  \item What is the property we want $\alpha$ to have, 
+  given this definition of $\gamma$? 
+  In some sense, it is \emph{the most precise 
+  abstraction} would can make.
+
+  \item For example, we can define a really bad $\alpha$ 
+  that is very imprecise. For instance, 
+  we could let $\alpha(\_) = ?$. But if we did this, 
+  then $\alpha$ would \emph{not be an adjoint}.
+
+  \item There is a collection of interesting properties 
+  we want $\alpha$ to have so that it is in some 
+  sense ``most precise'':
+  \begin{enumerate}
+    \item $\alpha(c)$ is the smallest $a \in \calA$ 
+    such that $c \le \gamma(a)$. 
+    \item $\gamma(a)$ is the largest $c \in \calC$ 
+    such that $\alpha(c) \le a$.
+    \item For all $a \in \calA$ and $c \in \calC$, 
+    $\alpha(c) \le a$ if and only if 
+    $c \le \gamma(a)$.
+  \end{enumerate}
+
+  \item These fun facts are more than just fun facts: they are 
+  in fact \emph{equivalent definitions} of adjoints (at least 
+  for preorders). 
+
+  \begin{theorem}
+    Let % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYAEEAviDGl0mXPkIoAjOSq1GLNpx78hDYAGEJY1TCgBzeEVAAzAE4QuSMiBwQkykACMYYKEgDMzvTMrIgc7IxofHSS0iB2Du7Urk7U3r4BQeqh4WZ0XDySFGJAA
+    \begin{tikzcd}
+    \mathcal{A} \arrow[r, "\alpha", bend left] & \mathcal{C} \arrow[l, "\gamma", bend left]
+    \end{tikzcd} be a pair of functors. Then the following 
+    are equivalent:
+    \begin{enumerate}
+      \item $\alpha \dashv \gamma$ 
+      \item For any $c \in \calC$, $\alpha(c)$ is the 
+      smallest $a \in \calA$ such t hat $c \le \gamma(a)$
+      \item For any $a \in \calA$, 
+$\gamma(a)$ is the largest $c \in \calC$ 
+    such that $\alpha(c) \le a$.
+    \item For all $a \in \calA$ and $c \in \calC$, 
+    $\alpha(c) \le a$ if and only if 
+    $c \le \gamma(a)$.
+    \end{enumerate}
+  \end{theorem}
+
+  \item This is going to be a big proof. First we'll prove 
+  that (1) implies (2).
+
+  \todo{} fell behind. Same as the next one really.
+
+  \item If $\alpha \dashv \gamma$ then for all 
+  $a \in \calA$, $\gamma(a)$ is the largest 
+  $c \in \calC$ such that $\alpha(c) \le a$
+
+  First, $\alpha(\gamma(a)) \le a$, holds by 
+  $\alpha \dashv a$
+
+  Now we need to show $\alpha(a)$ is the smallest such. 
+  Suppose $c \in \calC$ such that $\alpha(c) \le a$. 
+  Need to show that $c \le \gamma(a)$. 
+  By $\gamma$ is monotone, 
+  \begin{align*}
+    \gamma(\alpha(c)) \le \gamma(a)
+  \end{align*}
+  By definition of adjoint, $c \le \gamma(\alpha(c))$, 
+  which completes the proof.
+
+  \item Proof that (2) implies (4). 
+
+    For any $c \in \calC$, $\alpha(c)$ is the 
+    smallest $a \in \calA$ such t hat $c \le \gamma(a)$.
+    Want to show that for all $a \in \calA$, $c \in \calC$, 
+    $\alpha(c) \le a \iff c \le \gamma(a)$.
+
+    $(\Rightarrow)$: Have that $\alpha(c) \le a$, 
+    need to show that $c \le \gamma(a)$.
+    By monotonicity, we have that $\gamma(\alpha(c)) \le \gamma(a)$.
+    By assumption, $c \le \gamma(\alpha(c))$.\footnote{Note: 
+    cannot appeal to adjoint roundtrip property here. This is the assumption 
+    in equivalent condition (2).}
+
+    $(\Leftarrow)$: Have $ c \le \gamma(a)$. Want $\alpha(c) \le a$.
+    Define some helpful notation: the \emph{downset} $c \downarrow \gamma = \{a
+    \mid c \le \gamma(a) \}$. 
+    Let $\varphi(a) = \text{min}(c \downarrow \gamma)$. 
+    \todo {get the rest}
+
+    \item Proof that (4) implies (1).
+    If for all $a \in \calA, c \in \calC$ 
+    it holds that $\alpha(c) \le a$ iff $c \le \gamma(a)$, 
+    then
+    for all $a \in \calA, c \in \calC$ 
+    it holds that $\alpha(\gamma(a)) \le a$ and 
+    $c \le \gamma(\alpha(c))$.
+
+
+    First, show $\alpha(\gamma(a)) \le a$. 
+    By assumption this is true if and only if 
+    $\gamma(a) \le \gamma(a)$, which vacuously holds.
+    The other side is identical.
+\end{itemize}
+
+\section{Generalizing beyond preorders}
+\begin{itemize}
+  \item We want a general definition of adjoints that generalizes the above 
+  four-way equivalence. 
+  \item To get there, we will first become more formal about 
+  this downarrow.
+  \item Let $\calC$ and $\calA$ be categories. 
+  Then, for an object $c \in \calC$, 
+  the category $c \downarrow G$ is a category 
+  whose objects are morphisms $c \to G(a)$ for each 
+  object $a \in \calA$.
+  Morphisms are commuting triangles:\marginnote{This is an 
+  instance of a \emph{comma category}.
+  Thing of note: notice how the preorder notion of a 
+  ``downset'' uses the same notation as comma category.}
+
+  \begin{center}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGMQBfU9TXfIRQBGclVqMWbAOIAKOgEpuvEBmx4CRUcPH1mrRCDl0A5Eq7iYUAObwioAGYAnCAFskZEDghJRE-WwOyo4u7oh+3kgATNR6UoZy1uYqzm4e1JGIMf7xIA4m3BRcQA
+\begin{tikzcd}
+  c \arrow[r, "f"] \arrow[rd, "f'"] & G(a) \arrow[d, "G(g)"] \\
+                                    & G(a')                 
+  \end{tikzcd}
+  \end{center}
+  where $c \mor{f} G(a)$ and $c \mor{f'} G(a')$ are two 
+  objects.
+
+  \item Now that we have a category we have a notion of ``smallest 
+  element'' that generalizes categorically. 
+  This means: the categorically generalization of property (2) 
+  will be that for all objects $c \in \calC$, 
+  the category $c \downarrow G$ has an initial object.
+
+  This is a \emph{definition of adjoint}.
+  
+
+  \item Generalizing (3), we need to build a category $F \downarrow a$.
+  This category has objects $F(c) \mor{f} a$ for 
+  objects $c$ and morphisms $f$. 
+  Then, a morphism in $F \downarrow a$ is again a triangle:
+
+  \begin{center}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEAKAYwEoQAvqXSZc+QigCM5KrUYs2dQcJAZseAkTKTZ9Zq0QceAcn4DZMKAHN4RUADMAThAC2SAEzUcEJMSEPnN0RPEG8kaTl9NntjZQDXXy8fRAi9BUN7QQoBIA
+\begin{tikzcd}
+  F(c) \arrow[r, "f"]              & a \\
+  F(c') \arrow[u] \arrow[ru, "f'"] &  
+  \end{tikzcd}
+  \end{center}
+  
+
+  \item Let 
+  % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYAGEAviDGl0mXPkIoAjOSq1GLNpx78hDYAEEJY1TCgBzeEVAAzAE4QuSMiBwQkytc1aIQAMRDUAEYwYFBIAMzEUjb2jogerk5BIWGIkdT0XmwA4pIUYkA
+\begin{tikzcd}
+  \mathcal{C} \arrow[r, "F", bend left] & \mathcal{A} \arrow[l, "G", bend left]
+  \end{tikzcd}
+
+  Finally generalizing (1) is a bit tricky. 
+  Let $\eta : \id \Rightarrow G \circ F$ 
+  and $\varepsilon : F \circ G \Rightarrow \id$. 
+  Then, we have \emph{coherence conditions}\footnote{
+    The idea of a coherence condition is essentially 
+    ``equations you add to your definitions when you generalize 
+    from preorders to categories''. Here, we've introduced 
+    extra ways to get between $\calC$ and $\calA$ via 
+    the units. This could add lots of extra morphisms 
+    to our category if we aren't careful. So, the coherence 
+    conditions restrict this proliferation of morphisms. 
+    It's useful to think about what happens without these 
+    coherence conditions; the easiest is to see that 
+    initiality is violated in the category $c \downarrow G$.
+  }
+
+  \item The final generalization is (4). Categorically,
+  this says for all $c \in \calC$ and $a \in \calA$, 
+  $\calA(F(c), a) \cong \calC(c, G(a))$ that is natural in 
+  $a$ and $c$.
+
+  What does ``natural in $a$ and $c$'' mean? Well, we need two functors with
+  compatible domains.  Intuition: take all the things that the definitions says 
+  are natural and ``poke a hole in them''. Here are the holes: $\calA(F(-_1),
+  -_2) : \calC^\text{op} \times \calA \to \mathsf{Set}$ and 
+  $\calC(-_1, G(-_2)) : \calC^\text{op} \times \calA \to \text{Set}$.
+  Then, the definition says there must be a natural 
+  isomorphism between these two functors.
+\end{itemize}
+
+\section{Examples}
+\begin{itemize}
+  \item A category $\calC$ has terminal objects 
+  if and only if 
+  the there is a functor $F : \calC \to 1$ (1 is the 1-object category)
+  that has a right adjoint.
+  \item 
+\end{itemize}
 
 % \begin{itemize}
 % \item We've seen three examples of ``inverses to product'':
