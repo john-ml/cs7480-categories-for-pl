@@ -1,0 +1,284 @@
+\chapter{Toposes}
+\marginnote{This chapter is heavily based on \citep{lawvere2009conceptual} chapters 32 and 33.}
+
+\begin{itemize}
+    \item A \emph{topos} is a category whose internal language is like set theory.
+    If you like, you can think of it as a ``\texttt{\#lang} for math'': it gives a 
+    reinterpretation internal to some category of all the mathematical symbols like $\land$, $\lor$, $\exists$,
+    $\forall$, $\Rightarrow$, set-builder notation, etc.
+
+    \item Many of the categories we've been discussing so far --
+    presheaf categories, the category of $G$-sets, the category of 
+    finite transition systems -- are examples of toposes.
+
+    \item Today we'll discuss elementary toposes, which are toposes whose 
+    internal language is intuitionistic higher order logic.  This means that the
+    law of excluded middle and the axiom of choice may not hold in these topoi
+     (i.e., logical statements like $\neg \neg \varphi$ may not entail $\varphi$) 
+
+    \item To get there, we will study the critical set-theoretic relationship of 
+    a \emph{subset}, which is a special relationship between two objects that 
+    says one object a \emph{part} of another. Once we have the categorification of 
+    subset in hand, we will use it to define other logical connectives.
+\end{itemize}
+
+\section{Parts of objects}
+\begin{itemize}
+    \item Recall the definition of a monomorphism,
+    which is the categorification of an inclusion map (or injective function):
+    from the homework:
+    \begin{definition}[Monomorphism]
+        Let $\calC$ be a category. A morphism $X \mor{f} Y$ is a \emph{monomorphism}
+        if for any morphisms 
+        % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAC0QBfU9TXfIRQBGclVqMWbABrdxMKAHN4RUADMAThAC2SMiBwQkokHAAWWNTiQBaAEzV6zVohCKA+sO68QmnXupDY2pzS2tEEycpVw87EGoGOgAjGAYABX48AjYNLEUzay4KLiA
+\begin{tikzcd}
+    Z \arrow[r, "g_1", shift left=2] \arrow[r, "g_2"', shift right] & X
+    \end{tikzcd}, 
+    if $f \circ g_1 = f \circ g_2$ then $g_1 = g_2$. This property is called \emph{left cancellation} of $f$.
+    Monomorphisms are typically drawn with a hook arrow like 
+    $X \hookrightarrow Y$.
+    \end{definition}
+
+    \item In the homework we saw that, in the category of finite sets, a 
+    function is injective if and only if it is a monomorphism. 
+    Injective maps identify subsets, so monomorphisms will identify 
+    subobjects. 
+
+    \item Monomorphisms give us a natural notion of a categorification of subset, which will 
+    be called a \emph{part of an object}:
+    \begin{definition}[Part of an object]
+        Let $\calC$ be a category and $X$ be an object in $\calC$. Then, $Y$ 
+        is a \emph{part} of $X$ if there is a monomorphism $Y \hookrightarrow X$.
+    \end{definition}
+
+%     \begin{definition}[Subobject]
+%         Let $\calC$ be a category and $X$ be an object in $\calC$. Then, 
+%         a \emph{subobject of $X$} is an equivalence class of 
+%         monomorphisms into $X$ where two 
+%         monomorphisms $h : Y \hookrightarrow X$ and $k : Z \hookrightarrow X$ 
+%         are equivalent if there is an isomorphism $v : Y \to Z$ 
+%         such that the following triangle commutes:
+%         % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgE0efEBmx4CRUcXEMWbRCABaPcTCgBzeEVAAzAE4QAtkjIgcEJKKf0sjdgAsIEANYgNJpSOt5yljb2iABMNM6u8R5eYX6BwZLaIIG8kXZIcU4uiI4hWTmU3EA
+% \begin{tikzcd}
+%     Y \arrow[r, "h", hook]                 & X \\
+%     Z \arrow[ru, "k", hook] \arrow[u, "v"] &  
+%     \end{tikzcd}
+%     \end{definition}
+ 
+    % \item A natural question one might ask is: why not have the simpler 
+    % definition where a subobject is simply a monomorphism? 
+
+    % \item You can think of $Z$ in the above definition as a ``test object'': in 
+    % order to show that $f$ is a monomorphism, we have to show that \emph{for every 
+    % other test object $Z$ in the category $\calC$}, it is the case that $f$ satisfies 
+    % the left cancellation property for any pair of morphisms from $Z$ to $X$.
+
+    % \item In many categories it isn't necessary to use 
+
+\end{itemize}
+
+\section{Subobject classifier}
+\begin{itemize}
+    \item The subobject classifier is the categorification of a 
+    characteristic function.
+
+    \begin{definition}[Characteristic function]
+        Let $S$ be a set and $A \subseteq S$. 
+        Then, the \emph{characteristic function of $A$}, written $\chi_A : A \to \{\top, \bot\}$, is the function:
+        \begin{align*}
+            \chi_A = x \mapsto \begin{cases}
+                \top \quad&\text{if } x \in A \\ 
+                \bot \quad&\text{otherwise.}
+            \end{cases}
+        \end{align*}
+    \end{definition}
+
+    
+    \item Intuitively, characteristic functions ought to be in bijection with the 
+    subsets they are defined over. We can see this as follows. Suppose we have the following 
+    diagram in the category of finite sets:
+    
+    \begin{center}
+        % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQBlEAX1PU1z5CKchWp0mrdgB1pwWTghpSAAlkAjCDlncefEBmx4CRUcXEMWbRCFnzpcHPQBOOnuJhQA5vCKgAZs4QALZIAEw0ikiiElbsOM5SvAFBoYhkIFGIMZZSNrIAxgAWWAD6AILu3EA
+\begin{tikzcd}
+    & \{\star\} \arrow[d, "true"] \\
+S \arrow[r, "\chi_A"] & {\{\top, \bot\}}           
+\end{tikzcd}
+    \end{center}
+    
+    Define $true : \star \mapsto \top$. Then, there is a set $B$
+    that is the pullback along the morphism $! : B \to \star$ 
+    and $\chi_A$, and this set $B$ must be isomorphic to $A$.
+
+    \item This setup lends itself naturally to a categorical definition:
+
+    \begin{definition}[Subobject classifier]
+        Let $\calC$ be a category with terminal objects and $\Omega$ 
+        be an object in $\calC$.
+        Then, a morphism $true : \mathbf{1} \to \Omega$
+        is called a \emph{subobject classifier of $\calC$} if for 
+        every monomorphism $j : U \hookrightarrow X$ there is a unique 
+        morphism $\chi_j : X \to \Omega$ called the \emph{classifying morphism for 
+        the subobject represented by $j$} such that the following diagram:
+        \begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBoBGAXVJADcBDAGwFcYkQANEAX1PU1z5CKchWp0mrdgB1pAeQC2MAOb0efEBmx4CRUcXEMWbRCHLr+2oUTIGaRqaYCqPcTCjL4RUADMAThAKSADMNDgQSGQgOPRYjOwAFhAQANYg9pImIABW6SCM9ABGMIwACgI6wvkwPjgWIP6BSABMYRGIohLG7Dh+Ury+AUGIUeFInQ5ZsgDGCVgA+rkDDUMhbS0Z3aYAhK7cQA
+\begin{tikzcd}
+    U \arrow[d, "j", hook] \arrow[r, "!"] & 1 \arrow[d, "true"] \\
+    X \arrow[r, "\chi_j"]                 & \Omega             
+    \end{tikzcd}
+        \end{center}
+        is a pullback along $\chi_j$ and $!$. In this situation, the object $\Omega$ is called 
+        the \emph{object of truth values}.
+    \end{definition}
+
+    \item In the category of finite sets, the two-element set $\{\top, \bot\}$ 
+    is the object of truth values and the map $true : \{\star\} \to \top$ is 
+    the subobject classifier.
+
+    \item The subobject classifier can be much more interesting in different 
+    categories!
+    Let's see an example of one.
+
+    \begin{definition}[Topos of trees]
+        Consider the following category called $\mathbb{N}_\rightarrow$:
+        \begin{center}
+            % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRGJAF9T1Nd9CKAIzkqtRizZCuPEBmx4CRAEyjq9Zq0QhlM3goFEAzGvGa2RvXL6LByACymNk7QDp3XMTCgBzeEVAAMwAnCABbJBMQHAgkZW4g0IjEVWjYxCEEkBDwpBE0pGIsnOTHAsQjTgpOIA
+\begin{tikzcd}
+    0 \arrow[r] & 1 \arrow[r] & 2 \arrow[r] & 3 \arrow[r] & ...
+    \end{tikzcd}
+        \end{center}
+    The \emph{topos of trees} is the category of presheaves on $\mathbb{N}_\leftarrow$
+    written $\mathsf{Psh}(\mathbb{N}_\rightarrow)$.
+    \end{definition}
+    
+    \item We haven't defined what a topos is yet, so just treat the above as the 
+    definition for a special kind of presheaf category. But, let's see what a subobject 
+    classifier is in this category.
+    First, let's look at what monomorphisms look like. Here is an example of a 
+    monomorphism:
+
+    \begin{center}
+        \includegraphics[width=200px]{fig/topos-1.png}
+    \end{center}
+
+    The red arrow is a natural transformation $Q \Rightarrow P$ where each 
+    component of the natural transformation is an injective function.
+    In a situation analogous to the one in finite sets, a natural transformation 
+    $\alpha : P \Rightarrow Q$ is a monomorphism in a presheaf category if and only 
+    if each component is an injective map.
+
+    \item Objects of this category can be thought of as ``sets of facts that are true 
+    at particular times''. They will correspond to \emph{Kripke models}, and 
+    a monomorphism will correspond to a Kripke sub-world.
+
+    \item Syntax of modal logic:
+    \begin{align*}
+        \phi, \psi ::= \phi \land \psi \mid \phi \lor \psi \mid \neg \phi \mid \square \phi \mid \diamond \phi \mid x
+    \end{align*}
+
+    Intuition: $\diamond \varphi$ says ``there is an accessible world where $\varphi$ holds'',
+    and $\square \varphi$ says ``$\varphi$ always holds''.
+
+    \item Now we can think about the object of truth values. It is this:
+
+    \begin{center}
+        \includegraphics[width=250px]{fig/truth-1.png}
+    \end{center}
+
+    Formally, $\Omega$ is a presheaf that maps each object to the 
+    set  $\{\top, 1, 2, \cdots\}$, and each 
+    morphism to the predecessor function that maps $1$ to $\top$ and $\top$ to $\top$.
+    Intuitively, think of each element of each set as representing ``the number 
+    of steps until something is true''. With this intuition, a non-zero value represents 
+    that something is false at a particular time step.
+
+    \item Given this object of truth values, we can design the subobject 
+    classifier as taking each time step and mapping it to the number of 
+    steps of ``gas'' that timestep has left:
+
+    \begin{center}
+        \includegraphics[width=250px]{fig/truth-2.png}
+    \end{center}
+
+    
+    \item Let's use this object of truth values to find the classifying morphism for 
+    $\alpha$ above. We need to find a morphism $P \mor{\chi_\alpha} \Omega$ 
+
+
+    \item  The mere existence of subobject classifiers already forces your category 
+    to behave in set-like ways. An example:
+        Every category with a subobject classifier is \emph{balanced}, 
+        meaning that if there is an epimorphism and monorphism between 
+        two objects, they are isomorphic. This is just like in sets where 
+        the existence of an injection and surjection implies an isomorphism.
+    
+\end{itemize}
+
+
+\section{Generalized elements}
+
+Important picture: the subobject classifier gives us an interpretation for set-builder.\marginnote{Think of $\varphi(x)$ 
+as an open term with free variable of type $X$.}
+
+\begin{center}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB13gAPAAk6xheADX7sAtlihj6AJzQALLAApuASk4BfEJtLpMufIRRkAjFVqMWbYTr0gM2PASKnyF+s1aIQpu-qcjV1Jzak9rH04AeXEYAHM6HQsYKDj4IlAAM1kIcSQyEBwIJDdCuiwGNgUICABrfxBs3PzqIqQAJl0snLzEUrbEAGYwq28OdjlFFXUGpt721uKhka82HFlrTQpNIA
+\begin{tikzcd}
+    \{x \in X \mid \varphi(x)\} \arrow[d, hook] \arrow[r] & 1 \arrow[d, "true"] \\
+    X \arrow[r, "\varphi(x)"]                             & \Omega             
+    \end{tikzcd}
+\end{center}
+
+We can say \emph{an element of X satisfies $\varphi$} if we can find a 
+morphism $x_0$ such that the following commutes:
+
+\begin{center}
+    % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkQAdD4ADwAIuWMHwAaAjgFssUcQwBOaABZYAFDwCUXAL4gtpdJlz5CKMsWp0mrdiN36QGbHgJEATBQsMWbRCGJ2DJ2M3UnMaL2tfLgB5CRgAc3oAh0NnE2RyUM8rHz9dCxgoePgiUAAzOQgJJEyQHAgkMjr6LEZ2RQgIAGtkiqqamnqkVz1yyurEJqHEAGZwnPYueSVVDV7x4cGG2fnvdhw5a1GQPomAFi2a49OkC7rtpojcngB9cnytIA
+\begin{tikzcd}
+    & \{x \in X \mid \varphi(x)\} \arrow[d, hook] \arrow[r] & 1 \arrow[d, "true"] \\
+1 \arrow[ru] \arrow[r, "x_0"] & X \arrow[r, "\varphi(x)"]                             & \Omega             
+\end{tikzcd}
+\end{center}
+
+This is often too strong, e.g. Kripke semantics. Enter generalized elements:
+\begin{def
+
+
+
+We say $U \vDash \varphi$ (read ``$U$ forces $\varphi$'').
+
+
+% \section{The category of parts of objects}
+% \begin{definition}[Slice category]
+% Let $\calC$ be a category 
+% \end{definition}
+
+\section{Kripke-Joyal Semantics}
+% https://ncatlab.org/nlab/show/Kripke-Joyal+semantics
+\begin{itemize}
+    \item The Kripke-Joyal semantics gives us a full picture of working internal 
+    to a topos
+    \item These will look very familiar if you are familiar with separation logic 
+    papers
+    % \item Let $\calE$ be an elementary topos and $\alpha : U \to X$ be a generalized element 
+% of $x \in \calE$.
+
+\end{itemize}
+
+\section{Toposes}
+\begin{itemize}
+    \item The Kripke-Joyal semantics tells us what features we need our 
+    category to support, which will be an elementary topos:
+    
+\end{itemize}
+
+\begin{definition}[Elementary topos]
+    A category $\calC$ is an elementary topos if and only if
+    it has products, coproducts, exponentials, an initial object, a terminal object, 
+    an object of truth values, and satisfies that for every object $X$ 
+    the slice category $\calC / X$ has products.
+\end{definition}
+\begin{itemize}
+    \item Every presheaf category is a topos (!!)
+\end{itemize}
+
+
