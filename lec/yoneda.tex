@@ -1282,7 +1282,7 @@ this is a quirk of our choice of types.
 Intuitively, the representables $(\yo B)(A)$ for two types $A$ and $B$ 
 is the collection of all equivalence classes of terms $M$ of type $A \to B$.
 Then, naturally, the action on morphisms $(\yo X)(f : A \to B) : \yo B \to \yo A$ 
-ought to be the ways of shifting viewpoints from $B$ to $A$,
+ought to be the ways of shifting viewpoints from $A$ to $B$,
 i.e.:
 
 \begin{align*}
@@ -1570,7 +1570,7 @@ Now, let's define a simple $\calC$-indexed set $P$:
   \quad 
   P(g) = \begin{cases}
     e \mapsto c \\
-    h \mapsto d
+    h \mapsto c
   \end{cases}
 \end{align*}
 
@@ -1656,8 +1656,8 @@ fully determine how $\alpha$ behaves on all other elements of $(\yo \star)(\star
 Indeed it does! Observe: by naturality, we have that $P(1) \circ \alpha = \alpha \circ (\yo \star)(1)$.
 This gives us a system of constraints that uniquely defines $\alpha$. Observe:
 \begin{align*}
-  & ((P(1) \circ \alpha)(1))(0) = b = (\alpha \circ (\yo \star)(1))(0) \\ 
-  & \Rightarrow b = \alpha((\yo \star)(1)) \\
+  & ((P(1) \circ \alpha))(0) = b = (\alpha \circ (\yo \star)(1))(0) \\ 
+  & \Rightarrow b = \alpha(((\yo \star)(1))(0)) \\
   & \Rightarrow b = \alpha(1).
 \end{align*}
 A similar chain of logic lets us derive $\alpha(2) = c$. Notice what is happening 
