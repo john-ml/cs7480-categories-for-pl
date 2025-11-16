@@ -707,7 +707,25 @@ in $\calC$ there is an internal picture of the function $f : Y \to X$.
 For example, we can draw $F$ above as the following balloon diagram:
 
 \begin{center}
-  \includegraphics[width=100px]{fig/balloon-0.png}
+  \begin{tikzpicture}
+  \node (FX) at (-1,0) {$F(X)$};
+  \node (FY) at (1,0) {$F(Y)$};
+  \node (a) at (-1,-1.25) {$a$};
+  \node (b) at (-1,-0.75) {$b$};
+  \node (c) at (1,-1.25) {$c$};
+  \node (d) at (1,-0.75) {$d$};
+  \node (X) at (-1,-2.25) {$X$};
+  \node (Y) at (1,-2.25) {$Y$};
+
+  \draw (-1,-1) circle [x radius=5mm,y radius=7mm];
+  \draw (1,-1) circle [x radius=5mm,y radius=7mm];
+
+  \draw[->] (d) to node[midway,above] {$F(f)$} (a);
+  \draw[->] (c) to (a);
+  \draw[->] (X) to node[auto,swap] {$f$} (Y);
+  \draw [->,loop,distance=1.5em,in=305,out=235] (X) to (X);
+  \draw [->,loop,distance=1.5em,in=305,out=235] (Y) to (Y);
+  \end{tikzpicture}
 \end{center}
 
 % \begin{tikzpicture}[
