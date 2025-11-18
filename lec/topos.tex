@@ -1,4 +1,4 @@
-\chapter{Toposes}
+\chapter{Elementary topoi}
 \marginnote{This chapter is heavily based on \citep{lawvere2009conceptual} chapters 32 and 33.}
 
 \begin{itemize}
@@ -113,6 +113,7 @@ S \arrow[r, "\chi_A"] & {\{\top, \bot\}}
     \item This setup lends itself naturally to a categorical definition:
 
     \begin{definition}[Subobject classifier]
+        \sloppy
         Let $\calC$ be a category with terminal objects and $\Omega$ 
         be an object in $\calC$.
         Then, a morphism $true : \mathbf{1} \to \Omega$
@@ -171,13 +172,13 @@ S \arrow[r, "\chi_A"] & {\{\top, \bot\}}
     at particular times''. They will correspond to \emph{Kripke models}, and 
     a monomorphism will correspond to a Kripke sub-world.
 
-    \item Syntax of modal logic:
-    \begin{align*}
-        \phi, \psi ::= \phi \land \psi \mid \phi \lor \psi \mid \neg \phi \mid \square \phi \mid \diamond \phi \mid x
-    \end{align*}
+    % \item Syntax of modal logic:
+    % \begin{align*}
+    %     \phi, \psi ::= \phi \land \psi \mid \phi \lor \psi \mid \neg \phi \mid \square \phi \mid \diamond \phi \mid x
+    % \end{align*}
 
-    Intuition: $\diamond \varphi$ says ``there is an accessible world where $\varphi$ holds'',
-    and $\square \varphi$ says ``$\varphi$ always holds''.
+    % Intuition: $\diamond \varphi$ says ``there is an accessible world where $\varphi$ holds'',
+    % and $\square \varphi$ says ``$\varphi$ always holds''.
 
     \item Now we can think about the object of truth values. It is this:
 
@@ -279,4 +280,6 @@ We say $U \vDash \varphi$ (read ``$U$ forces $\varphi$'').
     \item Every presheaf category is a topos (!!)
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Groethendik topoi}
 
