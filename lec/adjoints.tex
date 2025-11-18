@@ -278,7 +278,7 @@
   \begin{theorem}
     Let % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYAEEAviDGl0mXPkIoAjOSq1GLNpx78hDYAGEJY1TCgBzeEVAAzAE4QuSMiBwQkykACMYYKEgDMzvTMrIgc7IxofHSS0iB2Du7Urk7U3r4BQeqh4WZ0XDySFGJAA
     \begin{tikzcd}
-    \mathcal{A} \arrow[r, "\alpha", bend left] & \mathcal{C} \arrow[l, "\gamma", bend left]
+    \mathcal{C} \arrow[r, "\alpha", bend left] & \mathcal{A} \arrow[l, "\gamma", bend left]
     \end{tikzcd} be a pair of functors. Then the following 
     are equivalent:
     \begin{enumerate}
@@ -306,7 +306,7 @@ $\gamma(a)$ is the largest $c \in \calC$
   First, $\alpha(\gamma(a)) \le a$, holds by 
   $\alpha \dashv a$
 
-  Now we need to show $\alpha(a)$ is the smallest such. 
+  Now we need to show $\gamma(a)$ is the largest such. 
   Suppose $c \in \calC$ such that $\alpha(c) \le a$. 
   Need to show that $c \le \gamma(a)$. 
   By $\gamma$ is monotone, 
