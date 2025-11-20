@@ -377,6 +377,7 @@ $\gamma(a)$ is the largest $c \in \calC$
   where $c \mor{f} G(a)$ and $c \mor{f'} G(a')$ are two 
   objects.
 
+
   \item Now that we have a category we have a notion of ``smallest 
   element'' that generalizes categorically. 
   This means: the categorically generalization of property (2) 
@@ -385,6 +386,7 @@ $\gamma(a)$ is the largest $c \in \calC$
 
   This is a \emph{definition of adjoint}.
   
+
 
   \item Generalizing (3), we need to build a category $F \downarrow a$.
   This category has objects $F(c) \mor{f} a$ for 
@@ -435,7 +437,61 @@ $\gamma(a)$ is the largest $c \in \calC$
   Then, the definition says there must be a natural 
   isomorphism between these two functors.
 
+  \item Packaging all these definitions up:
+
 \end{itemize}
+
+\begin{fullwidth}
+   \begin{definition}[Adjunction]
+    Let % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYAGEAviDGl0mXPkIoAjOSq1GLNpx78hDYABEJY1TCgBzeEVAAzAE4QuSMiBwQkykACMYYKEgDMzvTMrIggAGKS0iB2Du7Urk7U3r4Bzgx03gwACrJ4BGwMMNY4INTBGmEA4pIUYkA
+    \begin{tikzcd}
+    \mathcal{C} \arrow[r, "F", bend left] & \mathcal{D} \arrow[l, "G", bend left]
+    \end{tikzcd}
+    be a pair of functors. Then, the functor $F$ is \emph{left adjoint} to $G$, written $F \dashv G$, 
+    if any of the following equivalent definitions hold:
+    \begin{itemize}
+      \item \emph{Unit \& co-unit}: There is a pair of natural transformations $\eta : \id_\calC \Rightarrow G \circ F$ 
+      and $\epsilon : F \circ G \Rightarrow \id_\calD$ that satisfy the \emph{triangle identities}:
+      \begin{center}
+       % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRADEQBfU9TXfIRQBGclVqMWbdgHFOPPtjwEio4ePrNWiDt3EwoAc3hFQAMwBOEALZIyIHBCSiQDLGG0goEJgCMGrNQAFjB0UEhgTAwM1Dh0WAxskB4g1JpSOuwABAA6OTBxWdy8IJY2zrFOiABM1G4pOt5+AakgIWERUTEO8Yk6yYESWmx5MGjYDARZ8iVltoj2jki1ru6eTf6D7eGIkdGxvUkEg+mewgD68hRcQA
+\begin{tikzcd}
+  F \arrow[r, "F \eta ", Rightarrow] \arrow[rd, "1_F", Rightarrow] & FGF \arrow[d, "\epsilon F", Rightarrow] \\
+                                                                   & F                                      
+  \end{tikzcd} 
+  \qquad
+% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAHEQBfU9TXfIRQBGclVqMWbdgDFOPPtjwEio4ePrNWiDt3EwoAc3hFQAMwBOEALZIyIHBCSiQDLGG0goEJgCMGrNQAFjB0UEhgTAwM1Dh0WAxskB4g1JpSOuwABAA6OTBxWdy8IJY2zrFOiABM1G4pOt5+AakgIWERUTEO8Yk6yYESWmx5MGjYDARZ8iVltoj2jki1ru6eTf6D7eGIkdGxvUkEg+mewgD68hRcQA
+\begin{tikzcd}
+  G \arrow[r, "G \eta ", Rightarrow] \arrow[rd, "1_G", Rightarrow] & GFG \arrow[d, "\epsilon G", Rightarrow] \\
+                                                                   & G                                      
+  \end{tikzcd}
+      \end{center}
+      \item \emph{Natural isomorphism of hom-sets:} For any objects $c \in \calC$ and $d \in \calD$
+      there is an isomorphism:
+      \begin{align*}
+        \calD(Fc, d) \cong \calC(c, Gd)
+      \end{align*}
+      that is \emph{natural in $c$ and $d$}, i.e., there is a natural isomorphism 
+      between the two functors:
+      
+      \begin{center}
+       % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAB12BbOnACwDGjYAGEAvgD1OOGAA8cwCGjEACaVi7w13XoOEARMSDGl0mXPkIoAjOSq1GLNtLkKAyjBxGx9mFADm8ESgAGYAThBcSGQgOBBItiAARjBgUEgAzDH0zKyIHDr8QgzAhgAUAGIAtKRVAJTGpiDhkdHUcQnUKWlIVVnUDHQpDAAK5ngEbGFY-nw4INQ5TvmcPEXC4mU1KgDi9cYUYkA
+\begin{tikzcd}
+  \mathcal{C}^\text{op} \times \mathcal{D} \arrow[r, "{\mathcal{D}(F-,-)}", bend left] \arrow[r, "{\mathcal{C}(-, G-)}"', bend right] & \text{Set}
+  \end{tikzcd}
+      \end{center}
+      
+      \item \emph{Initiality condition}: For every object $c \in \calC$, the category $c \downarrow G$ 
+      has an initial object.
+
+      \item \emph{Terminality condition}: For every object $d \in \calD$, the category $F \downarrow d$ 
+      has a terminal object.
+
+    \end{itemize} 
+  \end{definition}
+ 
+\end{fullwidth}
+
+
 
 \section{Examples}
 \begin{itemize}
