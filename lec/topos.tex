@@ -286,223 +286,395 @@ We say $U \vDash \varphi$ (read ``$U$ forces $\varphi$'').
 \marginnote{This chapter is heavily based on these notes from 
 Alex Simpson: \url{https://alexksimpson.github.io/Talks/TutorialOnSheafSemantics.pdf}}
 
-We will eventually get to sheaves. We will build up to it 
-by first talking about Kripke semantics, then presheaf 
-semantics, then we will talk about sheaves.
+Last time we mentioned that sheaves serve as a ``hash-lang for math''.
+More precisely, this means that sheaves provide a model of
+\emph{higher-order intuitionistic logic}.
+In this logic it is possible to express a large amount of math;
+as a rough approximation, think of what can be written down
+as using Prop in Rocq (and without Inductives), or what can be expressed in Isabelle/HOL.
+While the standard model of this logic interprets propositions as classical truth values (either true or false),
+each category of sheaves provides a non-standard interpretation which often turns out to be convenient for modeling
+situations that arise in PL.
+This chapter provides a pared down presentation of the key idea behind how sheaves accomplish this.
+Rather than covering full higher-order intuitionistic logic,
+we will cover the intuitionistic propositional logic:
+\[
+    \varphi, \psi ::= \top \mid \bot \mid \varphi \land \psi
+    \mid \varphi \lor \psi \mid \varphi \Rightarrow \psi \mid a
+\]
+This logic consists of the usual intuitionistic logical connectives, plus
+some set of atomic propositions \(a\).
+
+Eventually we will see how to interpret this logic using the so-called \emph{sheaf semantics}.
+We will build up to it by first talking about Kripke semantics, then presheaf
+semantics.
 
 \section{Kripke semantics}
 
-\begin{itemize}
-    \item Kripke semantics are concerned with describing 
+Kripke semantics are concerned with describing
     beliefs over time.
-
-\item Example: in the \emph{before time}, 
+For example, in the past,
 we believed that in the night sky there 
-were 3 objects: a morning star, 
-evenin star, and saturn.
+were 3 objects: a morning star and an
+evening star.
 Then, recently, we learned that in fact 
 the morning star and evening star were 
-both venus, and discovered a new planet 
-Pluto. Then, in the present day, we learned
-Pluto is not a planet:
-
+both venus, and discovered new planets
+like Saturn and Pluto.
 \begin{center}
 \includegraphics[width=200px]{fig/planet.png}
 \end{center}
+We can describe this situation by interpreting the connectives of intuitionistic propositional
+logic with a generalized set of truth values.
+The key idea of Kripke semantics is to introduce a set \(W\)
+of \emph{possible worlds}, whose elements represent states of knowledge.
+These states of knowledge are partially ordered according to what an \emph{accessibility relation} \(\le\);
+the relation \(w \le w'\) (pronounced ``world \(w'\) is accessible from \(w\)'')
+represents the situation where a state of knowledge \(w\) can evolve into \(w'\).
+For the planetary example above, one could set \(W\)
+to the three-element set \(\{\text{before},\text{recently},\text{now}\}\)
+ordered by \(\text{before} \le \text{recently} \le \text{now}\).
 
-\item We can describe this situation using 
-\emph{Kripke logic}, which has the following 
-set of syntactic formulae:
-\begin{align}
-    \varphi, \psi ::= \top \mid \bot \mid \varphi \land \psi 
-    \mid \varphi \lor \psi \mid \varphi \Rightarrow \psi \mid a
-\end{align}
-\item There is an interpretation function:
-\begin{align}
-    \lceil - \rceil : \text{Formula} \rightarrow 2^\mathbb{W}
-\end{align}
-where $\mathbb{W}$ is the set of \emph{Kripke worlds}, 
-i.e. $\mathbb{W} = \{\text{before}, \text{recently}, \text{after}\}$.
-The set of worlds is an ordered set ordered 
-by a \emph{reachability relation $\le$}.
-\item A subset $U$ of $\mathbb{W}$ is \emph{closed under} $\le$ 
-if $w \in U$ and $w' \ge w$ then $w' \in U$.
-\item Example: The predicate $\lceil$pluto is a planet$\rceil$ is not closed
-under $\le$, since it is a planet in the Recently
-time step but it is not a planet in the Now timestep.
-This notion is called \emph{Kripke monotonicity}.
-\item Now we can give the \emph{Kripke semantics} 
-that tells us how to interpret formulae in terms of 
-Kripke worlds. We will require that our semantics 
-satisfies Kripke monotonicity.
+Each proposition \(\varphi\) is interpreted as a subset of \(W\) giving the set of possible worlds in which \(\varphi\) holds.
+Crucial to this interpretation is a \emph{monotonicity} property that models the fact that
+knowledge is stable over time: if \(\varphi\) holds in world \(w\), then it also holds in all worlds accessible from \(w\).
+The Kripke semantics of intuitionistic propositional logic is as follows.
 \begin{align*}
-    \lceil \top \rceil &= \mathbb{W} \\
-    \lceil \bot \rceil &= \emptyset \\
-    \lceil \varphi \land \psi \rceil &= \{w \mid w \in \lceil \varphi \text{ and } w \in \lceil \psi \rceil \} \\
-    \lceil \varphi \lor \psi \rceil &= \{w \mid w \in \lceil \varphi \text{ or } w \in \lceil \psi \rceil \} \\
-    \lceil \varphi \Rightarrow \psi \rceil 
-    &= \{w \mid \forall w' \ge w \text{ if } w' \in \lceil \varphi \rceil \text{ then } w' \in \lceil \psi \rceil\} 
+  \llbr{-} &: \text{Formula} \to \wp(W) \\
+  \llbr{\top} &= W \\
+  \llbr{\bot} &= \varnothing \\
+  \llbr{\varphi\land\psi} &= \llbr{\varphi} \cap \llbr{\psi}\\
+  \llbr{\varphi\lor \psi} &= \llbr{\varphi} \cup \llbr{\psi}\\
+  \llbr{\varphi\Rightarrow\psi} &=
+  \{ w \mid \text{for all }w' \ge w\text{, if } w'\in\llbr{\varphi} \text{ then }w'\in\llbr{\psi}\}
 \end{align*}
+Of these definitions, the interpretation of \(\Rightarrow\) is the most interesting.
+A naive interpretation that says \(\varphi\Rightarrow \psi\) holds in world \(w\)
+if and only if \(w\in\llbr{\varphi}\) implies \(w\in\llbr{\psi}\)
+is not valid here, because it fails to satisfy monotonicity.
 
-\item These semantics are designed so that you have sound interpretations
-of your proof rules: if $\varphi_1, \cdots, \varphi_n \vdash \psi$
-then $\lceil \varphi_1 \land \cdots \land \varphi_n \rceil \subseteq \lceil \psi \rceil$,
+These semantics are designed so that you have sound interpretations
+of the proof rules of intuitionistic propositional logic: if $\varphi_1, \cdots, \varphi_n \vdash \psi$
+then $\llbr{\varphi_1} \cap \cdots \cap \llbr{\varphi_n} \subseteq \llbr{\psi}$,
 where $\vdash$ is intuitionistic syntactic entailment.
-\end{itemize}
+In this sense the Kripke semantics provides a ``domain-specific reinterpretation''
+of the usual rules of propositional logic, where each formula \(\varphi\)
+denotes a monotone subset \(\llbr{\varphi}\) of the poset \(W\).
+
+As an example of this kind of reinterpretation,
+consider the poset \(\N\) ordered by \emph{reverse} inclusion,
+so that a natural number \(n\) is accessible from \(m\) if \(n\) is \emph{smaller} than \(m\).
+This gives a semantics of intuitionistic propositional logic that is used in \emph{step-indexing}~\cite{dreyer2009logical}.
 
 \section{Presheaf semantics}
-\begin{itemize}
-    \item Now we can begin to generalize from the previous situation 
-    to be categorical.
-    \item The partial order of worlds $(\mathbb{W}, \le)$ becomes 
-    a category $\calC$. 
-    \item Continuing with our example, we have $\calC$ is:
 
-    \begin{center}
-       % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRACEYAzCAJ1YC+pdJlz5CKAIzkqtRizYAlGAGMYYHAwCeIISOx4CRAEwzq9Zq0QgAchADuu2TCgBzeEVBdeEALZIyEBwIJEk9EG8-UOpgpGMBCgEgA
-\begin{tikzcd}
-    Before \arrow[r] & Recently \arrow[r] & Now
-    \end{tikzcd} 
-    \end{center}
+Presheaf semantics generalizes the poset \((W,\le)\) from Kripke semantics
+to a category \(\calC\).
+Elements \(w\in W\) are generalized to objects \(c\) of \(\calC\)
+and the accessibility relation \(w' \ge w\) is generalized to a morphism \(f : c' \to c\).
+There are two things to note about this generalization.
+First, there can now be multiple such morphisms \(f\) between any two given objects;
+intuitively, this is like a generalization of traditional Kripke semantics
+where there can be multiple different ``ways'' of going from one world to another.
+Second, there is a bit of reversal of direction going on:
+the accessibility relation \(w' \ge w\) becomes the existence of a morphism \(c' \to c\).
+This reversal of direction has to do with the fact that presheaves on a category \(\calC\)
+are contravariant; i.e., functors \(\calC^{\mathsf{op}}\to \Set\).
 
-    \item A  monotone subset (i.e., a Kripke monotone predicate)
-    is a presheaf $\calC^\text{op}$. For example, 
-    we can have the following presheaf:
+Rather than interpreting each formula as a monotone subset of \(W\),
+the presheaf semantics interprets each formula as what is called a \emph{sieve} on \(\calC\).
+\begin{definition}
+  A \emph{sieve} on a category \(\calC\) is a collection of morphisms \(S\) in \(\calC\)
+  that is closed under precomposition in the sense that if \(c' \mor{f} c\) is in \(S\)
+  then so is \(c'' \mor{g} c' \mor{f} c\) for any morphism \(c'' \mor{g} c'\).
+\end{definition}
+Intuitively, a sieve \(S\) containing a morphism \(c' \mor{f} c\) represents
+a proposition \(\varphi\) where, if one is currently in world \(c\),
+then \(\varphi\) will become true if one transitions to world \(c'\) via \(f\).
+The requirement that \(S\) be closed under precomposition
+provides a generalization of monotonicity.
 
-    \begin{center}
-        \includegraphics[width=300px]{fig/planet-psh.png}
-    \end{center}
+The \emph{presheaf semantics} is the corresponding generalization of Kripke semantics
+where propositions are interpreted as sieves:
+\begin{align*}
+  \llbr{-} &: \text{Formula} \to \{\text{sieves on }\calC\} \\
+  \llbr{\top} &= \text{the set of all morphisms in \(\calC\)} \\
+  \llbr{\bot} &= \varnothing \\
+  \llbr{\varphi\land\psi} &= \llbr{\varphi} \cap \llbr{\psi}\\
+  \llbr{\varphi\lor \psi} &= \llbr{\varphi} \cup \llbr{\psi}\\
+  \llbr{\varphi\Rightarrow\psi} &=
+  \{c' \mor{f}c \mid
+  \text{for all \(c'' \mor{g} c'\), if \(f\circ g \in \llbr{\varphi}\) then \(f\circ g \in \llbr{\psi}\)}
+  \}
+\end{align*}
+Just like in the Kripke semantics, the presheaf
+semantics for Kripke logic will also validate intuitionistic
+logic entailments.
 
-\end{itemize}
+The following proposition verifies that the presheaf semantics indeed generalizes the posetal case.
+\begin{proposition}
+  For any poset \((W,\le)\), monotone subsets of \(W\)
+  are the same as sieves on \(W^{\mathsf{op}}\), where \(W\)
+  is considered as a thin category,
+  and the presheaf semantics agrees with the Kripke semantics.
+\end{proposition}
+In particular, the Kripke semantics for step-indexed logic corresponds to
+the presheaf semantics for the usual poset of natural numbers \((\N,\le)\) made into a thin category.
+(Note that, unlike in the last section, this poset has the natural numbers ordered in the usual way.
+The appearance of \(\mathsf{op}\) in the presheaf semantics automatically performs the reversal
+of the ordering relation that we did manually in the last section.)
 
-\subsection{Formulas as subpresheaves}
+%% \begin{itemize}
+%%     \item Now we can begin to generalize from the previous situation
+%%     to be categorical.
+%%     \item The partial order of worlds $(\mathbb{W}, \le)$ becomes
+%%     a category $\calC$.
+%%     \item Continuing with our example, we have $\calC$ is:
 
-\begin{itemize}
-    \item Now we want to be able to interpret formulae $\varphi$ 
-    with some free variables where $\Gamma \vdash \varphi$.
-    As usual, we can associate the context $\Gamma$ with some 
-    object $\lceil \Gamma \rceil$
-    \item An entailment $\Gamma \vdash \varphi$ is a \emph{subpresheaf}, 
-    which is a part of a presheaf that respects Kripke monotonicity.
-    I.e., it is a monic natural transformation $U \to \lceil \Gamma \rceil$ 
-    for some presheaf $U$
+%%     \begin{center}
+%%        % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRACEYAzCAJ1YC+pdJlz5CKAIzkqtRizYAlGAGMYYHAwCeIISOx4CRAEwzq9Zq0QgAchADuu2TCgBzeEVBdeEALZIyEBwIJEk9EG8-UOpgpGMBCgEgA
+%% \begin{tikzcd}
+%%     Before \arrow[r] & Recently \arrow[r] & Now
+%%     \end{tikzcd}
+%%     \end{center}
 
-    \item For example, the following is a subpresheaf: \todo{}
+%%     \item A  monotone subset (i.e., a Kripke monotone predicate)
+%%     is a presheaf $\calC^\text{op}$. For example,
+%%     we can have the following presheaf:
 
-    \item Now we can define a semantic interpretation $\lceil
-    \rceil(w)$ as a collection of morphisms $w_1 \to w$
-    that satisfies a category-theoretic analog of Kripke monotinicity 
-    called \emph{generalized monotinicity:}
-    if $(w' \mor{f} w) \in \lceil \Gamma \vdash \varphi \rceil(w)$
-    and $w'' \mor{g} w'$, then the composite 
-    $(w'' \mor{g} w \mor{f} w) \in \lceil \Gamma \vdash \varphi \rceil(w)$.
+%%     \begin{center}
+%%         \includegraphics[width=300px]{fig/planet-psh.png}
+%%     \end{center}
 
-    \begin{align*}
-        \lceil \top \rceil(w) &= \{ w' \mor{f} w \mid w' \text{ any object}\} \\
-        \lceil \bot \rceil(w) &= \emptyset \\
-        \lceil \varphi \land \psi \rceil &=
-        \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w) 
-        \text{ and } 
-        f \in \lceil \psi \rceil (w)\}\\
-        \lceil \varphi \lor \psi \rceil &=
-        \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w) 
-        \text{ or } 
-        f \in \lceil \psi \rceil (w)\}
-        \lceil \varphi \Rightarrow \psi \rceil &= \\
-        \{f : w' \to w \mid \forall g : w'' \to w'. 
-        \text{if } (w''' \mor{g} w' \mor{f} w) \in \lceil \varphi \rceil&
-        \text{ then } (w''' \mor{g} w' \mor{f} w) \in \lceil \psi \rceil\}
-    \end{align*}
-    \item These are the \emph{generalized Kripke semantics}:
-    these apply to any presheaf.
-%     \item Implication is interesting:  you interpret 
-%         $\lceil \varphi \Rightarrow \psi \rceil(w)$ as a monic 
-%         map of type
-%         % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQBGclVqMWbADrSGAYxhYGAAlkBxOgFstdNdIBOi5d3EwoAc3hFQAMwMQtSMiBwQko13ROIvJrhRcQA
-% \begin{tikzcd}
-%     U \arrow[r, tail] & \lceil \Gamma \rceil
-%     \end{tikzcd}
-%     We can reverse engineer what this monic map is by examining 
-%     the order-theoretic definition:
-%     \begin{align*}
-%         \Big\{ w \mor{g} w_{cur} \mid \forall w' \mor{f} w . \text{if }
-%         (w' \mor{f} w \mor{g} w_cur) \in \lceil \phi \rceil 
-%         \text{ then } (w' \mor{f} w \mor{g} w_cur) \in \lceil \psi \rceil \Big\}
-%     \end{align*}
+%% \end{itemize}
 
-\end{itemize}
+%% \subsection{Formulas as subpresheaves}
 
-\subsection{Example of presheaf semantics}
-\begin{itemize}
-    \item As an initial example, consider the topos of trees, i.e. presheaves on
-    $(\mathbb{N}, \le)$. 
-    \item Then, the interpretation of predicates $\lceil \varphi \rceil$ 
-    are Kripke-monotone subsets of the natural numbers.
+%% \begin{itemize}
+%%     \item Now we want to be able to interpret formulae $\varphi$
+%%     with some free variables where $\Gamma \vdash \varphi$.
+%%     As usual, we can associate the context $\Gamma$ with some
+%%     object $\lceil \Gamma \rceil$
+%%     \item An entailment $\Gamma \vdash \varphi$ is a \emph{subpresheaf},
+%%     which is a part of a presheaf that respects Kripke monotonicity.
+%%     I.e., it is a monic natural transformation $U \to \lceil \Gamma \rceil$
+%%     for some presheaf $U$
 
-    \item A more interesting example is the presheaf semantics for 
+%%     \item For example, the following is a subpresheaf: \todo{}
+
+%%     \item Now we can define a semantic interpretation $\lceil
+%%     \rceil(w)$ as a collection of morphisms $w_1 \to w$
+%%     that satisfies a category-theoretic analog of Kripke monotinicity
+%%     called \emph{generalized monotinicity:}
+%%     if $(w' \mor{f} w) \in \lceil \Gamma \vdash \varphi \rceil(w)$
+%%     and $w'' \mor{g} w'$, then the composite
+%%     $(w'' \mor{g} w \mor{f} w) \in \lceil \Gamma \vdash \varphi \rceil(w)$.
+
+%%     \begin{align*}
+%%         \lceil \top \rceil(w) &= \{ w' \mor{f} w \mid w' \text{ any object}\} \\
+%%         \lceil \bot \rceil(w) &= \emptyset \\
+%%         \lceil \varphi \land \psi \rceil &=
+%%         \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w)
+%%         \text{ and }
+%%         f \in \lceil \psi \rceil (w)\}\\
+%%         \lceil \varphi \lor \psi \rceil &=
+%%         \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w)
+%%         \text{ or }
+%%         f \in \lceil \psi \rceil (w)\}
+%%         \lceil \varphi \Rightarrow \psi \rceil &= \\
+%%         \{f : w' \to w \mid \forall g : w'' \to w'.
+%%         \text{if } (w''' \mor{g} w' \mor{f} w) \in \lceil \varphi \rceil&
+%%         \text{ then } (w''' \mor{g} w' \mor{f} w) \in \lceil \psi \rceil\}
+%%     \end{align*}
+%%     \item These are the \emph{generalized Kripke semantics}:
+%%     these apply to any presheaf.
+%% %     \item Implication is interesting:  you interpret
+%% %         $\lceil \varphi \Rightarrow \psi \rceil(w)$ as a monic
+%% %         map of type
+%% %         % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQBGclVqMWbADrSGAYxhYGAAlkBxOgFstdNdIBOi5d3EwoAc3hFQAMwMQtSMiBwQko13ROIvJrhRcQA
+%% % \begin{tikzcd}
+%% %     U \arrow[r, tail] & \lceil \Gamma \rceil
+%% %     \end{tikzcd}
+%% %     We can reverse engineer what this monic map is by examining
+%% %     the order-theoretic definition:
+%% %     \begin{align*}
+%% %         \Big\{ w \mor{g} w_{cur} \mid \forall w' \mor{f} w . \text{if }
+%% %         (w' \mor{f} w \mor{g} w_cur) \in \lceil \phi \rceil
+%% %         \text{ then } (w' \mor{f} w \mor{g} w_cur) \in \lceil \psi \rceil \Big\}
+%% %     \end{align*}
+
+%% \end{itemize}
+
+A more interesting example is the presheaf semantics for 
     name generation. 
-
-    \item We will take as our indexing category the category of 
-    finite injective maps $\mathsf{FinInj}^\text{op}$. 
+We will take as our indexing category the category of 
+    finite injective maps $\mathsf{FinInj}^{\mathsf{op}}$.
     Objects are finite sets $\Gamma$ and 
     homs are injection functions $\Gamma \to \Gamma'$.
-    Intuitively, this represents how names can change over time:
-    an injective map $\Gamma \to \Gamma'$ is some renaming.
+Intuitively, this represents how names can change over time:
+    an injective function $\Gamma \to \Gamma'$
+    expands the set of available names from \(\Gamma\) to \(\Gamma'\),
+    while possibly renaming the variables in \(\Gamma\) along the way.
 
-    \item In the semantics, $\lceil \varphi \rceil (\Gamma)$ 
-    is the set of renamings $r : \Gamma \to \Gamma'$ such 
-    that $\varphi$ holds when $\Gamma'$ is ``available'', i.e., 
-    $\Gamma$ is rewritten into some new context $\Gamma'$ that 
-    validates $\psi$. 
+In the resulting presheaf semantics, the interpretation \(\llbr{\varphi}\)
+of a proposition \(\varphi\) is the set of renamings
+$r : \Gamma \to \Gamma'$ such 
+that $\varphi$ holds when $\Gamma'$ is ``available'', i.e., 
+$\Gamma$ is rewritten into some new context $\Gamma'$ that 
+validates $\varphi$. 
 
-    \item Notice that this is \emph{proof-relevant} in the sense 
-    that the kind of substitution performed matters: there can be 
-    many injective maps $\Gamma \to \Gamma'$
-    
-    \item As usual the interesting case here is implication,
-    which can be read off directly from the Kripke semantics above.
-    
-    \item Just like in the Kripke semantics, the presheaf 
-    semantics for Kripke logic will also validate intuitionistic 
-    logic entailments.
-\end{itemize}
-
+Notice that this is \emph{proof-relevant} in the sense 
+that the kind of substitution performed matters: there can be 
+many injective maps $\Gamma \to \Gamma'$.
+As usual the interesting case here is implication,
+which can be read off directly from the Kripke semantics above.
 
 \section{Sheaves}
-
-\begin{itemize}
-    \item At this point we've hit most of the common PL applications.
-    Presheaf semantics get you very far: it is not that common to 
+At this point we've hit most of the common PL applications.
+    Presheaf semantics get you very far: it is not that common to
     need to use sheaves.
-    \item The definition of sheaf semantics will depend on a notion 
-    of \emph{coverage}. We can state the semantics first and then 
-    explain what a coverage is after. These definitions are nearly 
-    the same as presheaf semantics, but we only update the 
-    portions that affect positive types (negation, disjunction):
 
-    \todo{fill this in}
-    \begin{align*}
-        \lceil \top \rceil(w) &= \{ w' \mor{f} w \mid w' \text{ any object}\} \\
-        \lceil \bot \rceil(w) &= \{ f : w' \to w \mid \phi \text{ covers } w\} \\
-        \lceil \varphi \land \psi \rceil &=
-        \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w) 
-        \text{ and } 
-        f \in \lceil \psi \rceil (w)\}\\
-        \lceil \varphi \lor \psi \rceil &=
-        \{f  : w' \to w \mid f \in \lceil \varphi \rceil (w) 
-        \text{ or } 
-        f \in \lceil \psi \rceil (w)\}
-        \lceil \varphi \Rightarrow \psi \rceil &= 
-        \{f : w' \to w \mid \forall g : w'' \to w'. 
-        \text{if } (w'' \mor{g} w' \mor{f} w) \in \lceil \varphi \rceil&
-        \text{ then } (w'' \mor{g} w' \mor{f} w) \in \lceil \psi \rceil\}
-    \end{align*}
+Whereas presheaf and Kripke semantics are well-suited to modeling
+\emph{when} a proposition becomes true,
+sheaves are well-suited to modeling \emph{where}
+a proposition becomes true.
+Sheaves interpret objects \(c\) of the indexing category \(\calC\)
+not as states of knowledge, but rather as \emph{spaces};
+morphisms \(f : c' \to c\) represent \emph{subspace inclusions}
+that map a smaller space \(c'\) into a larger space \(c\).
+The sheaf semantics then models the spaces where a given proposition is true.
+The monotonicity requirements of Kripke and presheaf semantics
+continue to be relevant under this spatial reading:
+if a proposition holds in a space \(c\),
+then one would intuitively still expect it to hold in a subspace \(c'\)
+picked out by some inclusion \(f : c' \to c\).
+But the spatial setting provided by sheaf semantics adds an additional twist
+not present in the more temporal reading provided by presheaf and Kripke semantics:
+it is possible for a family of ``subspaces'' \(\{f_i : c'_i \to c\}_{i\in I}\)
+to jointly \emph{cover} a space \(c\).
 
-    \item Include picture from phone, nice analogy of topological
-    picture of coverage
+The spatial interpretation offered by sheaf semantics affects the reading of disjunction.
+The Kripke/presheaf reading of disjunction says that \(\varphi\lor\psi\)
+holds on a space \(w\) if either \(\varphi\) holds on all of \(w\)
+or \(\psi\) holds on all of \(w\). But there is a third possibility:
+perhaps \(\varphi\) holds on some piece \(w_1\) of \(w\),
+and \(\psi\) holds on some piece \(w_2\) of \(w\),
+and together \(w_1,w_2\) cover \(w\).
 
-    \item Definition of coverage
+A simple example is given by interpreting ``space'' as ``subset of \(\R\)''
+and ``inclusion'' as subset inclusion.
+These spaces along with their inclusion relations forms a thin category \(\wp(\R)\).
+Families of morphisms with a common codomain \(U\) in this setting
+are families \((U_i)_{i\in I}\) of subsets of \(\R\)
+where \(U_i \subseteq U\) for all \(i\in I\).
+It is then natural to say that such a family \emph{covers} \(U\)
+if they union to \(U\): \(\bigcup_i U_i = U\).
+The sheaf semantics for this notion of cover
+interprets each proposition \(\varphi\)
+as a collection \(\llbr{\varphi}\) of subsets of \(\R\);
+a subset \(U\) is in \(\llbr{\varphi}\)
+if ``\(\varphi\) is true everywhere in \(U\)''.
+For example, one can define an atomic proposition \(\varphi =\)``is less than one''
+whose interpretation \(\llbr{\varphi}\) is the collection of all those subsets \(U\) of \(\R\)
+contained in the \((-\infty,1)\),
+and an atomic proposition \(\psi =\)``is greater than zero''
+whose interpretation \(\llbr{\psi}\) is the collection of all those subsets contained in \((0,\infty)\).
+Now consider the disjunction \(\varphi \lor \psi\).
+Intuitively, this proposition should hold \emph{everywhere} in \(\R\),
+as every real number is either less than one or greater than zero:
+we should expect \(\llbr{\varphi\lor\psi} = \llbr{\top} = \) the set of all subsets of \(\R\).
+But the presheaf semantics says that \(\llbr{\varphi\lor\psi} = \llbr{\varphi} \cup \llbr{\psi}\),
+which consists only of those subsets of \(\R\) are either contained in \((-\infty,1)\)
+or \((0,\infty)\).
+The sheaf semantics corrects this by taking into account the fact that \((0,\infty)\) and \((-\infty,1)\)
+form a \emph{cover} of \(\R\): a disjunction \(\varphi\lor\psi\) holds on a subset \(U\) of \(\R\)
+under the sheaf semantics if there is a covering \(U = U_1 \cup U_2\) of \(U\) by two subspaces \(U_1,U_2\)
+such that \(\varphi\) holds on \(U_1\) and \(\psi\) holds on \(U_2\).
 
-    \item Example: a set of formulae $\{ \varphi_1, \cdots, \varphi_n \} \triangle \varphi$ 
-    if and only if $\bigvee_i \varphi_i = \varphi$.
+More generally,
+the sheaf semantics is parameterized by a relation \(T\) called a \emph{coverage}
+that says when a given family of morphisms \(\{f_i : c_i \to c\}_{i\in I}\) with common codomain \(c\)
+counts as a cover of \(c\).
+\begin{definition}
+  A \emph{coverage} on a category \(\calC\) is a relation \(T\)
+  between families of morphisms with common codomain \(c\) and objects \(c\) of \(\calC\).
+  If \(T\) relates a family \(\{f_i : c_i \to c\}_{i\in I}\) to an object \(c\) we say that
+  \(\{f_i : c_i \to c\}_{i\in I}\) is a \emph{\(T\)-cover} of \(c\).
+  The relation \(T\) must satisfy the following properties:
+  \begin{itemize}
+    \item Reflexivity: the singleton set \(\{\mathsf{id}_c : c \to c\}\) is in \(T\) for every object \(c\)
+    \item Transitivity: if \(\{f_i : c_i \to c\}_{i\in I}\) is in \(T\) and for every \(i\in I\)
+      there is a family \(\{f_{ij} : c_{ij} \to c_i\}_{j\in J_i}\) in \(T\),
+      then the family \(\{ f_i f_{ij} : c_{ij} \to c \}_{i\in I,j\in J_i}\) is in \(T\)
+    \item Stability: if \(\{f_i : c_i \to c\}_{i\in I}\) is in \(T\)
+      and \(g : c' \to c\) is an arbitrary morphism into \(c\),
+      then there exists a family \(\{f_j' : c_j' \to c'\}_{j\in J}\)
+      such that every \(gf_{j}'\) factors through some \(f_i\);
+      that is, for every \(j\in J\) there exists an \(i\in I\)
+      such that \(gf_{j} = f_ig'\) for some \(g'\).
+  \end{itemize}
+\end{definition}
+These coverage conditions are best visualized as closure conditions on families of morphisms drawn as trees.
+Reflexivity says that the trivial tree with just an identity morphism counts as a cover;
+transitivity says that a family of covering trees can be grafted onto another to form a new covering tree;
+stability says that a covering tree can be ``pulled back'' along a morphism \(g : c' \to c\).
+
+With the definition of coverage in hand, the sheaf semantics of intuitionistic propositional logic
+is as follows.
+\begin{align*}
+  \llbr{-} &: \text{Formula} \to \{\text{sieves on }\calC\} \\
+  \llbr{\top} &= \text{the set of all morphisms in \(\calC\)} \\
+  \llbr{\bot} &= \{f : c' \to c \mid \text{\(\varnothing\) is a \(T\)-cover of \(c\)}\}
+  \\
+  \llbr{\varphi\land\psi} &= \llbr{\varphi} \cap \llbr{\psi}\\
+  \llbr{\varphi\lor \psi} &= \{ f : c' \to c \mid \text{there is a \(T\)-cover \(\{f_i : c_i \to c'\}_{i\in I}\) of \(c'\)
+    such that \(ff_i\in\llbr{\varphi}\) or \(ff_i\in\llbr{\psi}\) for all \(i\)}\} \\
+  \llbr{\varphi\Rightarrow\psi} &=
+  \{c' \mor{f}c \mid
+  \text{for all \(c'' \mor{g} c'\), if \(f\circ g \in \llbr{\varphi}\) then \(f\circ g \in \llbr{\psi}\)}
+  \}
+\end{align*}
+Like the presheaf semantics, this semantics interprets each proposition as sieve.
+But the sheaf semantics satisfies an additional invariant.
+Each sieve produced by the sheaf semantics is what is known as \emph{\(T\)-closed};
+we omit the formal definition here, but intuitively this says that if a proposition holds
+for every component of a covering family, then it holds for the space covered.
+
+Examples of coverages:
+\begin{itemize}
+  \item The notion of cover for subsets of \(\R\) forms a coverage on \((\wp(\R),\subseteq)\) considered as a thin category.
+  \item One can place a coverage on the category \(\mathsf{Formula}\) of propositional formulae
+    that says that a finite set \(\varphi_1,\dots,\varphi_n\) covers a formula \(\varphi\)
+    if \(\varphi_1\lor\dots\lor\varphi_n \dashv\vdash \varphi\).
+    Intuitively, this notion of coverage corresponds to the notion of cover one would get
+    by intepreting formulas as sets of models.
+  \item A more exotic notion of coverage, for the category \(\mathsf{FinInj}^{\mathsf{op}}\),
+    is given by declaring any singleton set to be a cover (that is, \(\{r : \Gamma \to \Gamma'\}\)
+    covers \(\Gamma\) for any \(\Gamma,\Gamma',r\).).
+    This coverage corresponds to a category of sheaves known as the \emph{Schanuel topos},
+    and produces a sheaf semantics that can be used to talk about name generation
+    as modeled by \emph{nominal sets}~\cite{pitts2013nominal}.
 \end{itemize}
+
+\subsection{Where are the categories?}
+
+One might have noticed that categories of presheaves or sheaves have not played a role
+in any of the above. This is because we have restricted the discussion to propositional logic.
+Moving from propositional to first-order logic requires interpreting formulas-in-context \(\Gamma\vdash\varphi\),
+which in turn requires interpreting contexts \(\Gamma\) and upgrading the semantics of formulas
+to include substitutions \(\gamma \in \llbr{\Gamma}\).
+It will turn out that this upgrade requires interpreting each \(\llbr{\Gamma}\) as a presheaf (in the presheaf semantics)
+or sheaf (in the sheaf semantics).
+
+We briefly sketch how this interpretation works.
+Recall the planetary picture from before.
+Turning this picture on its side, we obtain
+a balloon diagram lying over the category \(W^{\mathsf{op}}\),
+where \(W\) is the poset \(\text{before}\le\text{recently}\le\text{now}\).
+This balloon diagram defines a presheaf \(\mathsf{Sky}\) on \(W^{\mathsf{op}}\),
+whose elements model our conception of objects in the night sky over time.
+This presheaf can serve as the interpretation of a basic sort \(\mathtt{Sky}\) of a first-order intuitionistic logic.
+Logical predicates \(x\ofty\mathtt{Sky} \vdash \varphi(x)\) then denotes subpresheaves:
+for instance, the points in the diagram highlighted in yellow depict a subpresheaf
+corresponding to the predicate \(\varphi\) that out those objects that
+are considered planets through to the present day.
