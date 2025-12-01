@@ -1,0 +1,312 @@
+\chapter{Monads}
+
+\marginnote{A monad is just a monoid in the category of endoburritos.}
+Monads are widely used for structuring effectful computation in functional
+programs.  For example, we can have a small functional programming language with
+a monadic type-former $\plkw{T}$:
+
+\begin{gather}
+  \begin{aligned}
+   A,B ::=& \plkw{Unit}
+     \mid A \pltimes B
+     \mid A \plto B 
+     \mid \plkw{T}~A
+  \\
+  M,N ::=& \plunit{}
+      \mid \plpair{M}{N}
+      \mid \plfst{M}
+      \mid \plsnd{M}
+      \mid \pllam{x}{M}
+      \mid \plapp{M}{N}
+      \mid x \\
+      & \mid \plpure{M} 
+      \mid x \leftarrow M; N
+  \end{aligned}
+\end{gather}
+
+The syntax $\plpure{M}$ \emph{lifts} a pure computation into a monadic
+one, and the syntax $x \leftarrow M; N$ is a \emph{monadic bind}
+that enables computation inside the monad. The way that these 
+syntactic forms are used is best understood via their typing judgments:
+
+\begin{mathpar}
+    \inferrule{\Gamma \vdash M : A}{\Gamma \vdash \plpure{M} : \plkw{T}~A}
+    \qquad
+    \inferrule{\Gamma \vdash M : \plkw{T}~A
+    \qquad
+    \Gamma, x : A \vdash N : \plkw{T}~B
+    }{\Gamma \vdash x \leftarrow M; N : \plkw{T}~B}
+\end{mathpar}
+
+
+
+If you've programmed in Haskell, you're quite familiar with 
+examples of monads. A simple example is the \texttt{Maybe}
+monad, which lets you program with values that can 
+be either \texttt{Nothing} or \texttt{Just} a value. 
+This makes it a convenient pattern for implementing 
+and sequencing partial functions, as the following Haskell code 
+illustrates:
+
+\begin{lstlisting}
+divide :: Double -> Double -> Maybe Double
+divide a 0 = Nothing
+divide a b = Just $ a / b
+
+my_computation :: Double -> Maybe Double
+my_computation x = do
+  div1 <- divide 10 x;
+  div2 <- divide 20 x;
+  divide div1 div2
+\end{lstlisting}
+
+As usual for this book let's consider now the denotational semantics of monads.
+Let's start with the type former $\plkw{T}~M$.
+We typically think of the interpretation of types as ``a space of values that
+behave like a type'', where we use universal properties to characterize what it
+means to behave like a type. A monad is a new and exciting creature when viewed from 
+this lens: it \emph{takes in a type $A$} (so it is higher-order), and it 
+produces a \emph{new type} $\dbracket{\plkw{T}~A}$  that has $A$ living inside of it.
+This feels very functorial. We can couple this intuition with the requirement 
+that denotational semantics be defined compositionally, and we can arrive at the 
+conclusion that \emph{$\dbracket{\plkw{T}}$ is a functor}:
+\begin{align}
+    \dbracket{\plkw{T}~A} = \dbracket{\plkw{T}}(\dbracket{A})
+\end{align}
+
+Concretely, suppose we are interpreting our small higher-order language in 
+some Cartesian-closed category $\calC$. Then, $\dbracket{\plkw{T}}$ 
+is an \emph{endofunctor} $\dbracket{\plkw{T}} : \calC \to \calC$, a particular 
+kind of functor from a category into itself.
+
+As usual we don't know what kind of properties the functor
+$\dbracket{\plkw{T}~A}$ must have yet; to see those, we'll need to
+reverse-engineer them from how monads are used. Let's start by 
+examining \texttt{pure}. By our usual translation of typing judgments 
+into morphisms, we can conclude that 
+$\dbracket{\Gamma \vdash \plpure{M} : \plkw{T}~A}$ 
+must have type $\dbracket{\Gamma} \to \dbracket{\plkw{T}}(\dbracket{A})$.
+We need to build this morphism.
+We know how to get close to it: 
+$\dbracket{M : A}$ has type $\dbracket{\Gamma} \to \dbracket{A}$.
+But, we need an extra morphism to get from $A$ to $\plkw{T}~A$: 
+this is called the \emph{unit} of the monad at $\dbracket{A}$, and will be denoted 
+$\eta_{\dbracket{A}}$:
+\begin{align*}
+    \dbracket{\Gamma \vdash \plkw{pure}~M :\plkw{T}~A} = 
+    \dbracket{\Gamma} \mor{\dbracket{M}} \dbracket{A} \mor{\eta_{\dbracket{A}}} \dbracket{\plkw{T}}(\dbracket{A})
+\end{align*}
+
+In Haskell, $\eta$ is called \texttt{pure} or \texttt{return}. 
+Notably, in Haskell, \texttt{pure} is a polymorphic function of 
+type \texttt{a -> m a} for some monad \texttt{m} and type 
+parameter \texttt{a}. This is a polymorphic function, 
+so it makes sense to think of $\eta$ as a \emph{natural transformation}
+$\eta : \id_\calC \Rightarrow T$.
+
+\begin{lstlisting}
+class Functor m => Monad m where
+  return :: alpha -> m alpha
+  join :: m (m alpha) -> m alpha
+\end{lstlisting}
+
+Interpreting bind:
+
+ \begin{align*}
+    \dbracket{\inferrule{\Gamma \vdash M : \plkw{T}~A \and 
+    \Gamma, x : A \vdash N : \plkw{T}~B
+    }{\Gamma \vdash x \leftarrow M; N : \plkw{T}~B}}
+    &: \dbracket{\Gamma} \to \dbracket{\plkw{T}}(\dbracket{B}) \\ 
+    = \dbracket{\Gamma} &\mor{\langle \id, \dbracket{M} \rangle} \dbracket{\Gamma} \times \dbracket{\plkw{T}}(\dbracket{A}) \\
+    &\mor{\text{strength}} \dbracket{T}(\dbracket{\Gamma} \times \dbracket{A}) \\ 
+    &\mor{\dbracket{\plkw{T}}(\dbracket{N})} \dbracket{\plkw{T}} \Big( \dbracket{\plkw{T}}(\dbracket{B}) \Big) \\
+    &\mor{\mu} \dbracket{\plkw{T}}(\dbracket{B})
+\end{align*}
+
+% \marginnote{\url{http://blog.sigfpe.com/2023/08/what-does-it-mean-for-monad-to-be-strong.html}}
+% \begin{lstlisting}
+% strength :: Monad m => (x, m y) -> m (x, y)
+% strength (x, my) = do
+%   y <- my
+%   return (x, y)
+% \end{lstlisting}
+
+\section{What's the problem?}
+\begin{quote}
+    ``A monad is just a monoid in the category of endofunctors, what's the 
+    problem?''
+
+    \emph{-- Phil Wadler}
+\end{quote}
+
+We've seen how a monad consists of (1) an endofunctor $T :
+\calC \to \calC$; (2) a \emph{unit} natural transformation $\eta : \id_\calC \Rightarrow T$
+(3) a \emph{multiplication (or join)} natural transformation $\mu : T^2 \Rightarrow T$.
+As usual, these special morphisms must satisfy certain laws in order to 
+behave coherently. 
+In particular, these two natural transformations need to satisfy natural \emph{monoid laws}.
+Recall the definition of a monoid:
+\begin{definition}[Monoid]
+    A \emph{monoid} is a triple $(X, \bullet, e)$ where $X$ is a set, $\bullet$ is a 
+    \emph{multiplication operator} $\bullet : X \times X \to X$,
+    and $e \in X$ is a distinguished \emph{unit element} satisfying:
+    (1) \emph{associativity}: for any $a, b, c \in X$ 
+    it is the case that $a \bullet (b \bullet c) = (a \bullet b) \bullet c$ 
+    and (2) unitality: for any $a \in X$ it is the case that $a \bullet e = e \bullet a = a$.
+\end{definition}
+
+A monad will satisfy categorical analogs of the monoid laws: the unit natural trasnformation $\eta$ 
+must behave like a monoidal unit, and the multiplication natural transformation $\mu$ 
+must behave like a monoidal product.
+Let's examine associativity first.
+This requirement can be captured by the following commutive square:
+
+\begin{equation}
+   % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRABUA9AZhAF9S6TLnyEUARnJVajFmy4AmfoJAZseAkTLjp9Zq0QdOSgUPWiikndT1zD7ftJhQA5vCKgAZgCcIAWyQyEBwIJEkQBiwwAxAoCCYAIwZWagALGDooJDAmBgZqHDosBjZIaJAbWRj2AB0avyYAAmUvXwDEIJCkBWpI8sM4xOSKkHTM7Nz84KKSwzKUmX02OobGh1MQH38wgtDEbl6omMGkhbGsxBy8gpnSggXbGJWmFs227t2kA4ijthPhtIZC5XKaFYp3cqVJaGZ6OPhAA
+\begin{tikzcd}
+    T^3 \arrow[r, "T\mu ", Rightarrow] \arrow[d, "\mu T", Rightarrow] & T^2 \arrow[d, "\mu", Rightarrow] \\
+    T^2 \arrow[r, "\mu", Rightarrow]                                  & T                               
+    \end{tikzcd} 
+\label{eq:monad-assoc}
+\end{equation}
+
+This square has some unfamiliar notation in it: the 
+natural transformations $T \mu$ is given by composing 
+the natural transformation $\mu$ with the functor $T$. Concretely,
+the natural transformation $T \mu$ has components 
+$(T \mu)_A : T^3(A) \to T^2(A)$ given by 
+composing $T$ with each component of $\mu$, 
+i.e. $(T \mu)_A = T \circ \mu_A$. 
+The definition for $\mu T$ is analogous.
+
+The next requirement on the monad natural transformations is that $\eta$ 
+behaves like a monoidal unit. This is captured by the following commuting diagram:
+
+\begin{equation}
+ % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRABUQBfU9TXfIRQBGclVqMWbdgD0ATN14gM2PASJyx1es1aIOivqsFFRw8Tqn7OXcTCgBzeEVAAzAE4QAtkjIgcEEgAzNQMWGB6IFAQTABGDKzUABYwdFBIYEwMDNQ4dFgMbJARIKF0sTAMAAr8akIg7lgOSTilErpsADqdODAAHjjAWFBcAPo2Sh7eSJr+gYghIGEl+tFxCW0paRlZOf75hfrFie1WIN29A0Mj44YgUz6IonPBoeGRa-EnW+mImdm5A5FAgnSyRbpeJh3B6+XLzZ7LD4xL6bVK-f57PIFYElbSScGdGB5AAEEzcnkeswCSAR7zYnw2yTROwB+2xRxBbTB0mJ3SJdGJbQY5UqNWM6n0jWarVsXCAA
+\begin{tikzcd}
+    T \arrow[rd, "\text{id}_T"', Rightarrow] \arrow[r, "\eta T", Rightarrow] & T^2 \arrow[d, "\mu", Rightarrow] & T \arrow[ld, "\text{id}_T", Rightarrow] \arrow[l, "T \eta "', Rightarrow] \\
+                                                                             & T                                &                                                                          
+    \end{tikzcd}
+    \label{eq:monad-unit}
+\end{equation}
+
+There are two faces of this diagram each capturing one of the unitality 
+requirements. The left square asserts that $\mu \circ \eta T = \id_T$,
+and the right square asserts that $\mu \circ T \eta = \id_T$; these 
+equations correspond naturally to the monoid unitality law.
+Together, these equations define a monad:
+
+\begin{definition}[Monad]
+    \sloppy
+    Let $\calC$ be a category. A \emph{monad} on $\calC$ 
+    is a triple $(T, \eta, \mu)$ where 
+$T :
+\calC \to \calC$ is an endofunctor,  $\eta : \id_\calC \Rightarrow T$
+is the \emph{unit} natural transformation,
+and  $\mu : T^2 \Rightarrow T$
+is a \emph{multiplication (or join)} natural transformation,
+satisfying the associativity law in \cref{eq:monad-assoc}
+and unit law in \cref{eq:monad-unit}.
+\end{definition}
+
+
+\section{Examples of monads}
+
+\subsection{Maybe monad}
+\begin{itemize}
+    \item Let $F : \FinSet \to FinSet$ be a functor:
+    \begin{itemize}
+        \item Action on objects: $A \mapsto A \uplus \{\star\}$
+        \item Action on morphisms $ f : A \to B$: 
+        \begin{align*}
+            F(f) = a \mapsto \begin{cases}
+                \mathsf{inl}~f(x) \quad& \text{if } a = \mathsf{inl}~x \\ 
+                \mathsf{inr}~\star \quad& \text{if } a = \mathsf{inr}~\star
+            \end{cases}
+        \end{align*}
+    \end{itemize}
+    \item The unit $\eta : \id_\FinSet \Rightarrow F$ has components 
+    that straightforwardly inject $A$ into $F(A)$:
+    \begin{align*}
+        \eta_A &: \id_\FinSet{} (A) \to F(A) \\
+        &= x \mapsto \mathsf{inl}~x
+    \end{align*}
+    \item The multiplication $\mu : F^2 \rightarrow F$ merges the two 
+    nexted distinguished elements $\star$ into a single one and 
+    flattens the nesting. 
+\end{itemize}
+
+\subsection{Powerset monad}
+\begin{itemize}
+    \item The \emph{powerset functor} $\wp : \FinSet \to \FinSet$ that sends 
+    each finite set $A$ to the set of all subsets $\{A_i \mid A_i \subseteq A\}$
+    is a monad.
+    \item The unit $\eta : \id_\FinSet \Rightarrow \wp$ has components that 
+    map sets to the singleton set containing them:
+    \begin{align*}
+        \eta_A &: A \to \wp(A) \\ 
+        &= \{A\}
+    \end{align*}
+    \item The multiplication $\mu : \wp^2 \Rightarrow \wp$ 
+    has components that ``unfold the double powerset'':
+    \begin{align*}
+        \mu_A &: \wp(\wp(A)) \Rightarrow \wp(A) \\
+        &= \mathcal{S} \mapsto \bigcup_{A \in \mathcal{S}} A
+    \end{align*}
+\end{itemize}
+
+\subsection{Finite probability distribution monad}
+\begin{itemize}
+    \item The functor $\mathsf{Dist} : \FinSet \to \FinSet$ 
+\end{itemize}
+
+\section{Monads from adjunctions}
+A surprising fact: all adjunctions form a monad, and all monads 
+come from an adjunction pair!
+
+Let's see first how every adjunction forms a monad:
+
+\begin{proposition}
+    Consider functors $F : \calC \to \calD$ and $G : \calD \to \calC$ 
+    where $F \dashv G$. Then, there is a unit to the 
+    adjunction $\eta : \id_C \Rightarrow G \circ F$ 
+    and co-unit $\nu : F \circ G \Rightarrow \id_D$.
+    Then, there is a monad $(T, \eta, \mu)$:
+    \begin{itemize}[noitemsep]
+        \item Endofunctor $T$ given by the roundtrip $T = G \circ F$
+        \item Unit given by the unit of the adjunction
+        \item Multiplication $\mu : G \circ F \circ G \circ F \Rightarrow G \circ F$
+        given by $\mu = G \circ \epsilon \circ F$.
+    \end{itemize}
+
+\end{proposition}
+
+\subsection{Maybe monad from a free/forgetful adjunction}
+\begin{itemize}
+    \item Consider the categories $\FinSet$ and $\FinSet^*$.
+    \item There is a functor $\mathsf{forget} : \FinSet^* \to \FinSet$ 
+    called the \emph{forgetful functor} that ``forgets about the distinguished element''. 
+    \item There is a functor $\mathsf{free} : \FinSet \to \FinSet^*$ that adds on 
+    a distinguished element
+    \item There is an adjunction $\mathsf{free} \dashv \mathsf{forgetful}$.
+    \item The round trip $\mathsf{free} \circ \mathsf{forgetful}$ is exactly 
+    the monad $F$ we built earlier for the maybe monad.
+
+\end{itemize}
+
+\subsection{List monad}
+
+\begin{itemize}
+    \item 
+    \item List monad: Free/forgetful adjunction between sets and monoids.
+    Unit is singleton list construction; join is concatenation.
+\end{itemize}
+Example: the free $\dashv$ forgetful adjunction between 
+pointed sets and ordinary sets is the \texttt{Maybe} monad.
+
+\section{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Adjunctions from Monads}
