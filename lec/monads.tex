@@ -77,7 +77,11 @@ conclusion that \emph{$\dbracket{\plkw{T}}$ is a functor}:
 Concretely, suppose we are interpreting our small higher-order language in 
 some Cartesian-closed category $\calC$. Then, $\dbracket{\plkw{T}}$ 
 is an \emph{endofunctor} $\dbracket{\plkw{T}} : \calC \to \calC$, a particular 
-kind of functor from a category into itself.
+kind of functor from a category into itself. One way of understanding what 
+$T$ is is that it maps elements to \emph{generalized elements} that are 
+imbued with the additional structure of the monad.
+\marginnote{\citep{asilis2020probability} has a very nice discussion of 
+this motivation of monads as ``generalized elements of a category''.}
 
 As usual we don't know what kind of properties the functor
 $\dbracket{\plkw{T}~A}$ must have yet; to see those, we'll need to
@@ -213,7 +217,13 @@ and unit law in \cref{eq:monad-unit}.
 
 \section{Examples of monads}
 
+
 \subsection{Maybe monad}
+The \emph{maybe monad} is often the first example of a monad one 
+encounters in Haskell.
+Intuitively, the type $\plkw{Maybe}~A$ represents values that 
+behave like $A$ extended with the option of being ``nothing''.
+
 \begin{itemize}
     \item Let $F : \FinSet \to FinSet$ be a functor:
     \begin{itemize}
@@ -238,6 +248,8 @@ and unit law in \cref{eq:monad-unit}.
 \end{itemize}
 
 \subsection{Powerset monad}
+The \emph{powerset monad} is a 
+
 \begin{itemize}
     \item The \emph{powerset functor} $\wp : \FinSet \to \FinSet$ that sends 
     each finite set $A$ to the set of all subsets $\{A_i \mid A_i \subseteq A\}$
@@ -254,11 +266,6 @@ and unit law in \cref{eq:monad-unit}.
         \mu_A &: \wp(\wp(A)) \Rightarrow \wp(A) \\
         &= \mathcal{S} \mapsto \bigcup_{A \in \mathcal{S}} A
     \end{align*}
-\end{itemize}
-
-\subsection{Finite probability distribution monad}
-\begin{itemize}
-    \item The functor $\mathsf{Dist} : \FinSet \to \FinSet$ 
 \end{itemize}
 
 \section{Monads from adjunctions}
@@ -298,15 +305,202 @@ Let's see first how every adjunction forms a monad:
 \subsection{List monad}
 
 \begin{itemize}
-    \item 
     \item List monad: Free/forgetful adjunction between sets and monoids.
     Unit is singleton list construction; join is concatenation.
 \end{itemize}
 Example: the free $\dashv$ forgetful adjunction between 
 pointed sets and ordinary sets is the \texttt{Maybe} monad.
 
-\section{}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Adjunctions from Monads}
+\chapter{Modeling effects with syntax}
+Monads have found extensive application in computer science and langauge ideas 
+for dealing with effects. The previous chapter showed how to interpret 
+a monadic type, but it was not exactly clear how this captures the notion 
+of an \emph{effectful} computation. Here our aim is to make this clear by 
+elucidating the connection between a monad and its
+\emph{Klesli category}, which can be thought of as a syntactic representation 
+of the effects being modeled. For any particular monad $T$ on a category 
+$\calC$, the monad will come about as an adjunction between $\calC$ 
+and its Klesili category.
+
+We can start by characterizing effects using tiny languages that capture 
+only the effectful fragments of computation. For example, we can 
+represent the computations taking place under the finite probability monad $\plkw{Dist}$
+using the following tiny grammar:
+\begin{align*}
+    e_\plkw{Dist} ::= v \mid \plkw{if}~\plflip{}(p)~e_1~e_2
+\end{align*}
+
+The syntax is extremely pared down: it does not have any features at all 
+except for the ability to refer to values $v$, or 
+branch on a random Boolean that is true with probability $p$.
+The set of all terms that can be formed out of this grammar is parameterized by the 
+collection of values $v$: for each set of values $\calV$ we denote the set of all terms 
+from $e_\plkw{Dist}$ using values $\calV$ as $\mathsf{Exp}_\plkw{Disdt}(\calV)$.
+
+As usual, given a language it is useful to characterize its equivalences. This is a 
+design question: you, as the designer of the effect, must decide which effectful 
+programs ought to behave the same. Some equations are quite natural from 
+this perspective:
+\begin{mathpar}
+    \inferrule{e_1 \equiv e_2}{\plkw{if}~\plflip{} (p)~e_1~e_2 \equiv e_1}~(\textsc{e1})
+    \and
+    \inferrule{~}{\plkw{if}~\plflip{}(p)~e_1~e_2 \equiv \plkw{if}~\plflip{}(1-p)~e_2~e_1}~(\textsc{(e2)})
+    \and
+    \inferrule{~}{\plkw{if}~\plflip{}(1)~e_1~e_2 \equiv e_1}~\textsc{(e3)}
+\end{mathpar}
+The above equations capture natural reasoning principles.
+But, is this \emph{all} the necessary equations that characterize? Here is an example 
+of two tiny effectful programs that ought to be equivalent but aren't yet:
+
+\todo{}
+
+This motivates one more equation that captures all the equivalences for this effect:
+\todo{}
+\begin{mathpar}
+    \inferrule{p' = pq \and q' = }{\plkw{if}~\plflip{}(p)~(\plkw{if}~\plflip{}(q)~e_1~e_2)~e_3 \equiv
+    \plkw{if}~\plflip{}(p')~e_1~(\plkw{if}~\plflip{}(q')~e_2~e_3)~}~\textsc{(e4)}
+\end{mathpar}
+
+Now we have a tiny language that captures \emph{only} the effect of allocating 
+and branching on random quantities. Now we can use this to bolt on sampling 
+as a monad in the category of sets $\Set$.
+
+The finite
+probability distribution monad $\calD : \Set \to \Set$ sends sets $X$ to 
+the set of finitely-supported functions $\mu : X \to [0,1]$ such that 
+$\sum_{x \in X} \mu(x) = 1$.
+
+As more convenient notation, we can describe a probability distribution on 
+$X$ as a \emph{formal series}: a distribution $\mu : X \to [0,1]$ 
+can be written as an expression $c_1 [x_1] + \cdots + c_n [x_n]$ where 
+$c_i \in [0,1]$ are real-valued numbers satisfying $\sum_i c_i = 1$, 
+and each $[x_i]$ is a \emph{formal parameter} (i.e., a variable).
+There is a natural equivalence relation on formal series given by 
+combining the coefficients of formal parameters:
+\begin{align*}
+    c_1 [x_1] + \cdots + c_i [x_i] + c_i' [x_i] + \cdots c_n [x_n]
+    \equiv
+    c_1 [x_1] + \cdots + (c_i + c_i') [x_i] + \cdots c_n [x_n]
+\end{align*}
+The additional equations of formal series are the natural equivalences 
+given by the commutativity and associativity of addition and multiplication.
+
+
+Now we can give the unit and multiplication natural transformations for $\calD$:
+\begin{itemize}
+    \item The unit $\eta : \id_\Set \Rightarrow \calD$ has components $\eta_X : X \to \calD(X)$
+    that place all the probability mass on a single point: $\eta_X(x) = 1[x]$.
+    \item Multiplication $\mu : \calD^2 \Rightarrow \calD$ merges the probability 
+    distributions in the following way: 
+    \begin{align*}
+        \mu_X &: \calD\calD(X) \to \calD(X) \\
+        &= (c_1[c_{11}[x_1] + \cdots + c_{n1}x[n]] + \cdots + c_n[c_{1n}[x_1] + \cdots + c_{nn}x[n]]) \\
+        &\quad \mapsto
+        (c_1(c_{11}[x_1] + \cdots + c_{n1}x[n]) + \cdots + c_n(c_{1n}[x_1] + \cdots + c_{nn}x[n]))
+    \end{align*}
+\end{itemize}
+
+Outline:
+\begin{itemize}
+    \item Characterize the distribution monad by syntax and equations of a tiny language 
+    \item Turn the tiny language into a monad
+    \item Show that the distribution monad $\calD(X)$ is equivalent to the tiny language
+    \item Give the traditional definition of Kleisli category and Kleisli bind, connect 
+    it to the tiny language. This crytalizes how ``Kleisli category is syntactic 
+    description of a monad''.
+    \item Example Kleisli category: Markov kernels, partial functions (maybe monad)
+    \item Given a monad, find its Kleisli category and corresponding adjunction.
+    \item Eilenberg-Moore, from the perspective of ``models of tiny language''.
+\end{itemize}
+
+% \marginnote{This chapter is heavily inspired by \citep{asilis2020probability}.}
+% We saw in the previous chapter that every monad gives rise to an adjunction. 
+% A natural question one might have, after seeing this, is: does \emph{every}
+% monad comes from an adjunction? The answer is a very satisfying 
+% \emph{yes}. In fact, there is more than one such adjunction that
+% gives rise to every monad $T$ on a category $\calC$. Here are two important 
+% categories that admit adjunctions that give rise to the monad $T$:
+% \begin{itemize}
+%     \item The \emph{Kleisli category} $\calC_T$, sometimes called the category of 
+%     \emph{free $T$-algebras}, can be thought of as a syntactic characterization 
+%     of a monad.
+%     \item The \emph{Elienberg-Moore category} $\calC^T$, also called the \emph{category 
+%     of $T$-algebras}, can be thought of a semantic characterization 
+%     of a monad.
+% \end{itemize}
+
+% \section{The finite probability distribution monad}
+% For this chapter we will introduce a particular monad as a running example: the
+% \emph{finite probability distribution monad} $\calD$ on sets $\Set$. 
+% Intuitively, the finite distribution monad $\calD$ sends objects $X$ 
+% to the set of finitely-supported probability distributions one can 
+% form on sets $X$. The finite
+% probability distribution monad $\calD : \Set \to \Set$ sends sets $X$ to 
+% the set of finitely-supported functions $\mu : X \to [0,1]$ such that 
+% $\sum_{x \in X} \mu(x) = 1$.
+
+% As more convenient notation, we can describe a probability distribution on 
+% $X$ as a \emph{formal series}: a distribution $\mu : X \to [0,1]$ 
+% can be written as an expression $c_1 [x_1] + \cdots + c_n [x_n]$ where 
+% $c_i \in [0,1]$ are real-valued numbers satisfying $\sum_i c_i = 1$, 
+% and each $[x_i]$ is a \emph{formal parameter} (i.e., a variable).
+% There is a natural equivalence relation on formal series given by 
+% combining the coefficients of formal parameters:
+% \begin{align*}
+%     c_1 [x_1] + \cdots + c_i [x_i] + c_i' [x_i] + \cdots c_n [x_n]
+%     \equiv
+%     c_1 [x_1] + \cdots + (c_i + c_i') [x_i] + \cdots c_n [x_n]
+% \end{align*}
+% The additional equations of formal series are the natural equivalences 
+% given by the commutativity and associativity of addition and multiplication.
+
+
+% Now we can give the unit and multiplication natural transformations for $\calD$:
+% \begin{itemize}
+%     \item The unit $\eta : \id_\Set \Rightarrow \calD$ has components $\eta_X : X \to \calD(X)$
+%     that place all the probability mass on a single point: $\eta_X(x) = 1[x]$.
+%     \item Multiplication $\mu : \calD^2 \Rightarrow \calD$ merges the probability 
+%     distributions in the following way: 
+%     \begin{align*}
+%         \mu_X &: \calD\calD(X) \to \calD(X) \\
+%         &= (c_1[c_{11}[x_1] + \cdots + c_{n1}x[n]] + \cdots + c_n[c_{1n}[x_1] + \cdots + c_{nn}x[n]]) \\
+%         &\quad \mapsto
+%         (c_1(c_{11}[x_1] + \cdots + c_{n1}x[n]) + \cdots + c_n(c_{1n}[x_1] + \cdots + c_{nn}x[n]))
+%     \end{align*}
+% \end{itemize}
+
+% \subsection{Monads as spaces of generalized elements}
+% The above description of probability monads give a hint towards 
+% another way of understanding monads, which is to consider them 
+% as a way to turn objects into ``generalized objects''~\citep{asilis2020probability} 
+% and morphisms into ``generalized functions'':
+
+% \begin{itemize}
+%     \item The action on objects $X \mapsto TX$ sends an object $X$ to some ``generalized object''
+%     $TX$;
+%     \item The morphism $X \mor{f} Y$ gets sent to a ``generalized map'' 
+%     $ TX \mor{Tf} TY$ that accepts a generalized input and returns a generalized output
+%     \item The multiplication map $\mu : T T \Rightarrow T$ ``simplifies'' or ``evaluates''
+%     a twice-generalized element to a generalized element. For this reason, it can 
+%     be useful to think of $\mu$ as an \emph{evaluation map}. Naturality of evaluation 
+%     corresponds to generalized maps commuting with evaluation.
+% \end{itemize}
+
+% % In the case of the distribution monad $\calD$, the generalized elements can be 
+% % thought of as ``a weighted mixture of elements of a set'', and the evaluation map
+
+% \section{Modeling effects with syntax}
+
+
+% \section{Free algebras}
+% Given a category $\calC$ and a monad $(T, \eta, \mu)$ on $\calC$
+
+% \begin{definition}[Algebra]
+%     An \emph{algebra} 
+% \end{definition}
+
+% \subsection{What's algebraic about free algebras?}
+% \marginnote{In reference to \citep{bauer2018algebraic}}
+% Above we motivated the Kleisli category 
