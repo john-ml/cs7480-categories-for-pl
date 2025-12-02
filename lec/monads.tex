@@ -372,17 +372,17 @@ This motivates one more equation that captures all the equivalences for this eff
 \end{mathpar}
 
 Now we have a tiny language that captures \emph{only} the effect of allocating 
-and branching on random quantities. Now we can use this to bolt on sampling 
+and branching on random quantities. Using this tiny language, we can bolt on sampling
 as a monad in the category of sets $\Set$.
 Recall that the set $\mathsf{Exp}_\plkw{Dist}(\calV)$ of probabilistic computations
 with values in \(\calV\) is parameterized by a set \(\calV\).
 This can be used to define an endofunctor \(D : \Set \to \Set\):
 \begin{align*}
   &D : \Set \to \Set \\
-  &D(\calV) = \mathsf{Exp}_{\plkw{Dist}}(\calV) /_\equiv
+  &D(\calV) = \mathsf{Exp}_{\plkw{Dist}}(\calV) /_\equiv \\
   &D(f : \calV \to \calV') = e \mapsto e[f(v)/v]
 \end{align*}
-The action of this functor on morphisms sends function \(f\)
+The action of this functor on morphisms sends a function \(f\)
 to the function that uses \(f\) to substitute each value \(v\) in a given computation \(e\)
 with \(f(v)\).
 
@@ -398,11 +398,11 @@ the multiplication \(\mu(e)\) is ``flattening'' of the syntax tree of \(e\):
 \begin{align*}
   &\mu_{\calV} : D(D(\calV)) \to D(\calV) \\
   &\mu_{\calV}(\plkw{pure}(v)) = v \\
-  &\mu_{\calV}(\plifflip{p}{e_1}{e_2}) = \plifflip{p}{e_1}{e_2} \\
+  &\mu_{\calV}(\plifflip{p}{e_1}{e_2}) = \plifflip{p}{\mu_{\calV}(e_1)}{\mu_{\calV}(e_2)} \\
 \end{align*}
 Note in the first case that the ``value'' \(v\) is an element of \(D(\calV)\).
 Thinking of computations as abstract syntax trees, this multiplication operation
-flattens a tree whose leaves are trees into a tree whose leaves are values.
+flattens a tree of trees into an ordinary tree.
 One can check that the monad laws are satisfied;
 they correspond to properties one might expect to hold of tree flattening.
 
@@ -449,17 +449,13 @@ Now we can give the unit and multiplication natural transformations for $\calD$:
 
 Outline:
 \begin{itemize}
-    \item Characterize the distribution monad by syntax and equations of a tiny language 
-    \item Turn the tiny language into a monad
-    \item Show that the distribution monad $\calD(X)$ is equivalent to the tiny language
-    \item Give the traditional definition of Kleisli category and Kleisli bind, connect 
-    it to the tiny language. This crytalizes how ``Kleisli category is syntactic 
-    description of a monad''. \begin{itemize}
+    \item From what just happened to ``Kleisli category is syntactic description of a monad''. \begin{itemize}
       \item Taking stock of what happened with \(D\) and \(\calD\): starting from a syntactic
         description of probability, we recovered finitely-supported PMFs.
-      \item Moggi's insight: this is a recipe for modelling effects more generally:
+      \item Plotkin+Power's idea, inspired by Moggi's proposal to use monads:
+        this is a recipe for modelling effects more generally:
         start from a syntactic description, add equations one expects should hold,
-        and try to see what matheamtical objects come out.
+        and try to see what mathematical objects come out (c.f. algebraic effects)
       \item Examples: \begin{itemize}
         \item Failure: \(e ::= v \mid \plkw{fail}\). This recovers the Maybe monad.
         \item Nondeterminism: \(e ::= v \mid \plkw{amb}(e_1,e_2)\). This recovers the finite nonempty powerset monad.
@@ -479,7 +475,9 @@ Outline:
       \item Example: for Maybe, Kleisli morphisms are partial functions.
       \end{itemize}
     \item Given a monad, find its Kleisli category and corresponding adjunction.
-    \item Eilenberg-Moore, from the perspective of ``models of tiny language''.
+    \item The Kleisli monad models call-by-value computation.
+      Universal algebra shows how to model call-by-name:
+      Eilenberg-Moore, from the perspective of ``models of tiny language''.
 \end{itemize}
 
 % \marginnote{This chapter is heavily inspired by \citep{asilis2020probability}.}
