@@ -328,8 +328,10 @@ We can start by characterizing effects using tiny languages that capture
 only the effectful fragments of computation. For example, we can 
 represent the computations taking place under the finite probability monad $\plkw{Dist}$
 using the following tiny grammar:
+
+\newcommand\plifflip[3]{\plkw{if}~\plflip{}(#1)~{#2}~{#3}}
 \begin{align*}
-    e_\plkw{Dist} ::= v \mid \plkw{if}~\plflip{}(p)~e_1~e_2
+    e_\plkw{Dist} ::= \plkw{pure}(v) \mid \plifflip{p}{e_1}{e_2}
 \end{align*}
 
 The syntax is extremely pared down: it does not have any features at all 
@@ -337,35 +339,72 @@ except for the ability to refer to values $v$, or
 branch on a random Boolean that is true with probability $p$.
 The set of all terms that can be formed out of this grammar is parameterized by the 
 collection of values $v$: for each set of values $\calV$ we denote the set of all terms 
-from $e_\plkw{Dist}$ using values $\calV$ as $\mathsf{Exp}_\plkw{Disdt}(\calV)$.
+from $e_\plkw{Dist}$ using values $\calV$ as $\mathsf{Exp}_\plkw{Dist}(\calV)$.
 
 As usual, given a language it is useful to characterize its equivalences. This is a 
 design question: you, as the designer of the effect, must decide which effectful 
 programs ought to behave the same. Some equations are quite natural from 
 this perspective:
 \begin{mathpar}
-    \inferrule{e_1 \equiv e_2}{\plkw{if}~\plflip{} (p)~e_1~e_2 \equiv e_1}~(\textsc{e1})
+    \inferrule{~}{\plifflip{p}{e}{e} \equiv e}~(\textsc{Drop})
     \and
-    \inferrule{~}{\plkw{if}~\plflip{}(p)~e_1~e_2 \equiv \plkw{if}~\plflip{}(1-p)~e_2~e_1}~(\textsc{(e2)})
+    \inferrule{~}{\plifflip{p}{e_1}{e_2} \equiv \plifflip{1-p}{e_2}{e_1}}~(\textsc{Swap})
     \and
-    \inferrule{~}{\plkw{if}~\plflip{}(1)~e_1~e_2 \equiv e_1}~\textsc{(e3)}
+    \inferrule{~}{\plkw{if}~\plflip{}(1)~e_1~e_2 \equiv e_1}~(\textsc{Then})
+    \and
+    \inferrule{~}{\plkw{if}~\plflip{}(0)~e_1~e_2 \equiv e_2}~(\textsc{Else})
 \end{mathpar}
 The above equations capture natural reasoning principles.
 But, is this \emph{all} the necessary equations that characterize? Here is an example 
 of two tiny effectful programs that ought to be equivalent but aren't yet:
-
-\todo{}
+\begin{align*}
+  \plifflip{1/2}{(\plifflip{1/3}{(\plkw{pure}~\top)}{(\plkw{pure}~\bot)})}{(\plkw{pure}~\bot)}
+  \quad\stackrel?\equiv\quad
+  \plifflip{1/6}{(\plkw{pure}~\top)}{(\plkw{pure}~\bot)}
+\end{align*}
 
 This motivates one more equation that captures all the equivalences for this effect:
-\todo{}
 \begin{mathpar}
-    \inferrule{p' = pq \and q' = }{\plkw{if}~\plflip{}(p)~(\plkw{if}~\plflip{}(q)~e_1~e_2)~e_3 \equiv
-    \plkw{if}~\plflip{}(p')~e_1~(\plkw{if}~\plflip{}(q')~e_2~e_3)~}~\textsc{(e4)}
+  \inferrule
+    {p_1 + p_2 + p_3 = 1 \\ p_{12} = p_1 + p_2 \\ p_{23} = p_2 + p_3}
+    {\plkw{if}~\plflip{}(p_1+p_2)~(\plkw{if}~\plflip{}(p_1/p_{12})~e_1~e_2)~e_3 \equiv
+     \plkw{if}~\plflip{}(p_1)~e_1~(\plkw{if}~\plflip{}(p_2/p_{23})~e_2~e_3)}~\textsc{(Assoc)}
 \end{mathpar}
 
 Now we have a tiny language that captures \emph{only} the effect of allocating 
 and branching on random quantities. Now we can use this to bolt on sampling 
 as a monad in the category of sets $\Set$.
+Recall that the set $\mathsf{Exp}_\plkw{Dist}(\calV)$ of probabilistic computations
+with values in \(\calV\) is parameterized by a set \(\calV\).
+This can be used to define an endofunctor \(D : \Set \to \Set\):
+\begin{align*}
+  &D : \Set \to \Set \\
+  &D(\calV) = \mathsf{Exp}_{\plkw{Dist}}(\calV) /_\equiv
+  &D(f : \calV \to \calV') = e \mapsto e[f(v)/v]
+\end{align*}
+The action of this functor on morphisms sends function \(f\)
+to the function that uses \(f\) to substitute each value \(v\) in a given computation \(e\)
+with \(f(v)\).
+
+This endofunctor \(D\) forms a monad. The unit \(\eta\) is defined by
+the coercion from values to computations:
+\begin{align*}
+  &\eta_{\calV} : \calV \to D(\calV) \\
+  &\eta_{\calV}(v) = \plkw{pure}(v)
+\end{align*}
+The multiplication is defined by \emph{substitution}:
+given a computation \(e\) that produces computations,
+the multiplication \(\mu(e)\) is ``flattening'' of the syntax tree of \(e\):
+\begin{align*}
+  &\mu_{\calV} : D(D(\calV)) \to D(\calV) \\
+  &\mu_{\calV}(\plkw{pure}(v)) = v \\
+  &\mu_{\calV}(\plifflip{p}{e_1}{e_2}) = \plifflip{p}{e_1}{e_2} \\
+\end{align*}
+Note in the first case that the ``value'' \(v\) is an element of \(D(\calV)\).
+Thinking of computations as abstract syntax trees, this multiplication operation
+flattens a tree whose leaves are trees into a tree whose leaves are values.
+One can check that the monad laws are satisfied;
+they correspond to properties one might expect to hold of tree flattening.
 
 The finite
 probability distribution monad $\calD : \Set \to \Set$ sends sets $X$ to 
@@ -402,6 +441,12 @@ Now we can give the unit and multiplication natural transformations for $\calD$:
     \end{align*}
 \end{itemize}
 
+\begin{proposition}
+  The monads \(D\) and \(\calD\) are isomorphic;
+  that is, there is a natural isomorphism \(D \cong \calD\)
+  that commutes with the unit and multiplication operations of \(D\) and \(\calD\) respectively.
+\end{proposition}
+
 Outline:
 \begin{itemize}
     \item Characterize the distribution monad by syntax and equations of a tiny language 
@@ -409,8 +454,30 @@ Outline:
     \item Show that the distribution monad $\calD(X)$ is equivalent to the tiny language
     \item Give the traditional definition of Kleisli category and Kleisli bind, connect 
     it to the tiny language. This crytalizes how ``Kleisli category is syntactic 
-    description of a monad''.
-    \item Example Kleisli category: Markov kernels, partial functions (maybe monad)
+    description of a monad''. \begin{itemize}
+      \item Taking stock of what happened with \(D\) and \(\calD\): starting from a syntactic
+        description of probability, we recovered finitely-supported PMFs.
+      \item Moggi's insight: this is a recipe for modelling effects more generally:
+        start from a syntactic description, add equations one expects should hold,
+        and try to see what matheamtical objects come out.
+      \item Examples: \begin{itemize}
+        \item Failure: \(e ::= v \mid \plkw{fail}\). This recovers the Maybe monad.
+        \item Nondeterminism: \(e ::= v \mid \plkw{amb}(e_1,e_2)\). This recovers the finite nonempty powerset monad.
+        \item Logging: \(e ::= v \mid \plkw{log}(s); e\) (where \(s\) is drawn from some set of strings).
+          This recovers the writer monad.
+        \item Global state (one Boolean): \(e ::= v \mid x \gets \plkw{get}_b; e(x) \mid \plkw{put}_b; e\).
+          This recovers the state monad, if you work hard to find the right equations~\cite{plotkin2002notions}.
+        \end{itemize}
+      \end{itemize}
+    \item This approach of starting from syntax is essentially universal algebra.
+      One nice consequence is that we can use results from universal algebra to study effects.
+      We look at one example now: the idea of a Kleisli category of a monad. \begin{itemize}
+      \item Definition of Kleisli category. Morphisms \(\calV \to T{\mathcal W}\) are like substitutions,
+        showing how to transform each value \(\calV\) into a term \(T{\mathcal W}\).
+      \item Example: for Dist, Kleisli morphisms are transition matrices.
+        In the continuous case, Kleisli morphisms are Markov kernels.
+      \item Example: for Maybe, Kleisli morphisms are partial functions.
+      \end{itemize}
     \item Given a monad, find its Kleisli category and corresponding adjunction.
     \item Eilenberg-Moore, from the perspective of ``models of tiny language''.
 \end{itemize}
