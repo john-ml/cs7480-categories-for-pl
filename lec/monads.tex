@@ -225,7 +225,7 @@ Intuitively, the type $\plkw{Maybe}~A$ represents values that
 behave like $A$ extended with the option of being ``nothing''.
 
 \begin{itemize}
-    \item Let $F : \FinSet \to FinSet$ be a functor:
+    \item Let $F : \FinSet \to \FinSet$ be a functor:
     \begin{itemize}
         \item Action on objects: $A \mapsto A \uplus \{\star\}$
         \item Action on morphisms $ f : A \to B$: 
@@ -243,12 +243,12 @@ behave like $A$ extended with the option of being ``nothing''.
         &= x \mapsto \mathsf{inl}~x
     \end{align*}
     \item The multiplication $\mu : F^2 \rightarrow F$ merges the two 
-    nexted distinguished elements $\star$ into a single one and 
+    nested distinguished elements $\star$ into a single one and 
     flattens the nesting. 
 \end{itemize}
 
 \subsection{Powerset monad}
-The \emph{powerset monad} is a 
+The \emph{powerset monad} is defined by
 
 \begin{itemize}
     \item The \emph{powerset functor} $\wp : \FinSet \to \FinSet$ that sends 
