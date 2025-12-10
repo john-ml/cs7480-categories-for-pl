@@ -5,6 +5,7 @@
 
 \newcommand{\llpr}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\FamSet}{\mathsf{Fam}(\mathsf{Set})}
+\newcommand{\Alg}{\mathsf{Alg}}
 
 \chapter{Type Refinements as Indexed Inductive Types}
 
@@ -138,8 +139,8 @@ the following diagram:
 \end{tikzcd}\]
 
 However, we want to be able to map \emph{out} of our inductive types as well. To do so, we must
-define the \emph{recursor} for the Boolean type, canonically known as \texttt{if}:\footnote{We will
-adopt the convention of writing recursors with their \emph{major premise} (i.e., the value being
+define the recursor for the Boolean type, canonically known as \texttt{if}:\footnote{We will adopt
+the convention of writing recursors with their \emph{major premise} (i.e., the value being
 ``recursed on'') as the final argument. This is opposite the usual notation in functional
 programming but will better agree with the categorical formulation.}
 
@@ -387,8 +388,8 @@ preceding paragraph, that ``shape'' is determined precisely by the expression $\
 fixed-point equation $\mu t.~\tau$ for the inductive type.\footnote{You may wonder why we do not
 give a general categorification of inductive types simply by translating the general typing rules
 for recursive types, as we did for the examples above. Indeed, this is one viable path, but the
-relevant definitions acquire some bureaucratic machinery when abstracted that we prefer not to
-deal with.}
+relevant abstracted definitions acquire some bureaucratic machinery that we prefer not to deal
+with.}
 
 Adopting a categorical lens, we might observe that an expression $t.~\tau$ defines a mapping from a
 type $t$ to some type $\tau$ parameterized thereby. In our categorical interpretation, types form a
@@ -433,7 +434,7 @@ Such a pair is an example of an \emph{algebra} over the endofunctor $F$, also kn
 We are looking for the ``smallest'' $F$-algebra $(A, \alpha)$ such that its carrier $A$ is a fixed
 point. Let us first, however, consider simply the ``smallest'' $F$-algebra, without any further
 restrictions. We do this because it turns out that there is a natural interpretation of ``smallest''
-in terms of initiality. In particular, $F$-algebras form a category $\mathsf{Alg}_F$, so the
+in terms of initiality. In particular, $F$-algebras form a category $\Alg_F$, so the
 ``smallest'' $F$-algebra is simply the initial object in this category.
 
 \begin{definition}[Category of $F$-algebras]
@@ -496,7 +497,7 @@ to) a fixed point of $F$. This is the content of \emph{Lambek's lemma}.
     \arrow["\mathsf{in}_F"', from=3-1, to=3-3]
   \end{tikzcd}\]
 
-  Thus, we have the following diagram in $\mathsf{Alg}_F$:
+  Thus, we have the following diagram in $\Alg_F$:
 
   % https://q.uiver.app/#q=WzAsMyxbMCwwLCIoQSwgXFxhbHBoYSkiXSxbMCwyLCIoRiBBLCBGIFxcYWxwaGEpIl0sWzAsNCwiKEEsIFxcYWxwaGEpIl0sWzAsMSwiXFxsbHBye0YgXFxhbHBoYX0iXSxbMSwyLCJcXGFscGhhIl0sWzAsMiwiXFxtYXRoc2Z7aWR9X3soQSwgXFxhbHBoYSl9IiwyLHsiY3VydmUiOjR9XV0=
   \[\begin{tikzcd}
@@ -513,10 +514,10 @@ to) a fixed point of $F$. This is the content of \emph{Lambek's lemma}.
   Since $(A, \mathsf{in}_F)$ is initial, there is only one $F$-algebra morphism from $(A,
   \mathsf{in}_F)$ to itself, so this diagram must commute, i.e.,
   \[ \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} = \mathsf{id}_A.\]
-  Accordingly, $\llpr{F~\mathsf{in}_F}$ is a right-hand inverse for $\mathsf{in}_F$.
+  Accordingly, $\llpr{F~\mathsf{in}_F}$ is a right inverse for $\mathsf{in}_F$.
   
-  To show that it is also a left-hand inverse, we apply $F$ to both sides of the preceding equation
-  and rewrite using the functor laws:
+  To show that it is also a left inverse, we apply $F$ to both sides of the preceding equation and
+  rewrite using the functor laws:
   \[ F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{id}_{F A}. \]
   Then we observe that
   \[ F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} \]
@@ -644,6 +645,8 @@ least fixed point, motivating the following exercise:
 \begin{exercise}
 Show that the endofunctor $F(X) = 2^X$ on $\Set$ does not admit an initial algebra.
 (\emph{Hint:} recall Lambek's lemma.)
+
+TODO: not sure this is a functor
 \end{exercise}
 
 Of course, such results generalize to arbitrary categories, not just $\Set$, but examining
@@ -699,6 +702,7 @@ will see yet another denotation of $\sum$ later on), so the meanings of these no
 context-sensitive. TODO: verify that we do in fact introduce indexed (co)products later on}
 
 \begin{definition}[Families fibration]
+  TODO: maybe don't name the category
   The \emph{category of families (of sets)} $\FamSet$ is defined as follows:
   \begin{itemize}
     \item Objects are pairs $(A, P : A \to \Ob(\Set))$ of an indexing set $A$ and a \emph{family} of
@@ -743,13 +747,14 @@ index zero and into the right-hand side at successor indices. Concretely, such a
 follows:\footnote{We will continue our convention of eliding morphism actions. As before, these
 mappings are ``automatic'' from our choice of action on objects.}
 
-\begin{align*}
+\begin{align}
   F_\texttt{BitVec}(\N, X) = (\N, (n \mapsto
     &\left(\begin{array}{ll}\{\star\} & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
-    \oplus\\
+    \oplus \notag\\
     &\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ \{n_1\} \times \llbr{\texttt{Bool}} \times X(n_1) & \text{if } n = n_1 + 1 \end{array} \right)
   ))
-\end{align*}
+  \label{eqn:functor-bitvec}
+\end{align}
 
 But here we encounter a problem: the endofunctor we have just defined only acts on $\N$-indexed
 families. Therefore, it is \emph{not} an endofunctor on $\FamSet$, whose objects can have arbitrary
@@ -815,11 +820,11 @@ This recipe will require a number of auxiliary constructions, on which we now em
 % TODO: either define the families fibration somewhere, or add a footnote a la ``the astute reader
 % will have noticed that we titled this chapter ...'' and give (at least the gist of) the def there
 
-\section{Fibrational Constructions}
+\section{Constructing a Refinement Translation}
 
 \subsection{Another View of Families}
 
-For several of the constructions we give in this chapter, it will be helpful to have in mind an
+For some of the constructions we give in this chapter, it will be helpful to have in mind an
 alternative interpretation of $\FamSet$. This interpretation is inspired by the Curry--Howard
 correspondence between propositions and types.
 
@@ -875,12 +880,9 @@ in $\FamSet$ into a single object in $\Set$.
 \end{definition}
 
 The comprehension functor $\{-\}$ and forgetful functor $U$ are related by the natural
-transformation $\pi : \{-\} \Rightarrow U$ whose morphisms project the index from an element of an
-indexed family:
+transformation $\pi : \{-\} \Rightarrow U$ whose morphisms project (hence the notation $\pi$) the
+index from an element of an indexed family:
 \[ \pi_{(A,P)}(a, p) = a \]
-
-The notation $\pi$ is suggestive of the fact that these morphisms are just projections of the first
-component of each object.
 
 TODO: some more summing up/contextualizing the different maps; maybe also show adjointness here
 
@@ -940,7 +942,7 @@ predicate---i.e., it should yield a predicate that holds of the same values---wh
 $A$. Of course, this intuitive phrasing does not type-check: $F(A)$ is not a predicate (it is a
 set), and $\hat F$ cannot be applied to $A$ (since $A$ is not a family). But we can fill in some
 straightforward coercions to make this definition---which characterizes a so-called
-\emph{truth-preserving} lifting---precise: to characterize the objects in the codomain of $F$ as
+\emph{truth-preserving} lifting---precise: to treat the objects in the codomain of $F$ as
 predicates, we post-compose the truth functor; to allow $\hat F$ to act on sets, we pre-compose the
 truth functor; and the notion that these functors always yield the ``same predicate'' as each other
 is captured by natural isomorphism.
@@ -959,12 +961,251 @@ is captured by natural isomorphism.
   defines a trivial truth-preserving lifting of $F : \Set \to \Set$.
 \end{exercise}
 
-TODO:
+The truth-preserving lifting above, however, is degenerate in the sense that it entirely forgets the
+structure of the original family. We therefore instead define the following truth-preserving
+lifting:\footnote{While we have attempted to provide some intuition here, the motivation for this
+construction is largely found in its more general form in the setting of fibrational category
+theory, which is developed on page 347 of \citep{ghani2010fibrational}. There, one can also find a
+description of the lifting's action on morphisms along with a proof that it is truth-preserving.}
 
-The construction\footnote{The motivation for this construction is largely found in its more general
-form in the setting of fibrational category theory, which is developed on page 347 of
-\citep{ghani2010fibrational}.}
+\begin{align*}
+  \hat F(A, P) &= \Sigma_{F\pi_{(A, P)}} \top(F\{(A, P)\})
+\end{align*}
 
+Unlike in the exercise, we incorporate the ``structure of $P$ under $F$'' by applying $F$ to the
+\emph{comprehension} of the original family. We then re-separate the indexing set $A$ and associated
+family $P$ ``under $F$'' by taking an indexed coproduct along $F \pi_{(A, P)}$. Thus, the resulting
+family can be seen as containing those elements which ``wrap the structure of $P$ in $F$'' (or, from
+a logical perspective, the resulting predicate holds only of those elements of $F A$ whose
+``contents'' in $A$ were validated by $P$). Unfolding definitions makes these intuitions more
+apparent:
+
+\begin{align*}
+  \hat F(A, P) &= \Sigma_{F\pi_{(A, P)}} \top(F\{(A, P)\})\\
+    &= \Sigma_{F\pi_{(A, P)}} \left(F\{(A, P)\}, \_ \mapsto 1\right)\\
+    &= \left(F A, x \mapsto \sum_{y \in F\{(A, P)\}} (F\pi_{(A, P)}(y) = x) \times 1 \right)\\
+    &\cong (FA, x \mapsto \{y \in F\{(A, P)\} \mid (F \pi_{(A,P)})(y) = x\})
+\end{align*}
+
+As a concrete example, consider the truth-preserving lifting of $F_\mathtt{Nat}$:
+
+\begin{align*}
+  \hat F_\mathtt{Nat}(A, P) &= \Sigma_{F_\mathtt{Nat}} \top(\hat F_\mathtt{Nat}\{(A, P)\})\\
+    &= \Sigma_{F_\mathtt{Nat} \pi_{(A, P)}} \left(1 \oplus \{(A, P)\},\, \_ \mapsto 1\right)\\
+    &= \left(1 \oplus A,\, TODO: \right)
+\end{align*}
+
+Finally, since our objective was to obtain an endofunctor on $\FamSet_A$---not $\FamSet$---we define
+the functor $\hat F_A$ to be the restriction of $\hat F$ to $\FamSet_A$.
+
+\subsection{Translating Refinements}
+
+Recalling our original objective---to translate type refinements into indexed inductive types---we
+can see that truth-preserving liftings get us halfway to our goal: they transport the endofunctors
+that characterize simple inductive types into analogous endofunctors on families. But our aim is
+not to produce an indexed inductive type that corresponds to the unrestricted simple one, but rather
+some refinement thereof. This refinement translation is the last piece we must develop.
+
+In fact, we already have the tool we need to do this: op-reindexing. Recall that indexed
+coproducts (or, more generally, the op-reindexing functor) let us take a family and reindex it, such
+that the resulting family contains only those elements which are mapped by the reindexing function
+to a given value in its codomain. This is precisely what we do when we refine a datatype: given
+$\mathtt{P : T \to A}$, the type $\mathtt{\{ t : T \mid P(t) = a \}}$ is an $\mathtt{A}$-indexed
+type that, at a given index $\mathtt{a}$, consists of the elements of $\mathtt{T}$ on which
+$\mathtt{P}$ produces value $\mathtt{a}$.
+
+Therefore, the construction to which we have building all this time can finally be written as
+follows:
+
+\begin{definition}[Refinement translation]
+  Let $F : \Set \to \Set$ be an endofunctor characterizing the inductive type $\mu F$. Let $(A,
+  \alpha : F A \to A)$ be an $F$-algebra. We define the translation of the refinement type
+  characterized by the family
+  \[ (A, a \mapsto \{ x \in \mu F \mid \llpr{\alpha}_F(x) = a \}) \] as the indexed inductive type
+  $\mu F^\alpha$ characterized by the endofunctor $F^\alpha : \FamSet_A \to \FamSet_A$ such that
+  \[ F^\alpha = \Sigma_\alpha \circ \hat F_A. \]
+\end{definition}
+
+Once again, it is illuminating to expand this functor's action on objects:
+
+\begin{align}
+  F^\alpha(A, P) &= (\Sigma_A \circ \hat F_A)(A, P) \notag\\
+    &\cong \Sigma_\alpha (FA, x \mapsto \{y \in F\{(A, P)\} \mid (F \pi_{(A,P)})(y) = x\}) \tag{As before} \notag\\
+    &= \left(A, a \mapsto \sum_{x \in FA} (a = \alpha(x)) \times \{y \in F\{(A, P)\} \mid (F \pi_{(A,P)})(y) = x\}\right) \notag\\
+    &\cong (A, a \mapsto \{ y \in F\{(A, P)\} \mid \alpha((F \pi_{(A, P)})(y)) = a \})
+    \label{eqn:translation-expanded}
+\end{align}
+
+Upon cursory inspection, at least, the general shape of this family should seem reasonable: it is
+$A$-indexed, with elements drawn from a set of ``$F$-shaped objects'' restricted to those ``on
+which'' (after a certain projection) $\alpha$ attains value $a$.
+
+We illustrate how this works in practice with our example from the beginning: deriving the type of
+length-indexed vectors from the refinement of lists by their length. To simplify, we will consider
+just lists of Booleans, and attempt to derive the type \texttt{BitVec} from before.
+
+First, letting $2 \cong 1 \oplus 1$ be the object denoted by the Boolean type, we recall the
+definition of $F_\texttt{BitList} : \Set \to \Set$ and the algebra $(\N, \texttt{length})$
+thereover:
+\begin{align*}
+  F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
+  F_\texttt{BitList}(f) &= [\mathsf{inl} \circ \id_1, \mathsf{inr} \circ \langle \mathsf{id}_2, f\rangle]\\
+  \\[-10pt] % TODO: be less hacky
+  % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\mathtt{z}, \mathtt{s} \circ \pi_2]
+  \texttt{length} ~ (\mathsf{inl}~ ()) &= 0\\
+  \texttt{length} ~ (\mathsf{inr}~ (b, \ell)) &= \mathtt{succ}(\ell)
+\end{align*}
+
+We now compute the corresponding indexed inductive type. Note that we use the isomorphic expansion
+from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions:
+
+\begin{align*}
+  &F^\texttt{length}_\texttt{BitList}(\N, P)\\
+  &\cong (\N, n \mapsto \{ y \in F_\texttt{BitList}\{(\N, P)\} \mid \texttt{length}((F_\texttt{BitList} \pi_{(\N, P)})(y)) = n\})\\
+  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \mathsf{inl}~() \text{ and } 0 = n) \text{ or } (y = \mathsf{inr}~(b, (n_1, p)) \text{ and } \mathtt{succ}(n_1) = n) \right\})\\
+  &= \left(\N, \begin{cases}0 \mapsto \{\mathsf{inl}~()\} \\ \mathsf{succ}(n_1) \mapsto \{\mathsf{inr}~(b, (n_1, p)) \mid b \in 2, p \in P(n_1)\} \end{cases} \right)\\
+  &= (\N, (n \mapsto
+    \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
+    \oplus\\
+    &\hspace{5.75em}\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ 2 \times (\{n_1\} \times P(n_1)) & \text{if } n = \mathtt{succ}(n_1) \end{array} \right)
+  ))
+\end{align*}
+
+Up to isomorphism (specifically, with a minor rearrangement and reassociation in the right-hand
+summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equation
+(\ref{eqn:functor-bitvec})!
+
+\begin{exercise}
+\sloppy
+  Consider the following inductive type of trees with colored nodes (we refrain from calling these
+  ``red-black trees'' in prose because they need not maintain the relevant invariants):
+\begin{lstlisting}
+  inductive RBTree (A : Type) where
+    | leaf  : RBTree
+    | red   : A -> RBTree -> RBTree -> RBTree
+    | black : A -> RBTree -> RBTree -> RBTree
+\end{lstlisting}
+  \begin{enumerate}
+    \item Define the endofunctor $F_\mathtt{RBTree} : \Set \to \Set$ such that
+          $\llbr{\mathtt{RBTree}} \cong \mu F_\mathtt{RBTree}$.
+    \item Define an $F_\mathtt{RBTree}$-algebra $\mathtt{bh}$ that computes the \emph{black height}
+          of an \texttt{RBTree}, i.e., the maximum number of black nodes on a path from the root to
+          a leaf.
+    \item Using the above, compute $F_\mathtt{RBTree}^\mathtt{bh} : \FamSet_\N \to \FamSet_\N$, and
+          read off of this expression an indexed inductive type of black height-indexed colored
+          trees. Verify that your definition matches how you would intuitively define this type from
+          scratch.
+  \end{enumerate}
+\end{exercise}
+
+\section{Correctness}
+
+These illustrative examples are compelling, but we have yet to prove that our foregoing construction
+always characterizes the indexed inductive type of interest. To begin with, we do not even know that
+the functor $F^\alpha$ admits an initial algebra in the first place, nor---if it does---whether the
+carrier is in fact isomorphic to our na\"ive subset formulation of the refinement of $\mu F$ by
+$\alpha$. In this section, we will sketch the proof of these facts, referring the reader to the
+paper by Atkey et al. \citep{atkey2011refining} for further details.
+
+\subsection{Preliminaries}
+
+We begin with a few auxiliary definitions we will require for our proofs. First, TODO
+
+\begin{definition}[Reindexing functor]
+  Let $f : A \to B$ be a function (of sets). The \emph{reindexing functor} $f^* : \FamSet_B \to
+  \FamSet_A$ is defined by
+  \begin{align*}
+    f^*(B, Q) &= (A, Q \circ f)\\
+    f^*(\id_B, g^\sim) &= (\id_A, g^\sim \circ f)
+  \end{align*}
+\end{definition}
+
+Notice that this functor, in contrast with $\Sigma_f$, is contravariant: the domain of $f^*$ is the
+fiber over the codomain of $f$, and vice versa.
+
+\begin{lemma}
+  
+\end{lemma}
+
+\begin{lemma}
+  Let $(A, P)$ and $(B, Q)$ be objects in $\FamSet$. Let $f : A \to B$ be a function. Then there is
+  an isomorphism between the set of $\FamSet$-morphisms $h : (A, P) \to (B, Q)$ such that $Uh = f$
+  and $\FamSet_A$ morphisms $(A, P) \to f^*(B, Q)$:
+  \begin{align*}
+  &\{ h \in \Hom_{\FamSet}((A, P), (B, Q)) \mid Uh = f \} \cong\\
+  &\Hom_{\FamSet_A}((A, P), f^*(B, Q))
+  \end{align*}
+\end{lemma}
+
+\subsection{TOOD Name this}
+
+We want to show that, given an endofunctor $F$ on $\Set$ with an initial algebra, the endofunctor
+$F^\alpha$ on $\FamSet_A$ has one as well: that is, we must find an initial object in
+$\Alg_{F^\alpha}$. Since we already have an initial object in $\Alg_F$, it will be useful to relate
+to this category of algebras. Mirroring our construction of $F^\alpha$ itself, we will do this in
+two stages: first, we will consider algebras over $\hat F : \FamSet \to \FamSet$, and then we will
+limit our attention to an ``$\alpha$-relevant restriction'' thereof.
+
+Algebras over $\hat F$ are elements of the category $\Alg_{\hat F}$. Since $\FamSet$ ``sits atop''
+$\Set$ (in the sense that a family $P$ is ``atop'' its indexing set $UP$), the category $\Alg_{\hat
+F}$ likewise ``sits atop'' $\Alg_F$, a fact witnessed by the following \emph{algebras
+fibration}.\footnote{We will make this remark more precise later. TODO: see that this happens}
+
+\begin{definition}[Algebras fibration induced by $U$]
+  The \emph{algebras fibration} $U^\Alg$ induced by the families fibration $U$ is a functor
+  $U^{\Alg} : \Alg_{\hat F} \to \Alg_F$ defined by
+  \begin{align*}
+    U^\Alg(P, k : \hat F P \to P) &= (UP, Uk)\\
+    U^\Alg(f : (P, k) \to (Q, k')) &= Uf : (UP, Uk) \to (UQ, Uk')
+  \end{align*}
+\end{definition}
+
+It is worth pausing to clarify why this definition type-checks: recall that $\hat F$ is an
+endofunctor on \emph{families}, so $P$ is a pair of an indexing set and a family thereupon; $k$
+is a morphism of families, which is a pair of functions; and $f$ is an algebra morphism over an
+endofunctor on families and thus also a morphism of families (satisfying a certain commutativity
+condition).
+
+However, since $F^\alpha$ is a restriction of $\hat F$ by values of an algebra $(A, \alpha)$, we
+correspondingly restrict the category $\Alg_{\hat F}$ to the corresponding \emph{fiber} (defined
+analogously to how we defined fibers over the families fibration).
+
+\begin{definition}[Fiber of the algebras fibration over $(A, \alpha)$]
+  The \emph{fiber} of the algebras fibration over $(A, \alpha)$, or equivalently the \emph{category
+  of $\hat F$-algebras over $\alpha$}, denoted by $(\Alg_{\hat F})_\alpha$, is defined as follows:
+  \begin{itemize}
+    \item TODO
+  \end{itemize}
+\end{definition}
+
+In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just
+``decomposed'' in terms of $\hat F$ and $\alpha$. TODO: expand a little
+
+\begin{lemma}
+  Let $(A, \alpha : F A \to A)$ be an $F$-algebra. Then there is an isomorphism of categories
+  \[ (\Alg_{\hat F})_\alpha \cong \Alg_{F^\alpha} \]
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
+
+In order to work with this new formulation of the category, we will lift some of our constructions
+over the families fibration to $(\Alg_{\hat F})_\alpha$. 
+
+\begin{lemma}
+  Let $f$ be an $F$-algebra morphism $(A, \alpha) \to (B, \beta)$. Then there are functors
+  $\Sigma_f^\Alg$ and $f^{*\Alg}$ such that $\Sigma_f^\Alg \dashv
+  f^{*\Alg}$ and for any $\hat F$-algebra $((A, P), k)$,
+  \begin{itemize}
+    \item The $\hat F$-algebra $\Sigma_f^{\Alg}$ has carrier $\Sigma_f(A, P)$, and
+    \item The $\hat F$-algebra $f^{*\Alg}$ has carrier $f^*(A, P)$.
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
 
 % \begin{definition}[Reindexing functor]
 % \sloppy
@@ -977,11 +1218,6 @@ form in the setting of fibrational category theory, which is developed on page 3
 % \end{definition}
 
 % Notice that the reindexing functor operates contravariantly
-
-
-
-\subsection{}
-
 
 
 % Deleted: I think we actually just use the families fibration
@@ -1012,21 +1248,11 @@ form in the setting of fibrational category theory, which is developed on page 3
 
 \vspace{3cm}
 
-\subsection{Indexing Inductive Types}
-
 TODO: write exercise solutions!
 
 TODO: texttt and mathttt are not the same --- settle on one
 
-\section{Constructing Inductive Types from Refinements}
-
-\section{Correctness}
-
-
-
-\section{}
-
-\section{}
+\section{A Taste of Fibered Category Theory}
 
 References:
 - Article
@@ -1034,3 +1260,4 @@ References:
 - Wadler, Recursive types for free!
 - \href{https://courses.grainger.illinois.edu/cs522/sp2016/ComphrehensionCategoriesAndTheSemanticsOfTypeDependency.pdf}{Comprehension cat paper}
 - Ghani et al., Fibrational Induction Rules for Initial Algebras
+- The Bart Jacobs book on fibered category theory
