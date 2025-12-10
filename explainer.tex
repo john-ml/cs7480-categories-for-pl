@@ -438,6 +438,7 @@ in terms of initiality. In particular, $F$-algebras form a category $\Alg_F$, so
 ``smallest'' $F$-algebra is simply the initial object in this category.
 
 \begin{definition}[Category of $F$-algebras]
+\label{def:cat-of-algebras}
   Fix an endofunctor $F : \calC \to \calC$. The \emph{category of $F$-algebras} (or \emph{category
   of algebras over $F$}) is defined by the following:
   \begin{itemize}
@@ -907,7 +908,10 @@ functor, known as the \emph{op-reindexing functor}.
 In other words, $\Sigma_f (A, P)$ maps a given $b$ in the image of $f$ to the members of the family
 $P$ at each element of $b$'s preimage. Indeed, an isomorphic (and perhaps more intuitive)
 characterization of $\Sigma_f (A, P)$ is given by
-\[ \left(B, b \mapsto \sum_{a \in f^{-1}[\{b\}]} P(a)\right). \]
+\begin{equation}
+  \label{eqn:indexed-coprod-simplified}
+  \left(B, b \mapsto \sum_{a \in f^{-1}[\{b\}]} P(a)\right).
+\end{equation}
 
 \begin{exercise}
   TODO: maybe take the very strong coproducts diagram and have them show that (a) it commutes and
@@ -1071,6 +1075,8 @@ from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions
   ))
 \end{align*}
 
+TODO: make this notation agree with functor-bitvec
+
 Up to isomorphism (specifically, with a minor rearrangement and reassociation in the right-hand
 summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equation
 (\ref{eqn:functor-bitvec})!
@@ -1103,13 +1109,31 @@ summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equatio
 These illustrative examples are compelling, but we have yet to prove that our foregoing construction
 always characterizes the indexed inductive type of interest. To begin with, we do not even know that
 the functor $F^\alpha$ admits an initial algebra in the first place, nor---if it does---whether the
-carrier is in fact isomorphic to our na\"ive subset formulation of the refinement of $\mu F$ by
-$\alpha$. In this section, we will sketch the proof of these facts, referring the reader to the
-paper by Atkey et al. \citep{atkey2011refining} for further details.
+carrier of this algebra is in fact isomorphic to our na\"ive subset formulation of the refinement of
+$\mu F$ by $\alpha$. In this section, we will sketch the proof of these facts, referring the reader
+to the paper by Atkey et al. \citep{atkey2011refining} for further details.
 
 \subsection{Preliminaries}
 
-We begin with a few auxiliary definitions we will require for our proofs. First, TODO
+We begin with a few auxiliary definitions we will require for our proofs. First, recall that we
+TODO: call back here to the whole idea of being able to ``move back and forth,'' the note that it's
+actually adjoint!
+
+\begin{lemma}
+  \label{lem:fam-fibration-adjoint}
+  The functors $U \dashv \top$ form an adjoint pair.
+\end{lemma}
+
+\begin{proof}
+  We must show $\Set(U(A, P), B) \cong \FamSet((A, P), \top B)$, i.e.,
+  \[ \Set(A, B) \cong \FamSet((A, P), (B, \_ \mapsto 1)).\]
+  Elements of the right-hand set are pairs of morphisms $(f : A
+  \to B, f^\sim : \prod_{a \in A}, P(a) \to 1)$. But by terminality, there is only ever one choice
+  of $f^\sim$, so the right-hand side is isomorphic to the set of functions $f : A \to B$, i.e.,
+  $\Set(A, B)$.
+\end{proof}
+
+TODO: introduce symmetry/want to be bidirectional along other axis too
 
 \begin{definition}[Reindexing functor]
   Let $f : A \to B$ be a function (of sets). The \emph{reindexing functor} $f^* : \FamSet_B \to
@@ -1121,13 +1145,43 @@ We begin with a few auxiliary definitions we will require for our proofs. First,
 \end{definition}
 
 Notice that this functor, in contrast with $\Sigma_f$, is contravariant: the domain of $f^*$ is the
-fiber over the codomain of $f$, and vice versa.
+fiber over the codomain of $f$, and vice versa. Thus, given a function $f : A \to B$, we can produce
+functors running in both directions between $\FamSet_B$ and $\FamSet_A$. These complement the
+``perpendicular'' pair of functors $U : \FamSet \to \Set$ and $\top : \Set \to \FamSet$ that allow
+us to move bidirectionally between families and their index sets. Moreover, these are both adjoint
+pairs.
 
 \begin{lemma}
-  
+  \label{lem:reindex-adjoint}
+  Let $f : A \to B$ be a function. Then $\Sigma_f \dashv f^*$.
+%   % https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXEZhbVNldF9CIl0sWzIsMCwiXFxGYW1TZXRfQSJdLFsxLDAsIlxccGVycCJdLFsxLDAsIlxcU2lnbWFfZiIsMix7ImN1cnZlIjozfV0sWzAsMSwiZl4qIiwyLHsiY3VydmUiOjN9XV0=
+% \[\begin{tikzcd}
+% 	{\FamSet_B} & \perp & {\FamSet_A}
+% 	\arrow["{f^*}"', curve={height=18pt}, from=1-1, to=1-3]
+% 	\arrow["{\Sigma_f}"', curve={height=18pt}, from=1-3, to=1-1]
+% \end{tikzcd}\]
 \end{lemma}
+\begin{proof}
+  We show
+  \[ \FamSet_B(\Sigma_f(A, P), (B, Q)) \cong \FamSet_A((A, P), f^*(B, Q)). \]
+  Recall that morphisms in these fibers are fully characterized by their second component (i.e.,
+  their mapping on families), so, unfolding definitions (and using the isomorphic representation of
+  the indexed coproduct from equation (\ref{eqn:indexed-coprod-simplified})), it suffices to show
+  \[ \left\{ g : \prod_{b \in B} \sum_{a \in f^{-1}} P(a) \to Q(b) \right\} \cong \left\{ h :
+  \prod_{a \in A} P(a) \to Q(f(a)) \right\}. \] It is straightforward to check that $\iota$ (mapping
+  from left to right) and its putative inverse defined below indeed form an isomorphism between
+  these sets:
+  \begin{align*}
+    \iota(g) &= a \mapsto p \mapsto g(f(a))(a)(p)\\
+    \iota^{-1}(h) &= b \mapsto (a, p) \mapsto h(a)(p)(b)
+    \qedhere
+  \end{align*}
+\end{proof}
+
+There is one other lemma involving reindexing that we must define. TODO
 
 \begin{lemma}
+  \label{lem:famset-morphism-iso}
   Let $(A, P)$ and $(B, Q)$ be objects in $\FamSet$. Let $f : A \to B$ be a function. Then there is
   an isomorphism between the set of $\FamSet$-morphisms $h : (A, P) \to (B, Q)$ such that $Uh = f$
   and $\FamSet_A$ morphisms $(A, P) \to f^*(B, Q)$:
@@ -1137,14 +1191,19 @@ fiber over the codomain of $f$, and vice versa.
   \end{align*}
 \end{lemma}
 
-\subsection{TOOD Name this}
+\begin{proof}
+  TODO
+\end{proof}
+
+\subsection{TODO Name this}
 
 We want to show that, given an endofunctor $F$ on $\Set$ with an initial algebra, the endofunctor
 $F^\alpha$ on $\FamSet_A$ has one as well: that is, we must find an initial object in
 $\Alg_{F^\alpha}$. Since we already have an initial object in $\Alg_F$, it will be useful to relate
-to this category of algebras. Mirroring our construction of $F^\alpha$ itself, we will do this in
-two stages: first, we will consider algebras over $\hat F : \FamSet \to \FamSet$, and then we will
-limit our attention to an ``$\alpha$-relevant restriction'' thereof.
+$\Alg_{F^\alpha}$ to this category. Mirroring our construction of $F^\alpha$ itself, we will do this
+in two stages: first, we will consider algebras over $\hat F : \FamSet \to \FamSet$, which we relate
+to algebras over $F$; then, we will limit our attention to an ``$\alpha$-based restriction'' of
+$\hat F$-algebras.
 
 Algebras over $\hat F$ are elements of the category $\Alg_{\hat F}$. Since $\FamSet$ ``sits atop''
 $\Set$ (in the sense that a family $P$ is ``atop'' its indexing set $UP$), the category $\Alg_{\hat
@@ -1160,29 +1219,47 @@ fibration}.\footnote{We will make this remark more precise later. TODO: see that
   \end{align*}
 \end{definition}
 
-It is worth pausing to clarify why this definition type-checks: recall that $\hat F$ is an
-endofunctor on \emph{families}, so $P$ is a pair of an indexing set and a family thereupon; $k$
-is a morphism of families, which is a pair of functions; and $f$ is an algebra morphism over an
+It is worth pausing to clarify why this definition type-checks. Recall that $U : \FamSet \to \Set$
+maps families to their indexing sets. Since $\hat F$ is an endofunctor on \emph{families}, $P$
+comprises a family indexed by some set; $k$ is a morphism of families, which is a pair of functions;
+and $f$ is an algebra morphism (as defined in Definition \ref{def:cat-of-algebras}) over an
 endofunctor on families and thus also a morphism of families (satisfying a certain commutativity
-condition).
+condition). Thus, $U$ has an action on each of these.
+
+The algebras over $F$ inherit an additional useful property from those over $F$: in particular, if
+$F$ has an initial algebra, than so does $\hat F$:
+
+\begin{lemma}
+  Suppose $F$ has an initial algebra. Then $\hat F$ has an initial algebra too, and its carrier is
+  $\top(\mu F)$.
+\end{lemma}
+\begin{proof}
+  TODO
+\end{proof}
 
 However, since $F^\alpha$ is a restriction of $\hat F$ by values of an algebra $(A, \alpha)$, we
-correspondingly restrict the category $\Alg_{\hat F}$ to the corresponding \emph{fiber} (defined
-analogously to how we defined fibers over the families fibration).
+want to look at a correspondingly restricted category of algebras, not $\Alg_{\hat F}$ in its
+entirety. We thus restrict the category $\Alg_{\hat F}$ to an appropriate \emph{fiber} over our
+refining algebra. This definition, given below, is directly analogous to the definition of fibers
+over $\FamSet$; however, we phrase it slightly differently to motivate a later generalization. (One
+may find it worthwhile to ``pattern-match'' the tuple-valued variables below and unfold the
+definitions of $U^\Alg$ and $U$ to see this correspondence more directly.)
 
 \begin{definition}[Fiber of the algebras fibration over $(A, \alpha)$]
   The \emph{fiber} of the algebras fibration over $(A, \alpha)$, or equivalently the \emph{category
   of $\hat F$-algebras over $\alpha$}, denoted by $(\Alg_{\hat F})_\alpha$, is defined as follows:
   \begin{itemize}
-    \item TODO
+    \item Objects are $\hat F$-algebras $(P, k)$ such that $U^\Alg (P, k) = (A, \alpha)$
+    \item Morphisms are $\hat F$-algebra morphisms $f : (P, k) \to (Q, k')$ such that $U f =
+    \mathsf{id}_{(A, \alpha)}$
   \end{itemize}
 \end{definition}
 
-In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just
-``decomposed'' in terms of $\hat F$ and $\alpha$. TODO: expand a little
+In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just described as a
+``decomposition'' in terms of $\hat F$ and $\alpha$.
 
 \begin{lemma}
-  Let $(A, \alpha : F A \to A)$ be an $F$-algebra. Then there is an isomorphism of categories
+  Let $(A, \alpha)$ be an $F$-algebra. Then there is an isomorphism of categories
   \[ (\Alg_{\hat F})_\alpha \cong \Alg_{F^\alpha} \]
 \end{lemma}
 
@@ -1191,7 +1268,11 @@ In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just
 \end{proof}
 
 In order to work with this new formulation of the category, we will lift some of our constructions
-over the families fibration to $(\Alg_{\hat F})_\alpha$. 
+over the families fibration to $(\Alg_{\hat F})_\alpha$. TODO:
+
+The following lemmas are analogues of lemmas (\ref{lem:reindex-adjoint}) and
+(\ref{lem:famset-morphism-iso}) for the algebras fibration. The proofs are technical but not
+exceedingly difficult, so we elide them. TODO: create that label
 
 \begin{lemma}
   Let $f$ be an $F$-algebra morphism $(A, \alpha) \to (B, \beta)$. Then there are functors
@@ -1202,6 +1283,30 @@ over the families fibration to $(\Alg_{\hat F})_\alpha$.
     \item The $\hat F$-algebra $f^{*\Alg}$ has carrier $f^*(A, P)$.
   \end{itemize}
 \end{lemma}
+
+\begin{lemma}
+  Let $(A, \alpha)$ and $(B, \beta)$ be $\hat F$-algebras. Fix an object $((A, P), k)$ in
+  $(\Alg_{\hat F})_\alpha$ and $((B, Q), k')$ in $(\Alg_{\hat F})_\beta$. Let $f : (A, \alpha) \to
+  (B, \beta)$ be an $\hat F$-algebra morphism.
+  
+  Then there is an isomorphism between the set of $\Alg_{\hat F}$-morphisms $h : k \to k'$ such that
+  $U^\Alg h = f$ and the set of morphisms $k \to f^{*\Alg}(k')$:
+  \[ \{h \in \Hom_{\Alg_{\hat F}}(k, k') \mid U^\Alg h = f\} \cong \Hom_{\Alg_{\hat F}}(k, f^{*\Alg}(k')) \]
+\end{lemma}
+
+Equipped with these intermediate results, we can now finally prove what we set out to show: that
+$F^\alpha$ admits an initial algebra, and that its carrier is isomorphic to the ``na\"ive''
+refinement interpretation. We make one brief observation: we can rewrite our previous ``na\"ive''
+interpretation of refinements using the truth and op-reindexing functors as follows:
+
+\[ (A, a \mapsto \{x \in \mu F \mid \llpr{\alpha}_F(x) = a\}) \cong \Sigma_{\llpr{\alpha}_F} \top(\mu F). \]
+
+Using this formulation, we now state our main theorem.
+
+\begin{theorem}
+The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\llpr{\alpha}}
+\top(\mu F)$.
+\end{theorem}
 
 \begin{proof}
   TODO
