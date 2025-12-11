@@ -1,7 +1,7 @@
-% TODO: styling
+% Exercise boxes
 \mdtheorem[style=theoremstyle,frametitlebackgroundcolor=black,frametitlefontcolor=white]{exercise}{Exercise}
 
-% TODO: better workaround for \sloppy? (cf https://tex.stackexchange.com/q/153872)
+% Try to find better workaround for \sloppy (cf https://tex.stackexchange.com/q/153872)
 
 \newcommand{\llpr}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\FamSet}{\mathsf{Fam}(\mathsf{Set})}
@@ -28,7 +28,7 @@ pairs, adjoining to values of the list type proofs that they satisfy the length 
 However, dependent types permit a more elegant encoding: such constraints can be directly ``baked
 into'' the definition of an inductive type via type indices, ensuring that all values inhabiting the
 type are correct by construction. Our example above, for instance, yields the type of length-indexed
-vectors:\footnote{Throughout this chapter, we will write code snippets in a syntax similar to that
+vectors:\footnote{Throughout this explainer, we will write code snippets in a syntax similar to that
 of Lean 4, though we assume all constructors live in the global namespace. Those familiar with Agda
 can read \texttt{inductive} as \texttt{data} and \texttt{Type} as \texttt{Set}.}
 
@@ -39,17 +39,21 @@ inductive Vector (A : Type) : Nat -> Type
 \end{lstlisting}
 
 The type \texttt{Vector} naturally internalizes the \texttt{length} refinement from the simply typed
-setting. In this chapter, we will use a categorical construction to generalize this transformation
+setting. In this explainer, we will use a categorical construction to generalize this transformation
 to arbitrary inductive types and a broad class of refinements. In other words, we answer the
 following question: how can a refinement of a type in a simply typed language be translated into an
-indexed inductive type in a dependently typed one? Along the way, we will see how to translate
-familiar concepts like inductive datatypes and their folds into categorical language. The content of
-this chapter is based on the work of Atkey, Johann, and Ghani \citep{atkey2011refining}.
+indexed inductive type in a dependently typed one?
 
-% Note that in this chapter, we will tacitly work over a set-theoretic semantics of a basic lambda
-% calculus. However, to avoid having to stray too far afield into a general account of (dependent)
-% inductive types, we will opt not to give a formal grammar for our syntax, and instead rely on code
-% snippets to characterize the entities of interest.
+Although this question serves as our motivation, the actual aim of this explainer is threefold:
+\begin{itemize}
+  \item To give an account of a categorical semantics of inductive and indexed inductive types;
+  \item To illustrate an application of these tools in the form of the translation discussed above;
+  \item To provide motivating intuition for the study of \emph{fibrations}, which we regrettably do
+        not have space to treat herein.
+\end{itemize}
+
+The content of this explainer is largely based on the work of Atkey, Johann, and Ghani
+\citep{atkey2011refining}.
 
 \section{Categorifying Inductive Types}
 
@@ -696,11 +700,11 @@ Cartesian closed and contains finite coproducts---i.e., it is \emph{bicartesian 
 The category $\Set$ alone, however, lacks the structure to give an elegant semantics to indexed
 inductive types. Instead, we will turn to a new category built atop $\Set$ that is equipped with a
 notion of ``indexing'' that will afford a straightforward interpretation of our inductive types'
-indices.\footnote{Be careful when reading the following definition and elsewhere in this section:
+indices.\footnote{Be careful when reading the following definition and elsewhere in this explainer:
 the notation $\prod_{a \in A} S(a)$ below refers to a \emph{set-theoretic} indexed product, not,
 e.g., a $\Pi$-type. The symbols $\prod$, $\sum$, and $\to$ are regrettably highly overloaded (we
 will see yet another denotation of $\sum$ later on), so the meanings of these notations are highly
-context-sensitive. TODO: verify that we do in fact introduce indexed (co)products later on}
+context-sensitive.}
 
 \begin{definition}[Families fibration]
   TODO: maybe don't name the category
@@ -768,7 +772,6 @@ Therefore, to represent an indexed inductive type, we take the initial algebra o
 on $\FamSet$ itself, but on a restriction of $\FamSet$ where we consider only families indexed by
 the indexing set of the indexed type of interest. This smaller category is called the \emph{fiber}
 of the families fibration over $A$.
-% TODO: only italicize "fiber" if we decide to previously define families fibration
 
 \begin{definition}[Fiber of the families fibration over $A$]
 \sloppy
@@ -818,14 +821,11 @@ Our basic recipe for this conversion will be as follows:
 
 This recipe will require a number of auxiliary constructions, on which we now embark.
 
-% TODO: either define the families fibration somewhere, or add a footnote a la ``the astute reader
-% will have noticed that we titled this chapter ...'' and give (at least the gist of) the def there
-
 \section{Constructing a Refinement Translation}
 
 \subsection{Another View of Families}
 
-For some of the constructions we give in this chapter, it will be helpful to have in mind an
+For some of the constructions we give in this explainer, it will be helpful to have in mind an
 alternative interpretation of $\FamSet$. This interpretation is inspired by the Curry--Howard
 correspondence between propositions and types.
 
@@ -1054,7 +1054,7 @@ thereover:
 \begin{align*}
   F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
   F_\texttt{BitList}(f) &= [\mathsf{inl} \circ \id_1, \mathsf{inr} \circ \langle \mathsf{id}_2, f\rangle]\\
-  \\[-10pt] % TODO: be less hacky
+  \\[-10pt] % Spacing hack
   % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\mathtt{z}, \mathtt{s} \circ \pi_2]
   \texttt{length} ~ (\mathsf{inl}~ ()) &= 0\\
   \texttt{length} ~ (\mathsf{inr}~ (b, \ell)) &= \mathtt{succ}(\ell)
@@ -1115,9 +1115,9 @@ to the paper by Atkey et al. \citep{atkey2011refining} for further details.
 
 \subsection{Preliminaries}
 
-We begin with a few auxiliary definitions we will require for our proofs. First, recall that we
-TODO: call back here to the whole idea of being able to ``move back and forth,'' the note that it's
-actually adjoint!
+We begin with a few auxiliary lemmas and definitions we will require for our proofs. First, recall
+our previous remark that the functors $\top : \Set \to \FamSet$ and $U : \FamSet \to \Set$ map in
+oppposite directions. In fact, we can say more: these form an adjoint pair.
 
 \begin{lemma}
   \label{lem:fam-fibration-adjoint}
@@ -1133,7 +1133,10 @@ actually adjoint!
   $\Set(A, B)$.
 \end{proof}
 
-TODO: introduce symmetry/want to be bidirectional along other axis too
+As before, we now turn from functors between $\FamSet$ and $\Set$---i.e., between families and their
+index sets---to those between fibers $\FamSet_A$---i.e., between families with distinct index sets.
+While our construction required only the op-reindexing functor $\Sigma_f$, the following alternative
+means of reindexing will be useful for our proof.
 
 \begin{definition}[Reindexing functor]
   Let $f : A \to B$ be a function (of sets). The \emph{reindexing functor} $f^* : \FamSet_B \to
@@ -1146,14 +1149,12 @@ TODO: introduce symmetry/want to be bidirectional along other axis too
 
 Notice that this functor, in contrast with $\Sigma_f$, is contravariant: the domain of $f^*$ is the
 fiber over the codomain of $f$, and vice versa. Thus, given a function $f : A \to B$, we can produce
-functors running in both directions between $\FamSet_B$ and $\FamSet_A$. These complement the
-``perpendicular'' pair of functors $U : \FamSet \to \Set$ and $\top : \Set \to \FamSet$ that allow
-us to move bidirectionally between families and their index sets. Moreover, these are both adjoint
-pairs.
+functors running in both directions between $\FamSet_B$ and $\FamSet_A$. Moreover, these functors
+are adjoint, as we now prove.
 
 \begin{lemma}
   \label{lem:reindex-adjoint}
-  Let $f : A \to B$ be a function. Then $\Sigma_f \dashv f^*$.
+  Given a function $f : A \to B$, the functors $\Sigma_f \dashv f^*$ form an adjoint pair.
 %   % https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXEZhbVNldF9CIl0sWzIsMCwiXFxGYW1TZXRfQSJdLFsxLDAsIlxccGVycCJdLFsxLDAsIlxcU2lnbWFfZiIsMix7ImN1cnZlIjozfV0sWzAsMSwiZl4qIiwyLHsiY3VydmUiOjN9XV0=
 % \[\begin{tikzcd}
 % 	{\FamSet_B} & \perp & {\FamSet_A}
@@ -1167,7 +1168,7 @@ pairs.
   Recall that morphisms in these fibers are fully characterized by their second component (i.e.,
   their mapping on families), so, unfolding definitions (and using the isomorphic representation of
   the indexed coproduct from equation (\ref{eqn:indexed-coprod-simplified})), it suffices to show
-  \[ \left\{ g : \prod_{b \in B} \sum_{a \in f^{-1}} P(a) \to Q(b) \right\} \cong \left\{ h :
+  \[ \left\{ g : \prod_{b \in B} \sum_{a \in f^{-1}[\{b\}]} P(a) \to Q(b) \right\} \cong \left\{ h :
   \prod_{a \in A} P(a) \to Q(f(a)) \right\}. \] It is straightforward to check that $\iota$ (mapping
   from left to right) and its putative inverse defined below indeed form an isomorphism between
   these sets:
@@ -1178,7 +1179,9 @@ pairs.
   \end{align*}
 \end{proof}
 
-There is one other lemma involving reindexing that we must define. TODO
+We also prove a lemma for later use that characterizes the morphisms into a reindexed family: they
+are isomorphic to those morphisms into the original family that mapped indexing sets according to
+$f$.
 
 \begin{lemma}
   \label{lem:famset-morphism-iso}
@@ -1195,7 +1198,7 @@ There is one other lemma involving reindexing that we must define. TODO
   TODO
 \end{proof}
 
-\subsection{TODO Name this}
+\subsection{A Proof of Correctness}
 
 We want to show that, given an endofunctor $F$ on $\Set$ with an initial algebra, the endofunctor
 $F^\alpha$ on $\FamSet_A$ has one as well: that is, we must find an initial object in
@@ -1210,7 +1213,7 @@ $\Set$ (in the sense that a family $P$ is ``atop'' its indexing set $UP$), the c
 F}$ likewise ``sits atop'' $\Alg_F$, a fact witnessed by the following \emph{algebras
 fibration}.\footnote{We will make this remark more precise later. TODO: see that this happens}
 
-\begin{definition}[Algebras fibration induced by $U$]
+\begin{definition}[Algebras fibration]
   The \emph{algebras fibration} $U^\Alg$ induced by the families fibration $U$ is a functor
   $U^{\Alg} : \Alg_{\hat F} \to \Alg_F$ defined by
   \begin{align*}
@@ -1219,20 +1222,21 @@ fibration}.\footnote{We will make this remark more precise later. TODO: see that
   \end{align*}
 \end{definition}
 
-It is worth pausing to clarify why this definition type-checks. Recall that $U : \FamSet \to \Set$
-maps families to their indexing sets. Since $\hat F$ is an endofunctor on \emph{families}, $P$
-comprises a family indexed by some set; $k$ is a morphism of families, which is a pair of functions;
-and $f$ is an algebra morphism (as defined in Definition \ref{def:cat-of-algebras}) over an
-endofunctor on families and thus also a morphism of families (satisfying a certain commutativity
-condition). Thus, $U$ has an action on each of these.
+It is worth pausing to type-check this definition. Recall that $U : \FamSet \to \Set$ maps families
+to their indexing sets. Since $\hat F$ is an endofunctor on \emph{families}, $P$ comprises a family
+indexed by some set; $k$ is a morphism of families, which is a pair of functions; and $f$ is an
+algebra morphism (as defined in Definition \ref{def:cat-of-algebras}) over an endofunctor on
+families and thus also a morphism of families (satisfying a certain commutativity condition). Thus,
+$U$ has an action on each of these.
 
 The algebras over $F$ inherit an additional useful property from those over $F$: in particular, if
 $F$ has an initial algebra, than so does $\hat F$:
 
-\begin{lemma}
+\begin{theorem}
+  \label{thm:lifting-init-alg}
   Suppose $F$ has an initial algebra. Then $\hat F$ has an initial algebra too, and its carrier is
   $\top(\mu F)$.
-\end{lemma}
+\end{theorem}
 \begin{proof}
   TODO
 \end{proof}
@@ -1259,6 +1263,7 @@ In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just 
 ``decomposition'' in terms of $\hat F$ and $\alpha$.
 
 \begin{lemma}
+  \label{lem:alg-falpha-iso}
   Let $(A, \alpha)$ be an $F$-algebra. Then there is an isomorphism of categories
   \[ (\Alg_{\hat F})_\alpha \cong \Alg_{F^\alpha} \]
 \end{lemma}
@@ -1267,20 +1272,19 @@ In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just 
   TODO
 \end{proof}
 
-In order to work with this new formulation of the category, we will lift some of our constructions
-over the families fibration to $(\Alg_{\hat F})_\alpha$. TODO:
-
-The following lemmas are analogues of lemmas (\ref{lem:reindex-adjoint}) and
-(\ref{lem:famset-morphism-iso}) for the algebras fibration. The proofs are technical but not
-exceedingly difficult, so we elide them. TODO: create that label
+In order to work with this new formulation of the category, we will reproduce for $(\Alg_{\hat
+F})_\alpha$ several results analogous to those we showed for the families fibration. The following
+lemmas are analogues of Lemmas \ref{lem:reindex-adjoint} and \ref{lem:famset-morphism-iso}; their
+proofs are technical but not exceedingly difficult, so we elide them.
 
 \begin{lemma}
   Let $f$ be an $F$-algebra morphism $(A, \alpha) \to (B, \beta)$. Then there are functors
-  $\Sigma_f^\Alg$ and $f^{*\Alg}$ such that $\Sigma_f^\Alg \dashv
-  f^{*\Alg}$ and for any $\hat F$-algebra $((A, P), k)$,
+  $\Sigma_f^\Alg : (\Alg_{\hat F})_\alpha \to (\Alg_{\hat F})_\beta$ and $f^{*\Alg} : (\Alg_{\hat
+  F})_\beta \to (\Alg_{\hat F})_\alpha$ such that $\Sigma_f^\Alg \dashv f^{*\Alg}$ and for any $\hat
+  F$-algebras $((A, P), k)$ and $((B, Q), k')$,
   \begin{itemize}
-    \item The $\hat F$-algebra $\Sigma_f^{\Alg}$ has carrier $\Sigma_f(A, P)$, and
-    \item The $\hat F$-algebra $f^{*\Alg}$ has carrier $f^*(A, P)$.
+    \item The $\hat F$-algebra $\Sigma_f^{\Alg}((A, P), k)$ has carrier $\Sigma_f(A, P)$, and
+    \item The $\hat F$-algebra $f^{*\Alg}((B, Q), k')$ has carrier $f^*(B, Q)$.
   \end{itemize}
 \end{lemma}
 
@@ -1291,7 +1295,7 @@ exceedingly difficult, so we elide them. TODO: create that label
   
   Then there is an isomorphism between the set of $\Alg_{\hat F}$-morphisms $h : k \to k'$ such that
   $U^\Alg h = f$ and the set of morphisms $k \to f^{*\Alg}(k')$:
-  \[ \{h \in \Hom_{\Alg_{\hat F}}(k, k') \mid U^\Alg h = f\} \cong \Hom_{\Alg_{\hat F}}(k, f^{*\Alg}(k')) \]
+  \[ \{h \in \Hom_{\Alg_{\hat F}}(k, k') \mid U^\Alg h = f\} \cong \Hom_{\Alg_{\hat F}}(k, f^{*\Alg}(k')). \]
 \end{lemma}
 
 Equipped with these intermediate results, we can now finally prove what we set out to show: that
@@ -1309,7 +1313,19 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 \end{theorem}
 
 \begin{proof}
-  TODO
+  We will first construct a candidate $F^\alpha$-algebra, then show that it is initial. By Lemma
+  \ref{lem:alg-falpha-iso}, it suffices to find an initial object in $(\Alg_{\hat F})_\alpha$
+  instead.
+  
+  From Theorem \ref{thm:lifting-init-alg}, we obtain an inital algebra $(\top(\mu F),
+  \mathsf{in}_{\hat F})$ in $\Alg_{\hat F}$. We will use this to construct an initial object in the
+  fiber over $\alpha$. Mirroring the construction of $F^\alpha$, we apply the op-reindexing functor
+  $\Sigma_{\llpr{\alpha}}^\Alg$ for the algebras fibration to obtain
+  \[ \left(\Sigma_{\llpr{\alpha}}^\Alg \top(\mu F),~ \Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat
+     F} : \hat F (\top(\mu F)) \to \top(\mu F) \right). \]
+  Note that this type-checks because $\llbr{\alpha} : F A \to A$. TODO: figure out why this actually
+  type checks!
+  We will aim to show that this object is initial in $(\Alg_{\hat F})_\alpha$.
 \end{proof}
 
 % \begin{definition}[Reindexing functor]
@@ -1350,14 +1366,17 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 
 
 
+\section{An Invitation to Fibered Category Theory}
 
-\vspace{3cm}
+Throughout this explainer, we have followed Atkey et al. \citep{atkey2011refining} in carefully
+presenting the material so as to admit a generalization to the abstract language of
+\emph{fibrations}. Regrettably, we do not have the space here to present that generalization.
+Instead, we direct the reader to the following sources TODO: finish
 
-TODO: write exercise solutions!
+TODO: write exercise solutions! (and harder exercises)
 
-TODO: texttt and mathttt are not the same --- settle on one
+TODO: texttt and mathtt are not the same --- settle on one
 
-\section{A Taste of Fibered Category Theory}
 
 References:
 - Article
@@ -1365,4 +1384,4 @@ References:
 - Wadler, Recursive types for free!
 - \href{https://courses.grainger.illinois.edu/cs522/sp2016/ComphrehensionCategoriesAndTheSemanticsOfTypeDependency.pdf}{Comprehension cat paper}
 - Ghani et al., Fibrational Induction Rules for Initial Algebras
-- The Bart Jacobs book on fibered category theory
+- The Bart Jacobs book on fibered category theory (Cat Log and ...)
