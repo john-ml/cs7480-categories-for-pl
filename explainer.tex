@@ -4,8 +4,10 @@
 % Try to find better workaround for \sloppy (cf https://tex.stackexchange.com/q/153872)
 
 \newcommand{\llpr}[1]{\llparenthesis #1 \rrparenthesis}
-\newcommand{\FamSet}{\mathsf{Fam}(\mathsf{Set})}
+\newcommand{\FamSet}{{\mathsf{Fam}(\mathsf{Set})}}
 \newcommand{\Alg}{\mathsf{Alg}}
+\newcommand{\inl}{\mathsf{inl}}
+\newcommand{\inr}{\mathsf{inr}}
 
 \chapter{Type Refinements as Indexed Inductive Types}
 
@@ -171,16 +173,18 @@ this as a restricted form of function extensionality:
   {x : \texttt{Bool} \vdash d : \tau \quad
    \vdash d[\texttt{true}/x] \equiv t : \tau \quad
    \vdash d[\texttt{false}/x] \equiv e : \tau}
-  {\vdash d[b/x] \equiv \texttt{if}(t,e)(b) : \tau}
+  {x : \texttt{Bool} \vdash d \equiv \texttt{if}(t,e)(x) : \tau}
 \end{mathpar}
 
 As in our previous translations of equational laws, the $\beta$ laws correspond to equalities of
 morphisms, while the $\eta$ law is a uniqueness criterion. In particular, the $\beta$ laws require
 that if we have morphisms $t, e : 1 \to \llbr{\tau}$, then $\mathtt{if}(t,e) \circ \mathtt{true} =
-t$ and $\mathtt{if}(t,e) \circ \mathtt{false} = e$. The interpretation of the $\eta$ law is more
-involved, but it amounts to the requirement that $\mathtt{if}(t,e)$ be the \emph{unique} morphism
-satisfying these properties. Putting these together, we obtain the following pair of commutative
-triangles:
+t$ and $\mathtt{if}(t,e) \circ \mathtt{false} = e$. Meanwhile, the $\eta$ law says that if we have
+some expression $d$ such that it can be substituted for $\texttt{if}(t, e)$ in the preceding two
+equalities\footnote{Recall that we interpret substitution as composition of morphisms.}---i.e., $d
+\circ \texttt{true} \equiv t$ and $d \circ \texttt{false} \equiv e$---then it is equal to the
+recursor: in other words, the recursor denotes the unique morphism satisfying these equalities.
+Putting these together, we obtain the following pair of commutative triangles:
 
 % https://q.uiver.app/#q=WzAsNCxbMCwwLCIxIl0sWzIsMCwiXFx0ZXh0dHR7Qm9vbH0iXSxbNCwwLCIxIl0sWzIsMiwiXFx0YXUiXSxbMCwxLCJcXHRleHR0dHt0cnVlfSJdLFsyLDEsIlxcdGV4dHR0e2ZhbHNlfSIsMl0sWzEsMywiXFx0ZXh0dHR7aWZ9KHQsZSkiLDJdLFswLDMsInQiLDFdLFsyLDMsImUiLDFdXQ==
 \[\begin{tikzcd}
@@ -214,6 +218,7 @@ For reasons that will become clear shortly, it is helpful to expand these triang
 \end{equation}
 
 \begin{exercise}
+\label{ex:denote-bool}
 \sloppy
 Verify that $1 \oplus 1$ is a suitable choice for $\llbr{\texttt{Bool}}$. What are the denotations
 of \texttt{true}, \texttt{false}, and $\texttt{if}(t,e)$?
@@ -225,9 +230,7 @@ We now perform a similar translation for natural numbers. The type \texttt{Nat} 
 constructors, which we abbreviate as \texttt{z} (zero) and \texttt{s} (successor), and is equipped
 with a recursor $\texttt{rec}(e_z, x.~e_s)(n)$. Notice that, unlike \texttt{if}, the recursor for
 \texttt{Nat} binds a variable in the successor case: this will be the recursive result of evaluating
-the recursor on the substructure of $n$.\footnote{We assume the reader is familiar with the standard
-setup of recursive types. See, e.g., Chapter 15 of Harper, \emph{Practical Foundations for
-Programming Languages (2\textsuperscript{nd} ed.)}.} The typing rules are given below:
+the recursor on the substructure of $n$. The typing rules are given below:
 
 \begin{mathpar}
 \inferrule*[right=T-z]{~}{\vdash z : \mathtt{Nat}}
@@ -241,10 +244,7 @@ Programming Languages (2\textsuperscript{nd} ed.)}.} The typing rules are given 
 
 The $\beta$ rules for the recursor express its behavior as a fold over the structure of a natural
 number: applying the recursor to zero evaluates to the first arm, while applying it to a successor
-binds $x$ to the recursive result of folding over its predecessor, then evaluates $e_s$. As before,
-we will elide detailed analysis of the $\eta$ rule beyond noting that it corresponds to a uniqueness
-condition:
-
+binds $x$ to the recursive result of folding over its predecessor, then evaluates $e_s$:
 \begin{mathpar}
 \inferrule*[right=$\beta^{\mathtt{rec_{Nat}}}_z$]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
@@ -255,13 +255,23 @@ condition:
   {\vdash \mathtt{rec_{Nat}}(e_z, x. e_s)(\mathtt{s}(n)) \equiv e_s[\mathtt{rec_{Nat}}(e_z, x. e_s)(n)/x] : \tau}
 \end{mathpar}
 
+Finally, the $\eta$ rule says that any expression $e$ that satisfies the above equations is equal to
+the corresponding recursor application:
+
+\begin{mathpar}
+\inferrule*[right=$\eta^{\mathtt{rec_{Nat}}}$]
+  {y : \texttt{Nat} \vdash e : \tau \\ \vdash e[z/y] \equiv e_z : \tau \\ n : \texttt{Nat} \vdash e[s(n)/y] \equiv e_s[e/x] : \tau }
+  {y : \texttt{Nat} \vdash e \equiv \texttt{rec}(e_z, x.e_s)(y) : \tau}
+\end{mathpar}
+
 % TODO: a bit too metaphorical/scare-quote-y
 As with Booleans, categorifying the rules for natural numbers yields an object representing the type
 \texttt{Nat}, a morphism for each constructor, and, for each pair of ``folding-function'' morphisms
-running ``parallel to'' the constructors, a unique morphism denoted by the recursor. In the case of
-natural numbers, however, the resulting construction has a special name: the \emph{natural numbers
-object} in a Cartesian closed category.\footnote{There are technical reasons why we insist that the
-category be Cartesian closed, even though the construction does not require exponential objects.}
+running ``parallel to'' the constructors, a unique morphism denoted by the recursor.\footnote{Note
+that we obtain from the $\eta$ law the uniqueness condition---that any morphism $e$ satisfying the
+$\beta$-derived equalities $e \circ z = e_z$ and $e \circ s = e_s$ is equal to the recursor
+morphism---by recalling that substitution is interpreted as composition.} In the case of natural
+numbers, however, the resulting construction has a special name: the \emph{natural numbers object}.
 
 \begin{definition}[Natural numbers object]
 \sloppy
@@ -286,7 +296,8 @@ category be Cartesian closed, even though the construction does not require expo
   \end{tikzcd}\]
 \end{definition}
 
-As before, it will be helpful to instead view this diagram as a pair of squares:
+Here, $u$ is $\mathtt{rec_{Nat}}(e_z, x.e_s)$. As before, it will be helpful to instead view this
+diagram as a pair of squares:
 
 % https://q.uiver.app/#q=WzAsNyxbMCwwLCIxIl0sWzIsMCwiXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzQsMCwiXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzIsMiwiXFxsbGJye1xcdGF1fSJdLFswLDIsIjEiXSxbNCwyLCJcXGxsYnJ7XFx0YXV9Il0sWzMsMF0sWzAsMSwiXFx0ZXh0dHR7en0iXSxbMSwzLCJcXHRleHR0dHtyZWN9KGVfeix4Ln5lX3MpIiwyXSxbNCwzLCJlX3oiLDFdLFs1LDMsImVfcyIsMV0sWzIsNSwiXFx0ZXh0dHR7cmVjfShlX3oseC5+ZV9zKSIsMV0sWzAsNCwiXFxtYXRoc2Z7aWR9XzEiLDFdLFsyLDEsIlxcdGV4dHR0e3N9IiwyXV0=
 \begin{equation}
@@ -306,6 +317,7 @@ As before, it will be helpful to instead view this diagram as a pair of squares:
 \end{equation}
 
 \begin{exercise}
+\label{ex:interp-exnat}
 \sloppy
   Give a categorical interpretation of the type of \emph{extended natural numbers}, i.e., the type
   of natural numbers extended with an extra element representing infinity, defined as follows:
@@ -362,8 +374,8 @@ Applying this rewriting to the \texttt{Nat} datatype depicted in diagram
 	\\
 	{1 \oplus A} && A
 	\arrow["{[ z, s]}", from=1-1, to=1-3]
-	\arrow["{\left[ \mathsf{inl} \mathop\circ \mathsf{id}_1,~ \mathsf{inr} \mathop\circ \mathsf{rec_{Nat}}([ f_z, f_s]) \right]}"', from=1-1, to=3-1]
-	\arrow["{\mathtt{rec_{Nat}}([ f_z, f_s])}", from=1-3, to=3-3]
+	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \mathtt{rec_{Nat}}([ f_z, f_s]) \right]}"', from=1-1, to=3-1]
+	\arrow["{\mathtt{rec_{Nat}}([ f_z, f_s])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ f_z, f_s]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
 and a similar transformation occurs for diagram (\ref{fig:bool-squares}). (Above and hereafter, we
@@ -377,14 +389,25 @@ the natural numbers. That is, using a least-fixed-point operator $\mu$, we would
 \[ \texttt{Nat} \triangleq \mu t.~1 \oplus t, \]
 so that \texttt{Nat} is the (smallest) type satisfying the type isomorphism
 \[ \texttt{Nat} \cong 1 \oplus \texttt{Nat}. \]
+Similarly, diagram (\ref{fig:bool-squares}) is ``consolidated'' into a single square with a
+constructor with domain $1 \oplus 1$:
+\[\begin{tikzcd}
+	{1 \oplus 1} && {\llbr{\texttt{Bool}}} \\
+	\\
+	{1 \oplus 1} && A
+	\arrow["{[ z, s]}", from=1-1, to=1-3]
+	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \mathsf{id}_1 \right]}"', from=1-1, to=3-1]
+	\arrow["{\mathtt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
+	\arrow["{[ t, e ]}"', from=3-1, to=3-3]
+\end{tikzcd}\]
+% TODO: exercise here?
+% \begin{exercise}
+% \sloppy
+%   ``Consolidate'' diagram (\ref{fig:bool-squares}) as we did for diagram (\ref{fig:nat-squares})
+%   above, and verify that the (degenerate) recursive type equation for Booleans emerges.
+% \end{exercise}
 
-\begin{exercise}
-\sloppy
-  ``Consolidate'' diagram (\ref{fig:bool-squares}) as we did for diagram (\ref{fig:nat-squares})
-  above, and verify that the (degenerate) recursive type equation for Booleans emerges.
-\end{exercise}
-
-With this consolidation, every inductive type now translates to a single object (the top-right
+With this consolidation, every inductive type now translates to a single object (the top-left
 corner of the square), a single morphism (the constructor), and a universal property that translates
 the recursor. The ``shape'' of the objects on the left-hand side of the commutative square are
 determined by the ``shape'' of the inductive type. More precisely, using the observation in the
@@ -398,11 +421,11 @@ with.}
 Adopting a categorical lens, we might observe that an expression $t.~\tau$ defines a mapping from a
 type $t$ to some type $\tau$ parameterized thereby. In our categorical interpretation, types form a
 category; thus, such a mapping from types to types ought to correspond to a functor. More
-specifically, since we are mapping from a category into itself, this is an \emph{endofunctor}. The
-endofunctor associated with the type of natural numbers is defined by
+specifically, since we are mapping from a category (of types) into itself, this is an
+\emph{endofunctor}. The endofunctor associated with the type of natural numbers is defined by
 \begin{align*}
   F_\texttt{Nat}(X) &= 1 \oplus X\\
-  F_\texttt{Nat}(f : X \to Y) &= [\mathsf{inl} \circ \mathsf{id}_1, \mathsf{inr} \circ f] : 1 \oplus X \to 1 \oplus Y
+  F_\texttt{Nat}(f : X \to Y) &= [\inl \circ \mathsf{id}_1, \inr \circ f] : 1 \oplus X \to 1 \oplus Y
 \end{align*}
 
 Of course, the mapping $t.~\tau$ is not itself a type; rather, we apply the least-fixed-point
@@ -476,7 +499,8 @@ in terms of initiality. In particular, $F$-algebras form a category $\Alg_F$, so
 We have thus found a suitable notion of a ``smallest'' $F$-algebra. But what about the smallest
 $F$-algebra whose carrier is a fixed point of $F$? In fact, these are one and the same (up to
 isomorphism): it will always be the case that the carrier of the initial $F$-algebra is (isomorphic
-to) a fixed point of $F$. This is the content of \emph{Lambek's lemma}.
+to) a fixed point of $F$. In other words, if $(A, \alpha)$ is the initial $F$-algebra, then $F A
+\cong A$. This is the content of \emph{Lambek's lemma}.
 
 \begin{proposition}[Lambek's lemma]
   Let $F : \calC \to \calC$ be an endofunctor. If $(A, \mathsf{in}_F : F A \to A)$ is the initial
@@ -564,8 +588,8 @@ using a ``combining morphism'' $f_c : F A \to A$. Or, as a diagram:
 	\\
 	{F A} && A
 	\arrow["c", from=1-1, to=1-3]
-	\arrow["{F (\mathsf{rec}_{f_c})}"{description}, from=1-1, to=3-1]
-	\arrow["{\mathsf{rec}_{f_c}}"{description}, from=1-3, to=3-3]
+	\arrow["{F (\mathtt{rec}_{f_c})}"{description}, from=1-1, to=3-1]
+	\arrow["{\mathtt{rec}_{f_c}}"{description}, from=1-3, to=3-3]
 	\arrow["{f_c}", from=3-1, to=3-3]
 \end{tikzcd}\]
 
@@ -587,14 +611,16 @@ producing a Boolean, this function should translate to a morphism of type $F_\te
 
 \begin{align*}
 \texttt{f}_\texttt{even} &: 1 \oplus \texttt{Bool} \to \texttt{Bool}\\
-\texttt{f}\texttt{even}~(\mathsf{inl}~()) &= \texttt{true}\\
-\texttt{f}_\texttt{even}~(\mathsf{inr}~\texttt{b}) &= \texttt{not}(\texttt{b})
+\texttt{f}_\texttt{even}~(\inl~()) &= \texttt{true}\\
+\texttt{f}_\texttt{even}~(\inr~\texttt{b}) &= \texttt{not}(\texttt{b})
 \end{align*}
 
 This becomes the $F_\texttt{Nat}$-algebra
 % TODO: does this type-check?
-\[ \alpha_\texttt{even} = [\mathtt{true}, \mathtt{not} \circ -] \] which finally
-yields our translation of the parity function $\llpr{\alpha_\texttt{even}} : \llbr{\texttt{Nat}} \to
+\[ \alpha_\texttt{even} = [\mathtt{true}, \mathtt{not}] \] which finally
+reveals our translation of the parity function to be $\llpr{\alpha_\texttt{even}} :
+\llbr{\texttt{Nat}}
+\to
 \llbr{\texttt{Bool}}$.
 
 \begin{exercise}
@@ -622,8 +648,8 @@ Lists are thus represented by the initial algebra $(\mu F_{\mathtt{List_A}},
 length function as the fold induced by the ``combining function''
 \begin{align*}
   \texttt{f}_\texttt{length} &: \texttt{Unit} \oplus \texttt{A} \times \texttt{Nat} \to \texttt{Nat}\\
-  \texttt{f}_\texttt{length}~(\mathsf{inl}~()) &= 0\\
-  \texttt{f}_\texttt{length}~(\mathsf{inr}~(a, \ell)) &= \texttt{succ}(\ell)
+  \texttt{f}_\texttt{length}~(\inl~()) &= 0\\
+  \texttt{f}_\texttt{length}~(\inr~(a, \ell)) &= \texttt{succ}(\ell)
 \end{align*}
 which we translate into the $F_\mathtt{List_A}$-algebra
 % TODO: does this type-check?
@@ -658,8 +684,91 @@ Of course, such results generalize to arbitrary categories, not just $\Set$, but
 them in depth would take us too far afield. It suffices to note that all the usual strictly positive
 inductive types of interest are characterized by endofunctors that admit initial algebras.
 
+The following two exercises provide some pleasing generalizations to conclude this section. However,
+they are not necessary to follow the remainder of this explainer.
+
+\begin{exercise}
+\label{ex:isorec-translation}
+While we gave an interpretation of inductive types by translating the components of their structure
+into categorical terms, we could have alternatively followed our previous method and directly
+translated the generalized inference rules for isorecursively formulated inductive types (cf.\
+Harper, \emph{Practical Foundations for Programming Languages (2\textsuperscript{nd}
+ed.)}, Ch.\ 15).
+
+Your task: give a translation of these rules (shown below), and verify that it yields the
+same construction at which we just arrived.
+
+\begin{mathpar}
+\inferrule*[right=T-fold]
+  {\vdash t.\tau~\mathsf{pos}}
+  {e : \tau[\mu t. \tau/t] \vdash \texttt{fold}(e) : \mu t.\tau}
+
+\inferrule*[right=T-rec]
+  {x : \tau[\rho/t] \vdash e_1 : \rho}
+  {e_2 : \mu t.\tau \vdash \texttt{rec}(x. e_1)(e_2) : \rho}
+
+\inferrule*[right=$\beta^{\texttt{rec}}$]
+  {x : \tau[\rho/t] \vdash e_1 : \rho}
+  {e_2 : \tau[\mu t. \tau/t] \vdash \texttt{rec}(x.e_1)(\texttt{fold}(e_2)) \equiv e_1[\texttt{map}(e_2)(y. \texttt{rec}(x.e_1)(y))/x] : \rho}
+
+\inferrule*[right=$\eta^{\texttt{rec}}$]
+  {y : \tau[\rho/t] \vdash e : \rho \\ e_2 : \tau[\mu t.\tau/t] \vdash e[\texttt{fold}(e_2)/y] \equiv e_1[\texttt{map}(e_2)(y. \texttt{rec}(x.e_1)(y))/x]}
+  {y : \mu t.\tau \vdash e \equiv \texttt{rec}(x.e_1)(y) : \rho}
+\end{mathpar}
+
+These rules introduce two new auxiliary definitions:
+\gdef\NL{\\} % See https://tex.stackexchange.com/a/519322 and https://tex.stackexchange.com/a/234314
+\begin{itemize}
+  \item The judgment $\vdash t. \tau~\mathsf{pos}$ asserts that $t$ has only \emph{positive}
+        occurrences in $\tau$; i.e., it never appears to the left of an arrow. Note that all of the
+        rules implicitly carry this hypothesis, though we have only explicitly stated it for the
+        first.
+  \item The auxiliary function $\texttt{map}(e)(e')$ ``unpacks'' the structure of $e$ based on its
+        type and applies $e'$ to each ``element'' thereof. Its typing rule is as follows (where
+        $t$ may appear free in $\tau$):
+        \begin{mathpar}
+          \inferrule*[right=T-map]
+            {\vdash e : \tau [\rho / t] \\ x : \rho \vdash e' : \rho'}
+            {\vdash \texttt{map}(e)(x. e') : \tau[\rho'/t]}
+        \end{mathpar}
+        Here are two of its equational rules (it has one for every type former):
+        \begin{mathpar}
+          \inferrule*[right=$\beta^{\texttt{map}}_\times$]
+            {\vdash e : (\tau_1 \times \tau_2)[\rho/t] \\ x : \rho \vdash e' : \rho'}
+            {\vdash \texttt{map}(e)(e') \equiv \langle \texttt{map}(\mathsf{fst}~e)(x. e'), \texttt{map}(\mathsf{snd}~e)(x. e') \rangle \\: \tau_1[\rho'/t] \times \tau_2[\rho'/t]}
+          
+          \inferrule*[right=$\beta^{\texttt{map}}_\oplus$]
+            {\vdash e : (\tau_1 \oplus \tau_2)[\rho/t] \\ x : \rho \vdash e' : \rho'}
+            {
+              \begin{aligned}
+                \vdash \texttt{map}(e)(e') \equiv~ &\texttt{case}~e~\texttt{of}\NL[-6pt]
+                &|~\texttt{inl}~x_1 \mapsto \texttt{inl}~(\texttt{map}(x_1)(x. e'))\NL[-6pt]
+                &|~\texttt{inr}~x_2 \mapsto \texttt{inr}~(\texttt{map}(x_2)(x. e')) \NL[-6pt]
+                &: \tau_1[\rho'/t] \oplus \tau_2[\rho'/t]
+              \end{aligned}
+            }
+        \end{mathpar}
+        % Note that we are slightly abusing notation here: the second argument of \texttt{map} binds a
+        % variable $x$, which we have elided in syntax. This is intended to be more suggestive of the
+        % categorical translation.
+\end{itemize}
+Your translation should give an account of what these definitions mean categorically.
+
+\vspace{12pt}
+
+\noindent Here are some hints for this exercise:
+\begin{itemize}
+  \item If parameterized types are translated as functors, to what does type-variable substitution
+        correspond?
+  \item $\texttt{map}(e)$ will not be translated as a morphism.
+\end{itemize}
+\end{exercise}
+
 \begin{exercise}
 \sloppy
+(Note that this exercise is independent of the preceding one.)
+
+\noindent
   We now face the perennial categorical question: can we dualize this? (Spoiler: yes.) That is,
   given an endofunctor $F$, let us consider \emph{$F$-coalgebras} $(A,\, \eta : A \to F A)$ instead
   of $F$-algebras, and examine the \emph{terminal} $F$-coalgebra rather than the initial one.
@@ -1053,11 +1162,11 @@ definition of $F_\texttt{BitList} : \Set \to \Set$ and the algebra $(\N, \texttt
 thereover:
 \begin{align*}
   F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
-  F_\texttt{BitList}(f) &= [\mathsf{inl} \circ \id_1, \mathsf{inr} \circ \langle \mathsf{id}_2, f\rangle]\\
+  F_\texttt{BitList}(f) &= [\inl \circ \id_1, \inr \circ \langle \mathsf{id}_2, f\rangle]\\
   \\[-10pt] % Spacing hack
   % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\mathtt{z}, \mathtt{s} \circ \pi_2]
-  \texttt{length} ~ (\mathsf{inl}~ ()) &= 0\\
-  \texttt{length} ~ (\mathsf{inr}~ (b, \ell)) &= \mathtt{succ}(\ell)
+  \texttt{length} ~ (\inl~ ()) &= 0\\
+  \texttt{length} ~ (\inr~ (b, \ell)) &= \mathtt{succ}(\ell)
 \end{align*}
 
 We now compute the corresponding indexed inductive type. Note that we use the isomorphic expansion
@@ -1066,8 +1175,8 @@ from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions
 \begin{align*}
   &F^\texttt{length}_\texttt{BitList}(\N, P)\\
   &\cong (\N, n \mapsto \{ y \in F_\texttt{BitList}\{(\N, P)\} \mid \texttt{length}((F_\texttt{BitList} \pi_{(\N, P)})(y)) = n\})\\
-  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \mathsf{inl}~() \text{ and } 0 = n) \text{ or } (y = \mathsf{inr}~(b, (n_1, p)) \text{ and } \mathtt{succ}(n_1) = n) \right\})\\
-  &= \left(\N, \begin{cases}0 \mapsto \{\mathsf{inl}~()\} \\ \mathsf{succ}(n_1) \mapsto \{\mathsf{inr}~(b, (n_1, p)) \mid b \in 2, p \in P(n_1)\} \end{cases} \right)\\
+  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \inl~() \text{ and } 0 = n) \text{ or } (y = \inr~(b, (n_1, p)) \text{ and } \mathtt{succ}(n_1) = n) \right\})\\
+  &= \left(\N, \begin{cases}0 \mapsto \{\inl~()\} \\ \mathsf{succ}(n_1) \mapsto \{\inr~(b, (n_1, p)) \mid b \in 2, p \in P(n_1)\} \end{cases} \right)\\
   &= (\N, (n \mapsto
     \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
     \oplus\\
@@ -1366,7 +1475,7 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 
 
 
-\section{An Invitation to Fibered Category Theory}
+\section{A (Literal) Invitation to Fibered Category Theory}
 
 Throughout this explainer, we have followed Atkey et al. \citep{atkey2011refining} in carefully
 presenting the material so as to admit a generalization to the abstract language of
@@ -1385,3 +1494,120 @@ References:
 - \href{https://courses.grainger.illinois.edu/cs522/sp2016/ComphrehensionCategoriesAndTheSemanticsOfTypeDependency.pdf}{Comprehension cat paper}
 - Ghani et al., Fibrational Induction Rules for Initial Algebras
 - The Bart Jacobs book on fibered category theory (Cat Log and ...)
+
+\section*{Solutions to Exercises}
+
+\noindent\textbf{Solution \ref{ex:denote-bool}:}
+
+Pick $\llbr{\texttt{true}} = i_1$ and $\llbr{\texttt{false}} = i_2$, respectively the left and right
+injections into the coproduct, and take $\llbr{\texttt{if}(t, e)} = \langle t, e \rangle$.
+Commutativity and recursor  are immediate from the universal property for coproducts.
+
+\noindent\textbf{Solution \ref{ex:interp-exnat}:}
+
+Since the recursor for \texttt{ExtNat} is not explicitly given, we first derive it:
+
+\begin{mathpar}
+\inferrule*
+  {\vdash e_\texttt{z} : \tau \\ x : \tau \vdash e_\texttt{s} : \tau \\ \vdash e_\texttt{i} : \tau}
+  {\vdash \texttt{rec}(e_\texttt{z}, x.e_\texttt{s}, e_\texttt{i}) : \tau}
+\end{mathpar}
+
+As the hint alludes to, this example differs from the preceding ones because there are three
+constructors rather than two, yielding a third square in our diagram; it is a ``revolving door''
+rather than a pair of squares. It looks as follows:
+
+% https://q.uiver.app/#q=WzAsOCxbMiwyLCJcXGxsYnJ7RXh0TmF0fSJdLFs0LDIsIlxcbGxicntFeHROYXR9Il0sWzAsNCwiMSJdLFswLDYsIjEiXSxbMiw0LCJcXGxsYnJ7XFx0YXV9Il0sWzQsNCwiXFxsbGJye1xcdGF1fSJdLFswLDAsIjEiXSxbMCwyLCIxIl0sWzEsMCwiXFx0ZXh0dHR7c3VjY30iLDJdLFsyLDAsIlxcdGV4dHR0e3plcm99IiwwLHsibGFiZWxfcG9zaXRpb24iOjIwfV0sWzIsMywiXFxpZF8xIiwyXSxbMyw0LCJlX1xcdGV4dHR0e3p9IiwyXSxbMCw0LCJcXHRleHR0dHtyZWN9X1xcdGV4dHR0e0V4dE5hdH0oZV9cXHRleHR0dHt6fSwgZV9cXHRleHR0dHtpfSwgeC5lX1xcdGV4dHR0e3N9KSJdLFsxLDUsIlxcdGV4dHR0e3JlY31fXFx0ZXh0dHR7RXh0TmF0fShlX1xcdGV4dHR0e3p9LCBlX1xcdGV4dHR0e2l9LCB4LmVfXFx0ZXh0dHR7c30pIl0sWzUsNCwiZV9cXHRleHR0dHtzfSJdLFs2LDAsIlxcdGV4dHR0e2luZn0iXSxbNiw3LCJcXGlkXzEiLDJdLFs3LDQsImVfXFx0ZXh0dHR7aX0iLDAseyJsYWJlbF9wb3NpdGlvbiI6MzB9XV0=
+\[\begin{tikzcd}
+	1 \\
+	\\
+	1 && {\llbr{\texttt{ExtNat}}} && {\llbr{\texttt{ExtNat}}} \\
+	\\
+	1 && {\llbr{\tau}} && {\llbr{\tau}} \\
+	\\
+	1
+	\arrow["{\id_1}"', from=1-1, to=3-1]
+	\arrow["{\texttt{inf}}", from=1-1, to=3-3]
+	\arrow["{e_\texttt{i}}"{pos=0.25}, from=3-1, to=5-3]
+	\arrow["{\texttt{rec}_\texttt{ExtNat}(e_\texttt{z}, x.e_\texttt{s}, e_\texttt{i})}", from=3-3, to=5-3, dashed]
+	\arrow["{\texttt{succ}}"', from=3-5, to=3-3]
+	\arrow["{\texttt{rec}_\texttt{ExtNat}(e_\texttt{z}, x.e_\texttt{s}, e_\texttt{i})}", from=3-5, to=5-5, dashed]
+	\arrow["{\texttt{zero}}"{pos=0.3}, from=5-1, to=3-3]
+	\arrow["{\id_1}"', from=5-1, to=7-1]
+	\arrow["{e_\texttt{s}}", from=5-5, to=5-3]
+	\arrow["{e_\texttt{z}}"', from=7-1, to=5-3]
+\end{tikzcd}\]
+
+\textbf{Solution \ref{ex:isorec-translation}}:
+
+We translate each rule in turn.
+
+\begin{itemize}
+  \item \textsc{T-fold}: As previously discussed, the positivity hypothesis of this rule is
+        analogous to the requirement that the endofunctor $F$ denoted by $t. \tau$ has an initial
+        algebra. The substitution $\tau[\mu t.\tau/t]$ corresponds to plugging in $\llbr{\tau}$ for
+        the functor variable $t$ in $F(t)$: it is functor action on objects. Thus, the conclusion of
+        the rule induces the following morphism:
+
+        % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGxsYnJ7RiAoXFxtdSBGKX0iXSxbMiwwLCJcXGxsYnJ7XFxtdSBGfSJdLFswLDEsIlxcdGV4dHR0e2ZvbGR9Il1d
+        \[\begin{tikzcd}
+          {\llbr{F (\mu F)}} && {\llbr{\mu F}}
+          \arrow["{\texttt{fold}}", from=1-1, to=1-3]
+        \end{tikzcd}\]
+  \item \textsc{T-rec}: Now that we know how to interpret type-variable substitution, this
+        translation proceeds mechanically: the hypothesis says we have a morphism $e_1 : \llbr{\rho}
+        \to F\llbr{\rho}$, and the conclusion uses this to produce a morphism $\mu F \to
+        \llbr{\rho}$:
+
+        % https://q.uiver.app/#q=WzAsMyxbMiwwLCJcXGxsYnJ7XFxtdSBGfSJdLFswLDIsIkYgXFxsbGJye1xccmhvfSJdLFsyLDIsIlxcbGxicntcXHJob30iXSxbMSwyLCJlXzEiXSxbMCwyLCJcXHRleHR0dHtyZWN9KHguZV8xKSIsMV1d
+        \[\begin{tikzcd}
+          && {\llbr{\mu F}} \\
+          \\
+          {F \llbr{\rho}} && {\llbr{\rho}}
+          \arrow["{\texttt{rec}(x.e_1)}"{description}, from=1-3, to=3-3]
+          \arrow["{e_1}", from=3-1, to=3-3]
+        \end{tikzcd}\]
+  \item \textsc{$\beta^\texttt{rec}$}: Now we must contend with the function $\texttt{map}(e)$.
+        Observe that $e : (t.\tau)[\rho/t]$ from rule \textsc{T-map}, so we know that the type of
+        $e$ denotes a functor application $F \llbr{\rho}$. The key insight---which is most easily
+        observed by inspecting the sample $\beta$ rules for this function---is that the function
+        $\texttt{map}(e)$ denotes precisely the action of $F$ on \emph{morphisms}, i.e., terms.
+        Thus, we translate $\texttt{map}(e)$ as the morphism action $F(-)$.
+
+        We can now interpret the $\beta^\texttt{rec}$ rule. The left-hand side corresponds to the
+        morphism $\texttt{rec}(x.e_1) \circ \texttt{fold}$. The right-hand side becomes (removing
+        the explicit point $y$ for clarity, and recalling that substitution becomes morphism
+        composition) $e_1 \circ \llbr{\texttt{map}(e_2)(\texttt{rec}(x. e_1))}$, which
+        unfolds to $e_1 \circ F(\texttt{rec}(x.e_1))$. Since this rule is equational, we have
+        that these two morphisms are equal, i.e.,
+        \[ \texttt{rec}(x.e_1) \circ \texttt{fold} = e_1 \circ F(\texttt{rec}(x.e_1)) \]
+        This just says that if we stitch together the diagrams from the preceding two rules, the
+        resulting square commutes:
+        % https://q.uiver.app/#q=WzAsNCxbMiwwLCJcXGxsYnJ7XFxtdSBGfSJdLFswLDIsIkYgXFxsbGJye1xccmhvfSJdLFsyLDIsIlxcbGxicntcXHJob30iXSxbMCwwLCJGIChcXG11IEYpIl0sWzEsMiwiZV8xIl0sWzAsMiwiXFx0ZXh0dHR7cmVjfSh4LmVfMSkiLDFdLFszLDAsIlxcdGV4dHR0e2ZvbGR9IiwxXSxbMywxLCJcXHRleHR0dHtGfShcXHRleHR0dHtyZWN9KHguIGVfMSkpIiwxXV0=
+        \[\begin{tikzcd}
+          {F (\mu F)} && {\llbr{\mu F}} \\
+          \\
+          {F \llbr{\rho}} && {\llbr{\rho}}
+          \arrow["{\texttt{fold}}"{description}, from=1-1, to=1-3]
+          \arrow["{\texttt{F}(\texttt{rec}(x. e_1))}"{description}, from=1-1, to=3-1]
+          \arrow["{\texttt{rec}(x.e_1)}"{description}, from=1-3, to=3-3]
+          \arrow["{e_1}", from=3-1, to=3-3]
+        \end{tikzcd}\]
+  \item $\eta^\texttt{rec}$: The hypothesis of this rule translates to
+        \[ e \circ \texttt{fold} = e_1 \circ F(\texttt{rec}(x.e_1)) \]
+        and its conclusion to
+        \[ e = \texttt{rec}(x.e_1). \]
+        In other words, any morphism $e$ satisfying the equality from the $\beta$ rule must be equal
+        to the recursor; that is, the recursor is unique. We reflect this in our diagram from above:
+        \[\begin{tikzcd}
+          {F (\mu F)} && {\llbr{\mu F}} \\
+          \\
+          {F \llbr{\rho}} && {\llbr{\rho}}
+          \arrow["{\texttt{fold}}"{description}, from=1-1, to=1-3]
+          \arrow["{\texttt{F}(\texttt{rec}(x. e_1))}"{description}, from=1-1, to=3-1]
+          \arrow["{\texttt{rec}(x.e_1)}"{description}, from=1-3, to=3-3, dashed]
+          \arrow["{e_1}", from=3-1, to=3-3]
+        \end{tikzcd}\]
+\end{itemize}
+Observe that (renaming \texttt{fold} to $c$, $e_1$ to $f_c$, and $\rho$ to $A$) we have now arrived
+at the same diagram we derived in our previous translation!
