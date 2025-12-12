@@ -8,6 +8,7 @@
 \newcommand{\Alg}{\mathsf{Alg}}
 \newcommand{\inl}{\mathsf{inl}}
 \newcommand{\inr}{\mathsf{inr}}
+\newcommand{\soltitle}[1]{\vspace{12pt}\noindent\textbf{Solution \ref{#1}:}}
 
 \chapter{Type Refinements as Indexed Inductive Types}
 
@@ -80,7 +81,9 @@ inductive Option (A : Type) : Type where
   | none : Option A
 \end{lstlisting}
 has elements isomorphic to those of $\texttt{A} \oplus \texttt{Unit}$, which we interpret as
-$\llbr{\texttt{A}} \oplus 1$ (assuming that we are able to interpret \texttt{A}).
+$\llbr{\texttt{A}} \oplus 1$ (assuming that we are able to interpret \texttt{A}). More generally, to
+interpret the elements of a given inductive type, we can treat each constructor argument as a term
+in a product, then sum together the representations of each constructor. Where lies the problem?
 
 You may notice that our wording above is somewhat roundabout: this is intentional. An inductive type
 is characterized not merely by its ground inhabitants, but also by the \emph{maps into} the type
@@ -677,7 +680,7 @@ inductive SelfTree (A : Type) : Type where
   definition of an inductive type (i.e., an \texttt{inductive} declaration listing at least one
   putative constructor) that is isomorphic to the empty type.
 
-  \emph{Hint:} Recall that in a CCC, $0^A \cong 0 \times A \cong 0$.
+  \emph{Hint:} Recall that in a CCC, $0^A \cong 0 \cong 0 \times A$.
 \end{exercise}
 
 \subsection{On the Existence of Initial Algebras}
@@ -687,13 +690,14 @@ initial $F$-algebra. This is not, however, always the case. And we should expect
 not all recursive type equations admit a least fixed point---this is why we insist that no
 non-positive occurrences of $t$ appear in $\tau$ when defining an inductive type $\mu t.~\tau$. The
 failure to obtain a least fixed point in a recursive type equation corresponds to an analogous lack
-of an initial algebra for the corresponding functor. For instance, $\mu t.~t \to 2$ (i.e., $F(X) =
-2^X$) does not admit a least fixed point in an arbitrary Cartesian closed category: for one,
-Lambek's lemma says that this would induce an isomorphism $\mu F \cong 2^{\mu F}$, which by Cantor's
-theorem never holds in the CCC $\Set$. In fact, we can more generally prove the non-existence of
-certain initial algebras in arbitrary categories, not just $\Set$, but this would take us too far
-afield. For the purposes of this explainer, it suffices to note that all the usual strictly positive
-inductive types of interest are characterized by endofunctors that admit initial algebras.
+of an initial algebra for the corresponding functor. For instance, $\mu t.~(t \to 2) \to 2$ (i.e.,
+$F(X) = 2^{2^X}$) does not admit a least fixed point in every Cartesian closed category: for one,
+Lambek's lemma says that this would induce an isomorphism $\mu F \cong 2^{2^{\mu F}}$, which by
+Cantor's theorem never holds in the CCC $\Set$. In fact, we can more generally prove the
+non-existence of certain initial algebras in arbitrary categories, not just $\Set$, but this would
+take us too far afield. For the purposes of this explainer, it suffices to know that all the usual
+strictly positive inductive types of interest are characterized by endofunctors that admit initial
+algebras.
 
 \begin{exercise}
 \label{ex:isorec-translation}
@@ -838,6 +842,13 @@ context-sensitive.}
   is called the \emph{families fibration}.
 \end{definition}
 
+Note that, while we will not treat them in full generality, \emph{(Grothendieck) fibrations} are
+objects of particular interest in category theory and characterize a certain kind of structure
+(which we will attempt to intuitively motivate at several points hereafter). Throughout this
+explainer, you will encounter definitions phrased as features ``of the families fibration:'' these
+should be read as referring to the entire structure of $\FamSet$, $\Set$, and this mapping between
+them, rather than particular characteristics of a single forgetful functor.
+
 % \begin{definition}[Families fibration (of $\Set$)]
 %   The \emph{families fibration (of $\Set$)} is a functor $U : \FamSet \to \Set$ defined as follows:
 %   \begin{align*}
@@ -846,7 +857,7 @@ context-sensitive.}
 %   \end{align*}
 % \end{definition}
 
-Let's now use this category to interpret indexed inductive types. We'll start with the type
+Let's now use the category of families to interpret indexed inductive types. We'll start with the type
 \texttt{BitVec n}, which is like the type \texttt{Vector A n} we have previously discussed, except
 that it contains only Booleans:\footnote{\texttt{Vector A n} is defined similarly. We choose
 \texttt{BitVec} for this example to avoid any potential confusion between the parameter \texttt{A}
@@ -870,7 +881,7 @@ mappings are ``automatic'' from our choice of action on objects.}
   F_\texttt{BitVec}(\N, X) = (\N, (n \mapsto
     &\left(\begin{array}{ll}\{\star\} & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
     \oplus \notag\\
-    &\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ \{n_1\} \times \llbr{\texttt{Bool}} \times X(n_1) & \text{if } n = n_1 + 1 \end{array} \right)
+    &\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ \{n_1\} \times \llbr{\texttt{Bool}} \times X(n_1) & \text{if } n = \texttt{succ}(n_1) \end{array} \right)
   ))
   \label{eqn:functor-bitvec}
 \end{align}
@@ -903,6 +914,7 @@ the families fibration over $A$. As before, the morphisms induced by initiality 
 using the target algebras' structure maps.
 
 \begin{exercise}
+\label{ex:fin-functor}
 \sloppy
 Identify the endofunctor on $\FamSet_\N$ that characterizes \texttt{Fin n}, the type of ``natural
 numbers less than $n$'' (or, isomorphically, $\Z/n\Z$):
@@ -915,6 +927,8 @@ inductive Fin : Nat -> Type where
 
 \emph{Hint:} Notice that, for a given index, there maybe multiple (or no) applicable constructors.
 \end{exercise}
+
+%%%%%%%
 
 Notice that we can also interpret refinements of simple types in the category of families. If $T =
 \mu F$ is an inductive type, then given an $A$-valued combining function $f$ for $T$ (i.e., an
@@ -969,7 +983,8 @@ as the set's \emph{truth predicate}.
   the terminal object in $\Set$ (i.e., $\{\star\}$). The truth predicate is terminal in $\FamSet_A$.
 
   The functor $\top : \Set \to \FamSet$ that sends sets to their truth objects (and maps morphisms
-  in the obvious way) is called the \emph{truth functor} for the families fibration.
+  by pairing them with $\_ \mapsto \mathsf{id}_1$) is called the \emph{truth functor} for the
+  families fibration.
 \end{definition}
 
 \subsection{Comprehension and Reindexing}
@@ -998,8 +1013,6 @@ transformation $\pi : \{-\} \Rightarrow U$ whose morphisms project (hence the no
 index from an element of an indexed family:
 \[ \pi_{(A,P)}(a, p) = a \]
 
-TODO: some more summing up/contextualizing the different maps; maybe also show adjointness here
-
 We will also require means of mapping between $\FamSet_A$ and $\FamSet_B$ for distinct indexing sets
 $A$ and $B$. Intuitively, this is because we interpret our indexed inductive types as endofunctors
 only over a specific fiber, so we will need to move between fibers in order to, for instance, fold
@@ -1025,6 +1038,48 @@ characterization of $\Sigma_f (A, P)$ is given by
   \label{eqn:indexed-coprod-simplified}
   \left(B, b \mapsto \sum_{a \in f^{-1}[\{b\}]} P(a)\right).
 \end{equation}
+
+We summarize the developments of this section in the diagram below: the category of families sits
+``above'' the category of sets, with each fiber situated atop its corresponding index set. As
+discussed previously, we have functors running in ``orthogonal'' directions, with $U$, $\top$, and
+$\{-\}$ mapping between $\FamSet$ and $\Set$ while $\Sigma_f$ reindexes between fibers. We will
+have more to say about this diagram later.
+
+\begin{center}
+\begin{tikzpicture}
+  \node (FamSet) at (0, 1.75) {};
+  \node (Set) at (0, -1.5) {};
+	\draw[draw=black, thin, solid] (FamSet) ellipse (3.75 and 1.75);
+	\draw[draw=black, thin, solid] (Set) ellipse (1.50 and 0.50);
+	\node[black, anchor=south west] at (1.3,-1.3) {$\Set$};
+	\node[black, anchor=south west] at (1.5,3.25) {$\FamSet$};
+	\node[black, anchor=south] at (-1.75,2.4) {$\FamSet_A$};
+	\node[black, anchor=south] at (1.75,2.4) {$\FamSet_B$};
+  \node (FamSetA) at (-1.75, 1.5) {};
+  \node (FamSetB) at (1.75, 1.5) {};
+	\draw[draw=black, thin, solid] (FamSetA) ellipse (1 and 1);
+	\draw[draw=black, thin, solid] (FamSetB) ellipse (1 and 1);
+	\draw[draw=black, thin, dashed] (-0.5,-1.3) -- (-1.5,0.50);
+	\draw[draw=black, thin, dashed] (0.5,-1.3) -- (1.5,0.50);
+	\node[black] (A) at (-0.5,-1.5) {$A$};
+	\node[black] (B) at (0.5,-1.5) {$B$};
+	\node[black] at (-1.75,1.75) {$(A, P)$};
+	\node[black] at (-1.75,1.25) {$(A, P')$};
+	\node[black] at (1.75,1.75) {$(B, Q)$};
+	\node[black] at (1.75,1.25) {$(B, Q')$};
+  \draw[draw=black, ->] (A) -- (B) node [midway, below=2pt, label=$f$] {};
+  \draw[draw=black, ->] (FamSetA)++(1,0) -- (0.75, 1.5) node [midway, below=2pt, label=$\Sigma_f$] {}; 
+  \draw[draw=black, <-] (Set)++(-1,0.5) -- (-1, 0) node [midway, below left=6pt, label=$U$] {};
+  \draw[draw=black, ->] (Set)++(0,0.5) -- (0, 0) node [midway, below left=6pt, label=$\top$] {};
+  \draw[draw=black, <-] (Set)++(1,0.5) -- (1, 0) node [midway, below right=10pt, label=$\{-\}$] {};
+  % Hacky nat trans arrow b/c we don't have tikzcd
+  \draw[draw=black] (-0.85, -0.8) -- (0.9, -0.8) node [midway, below right=5pt, label=$\pi$] {};
+  \draw[draw=black] (-0.85, -0.86) -- (0.9, -0.86);
+  \node[black] at (-0.8, -0.85) {\footnotesize $\Leftarrow$};
+\end{tikzpicture}
+\captionof{figure}{A summary of functors to be used in our translation.}
+\label{fig:famset-diag-no-adjoints}
+\end{center}
 
 \begin{exercise}
   \label{ex:very-strong-coprods}
@@ -1088,6 +1143,7 @@ is captured by natural isomorphism.
 \end{definition}
 
 \begin{exercise}
+\label{ex:trivial-truth-pres}
   Verify that
   \begin{align*}
     \hat F(A, P) &= (F A,\, \_ \mapsto 1)\\
@@ -1097,15 +1153,17 @@ is captured by natural isomorphism.
 \end{exercise}
 
 The truth-preserving lifting above, however, is degenerate in the sense that it entirely forgets the
-structure of the original family. We therefore instead define the following truth-preserving
+% structure of the original family. We therefore instead define the following truth-preserving
 lifting:\footnote{While we have attempted to provide some intuition here, the motivation for this
 construction is largely found in its more general form in the setting of fibrational category
 theory, which is developed on page 347 of \citep{ghani2010fibrational}. There, one can also find a
 description of the lifting's action on morphisms along with a proof that it is truth-preserving.}
 
-\begin{align*}
-  \hat F(A, P) &= \Sigma_{F\pi_{(A, P)}} \top(F\{(A, P)\})
-\end{align*}
+% We define a truth-preserving lifting of an arbitrary endofunctor $F : \Set \to \Set$ as
+% follows:\footnote{We elide its action on morphisms and the proof that it is truth-preserving; both
+% can be found in Ghani et al. \citep{ghani2010fibrational}.}
+
+\[ \hat F(A, P) = \Sigma_{F\pi_{(A, P)}} \top(F\{(A, P)\}) \]
 
 Unlike in the exercise, we incorporate the ``structure of $P$ under $F$'' by applying $F$ to the
 \emph{comprehension} of the original family. We then re-separate the indexing set $A$ and associated
@@ -1127,7 +1185,10 @@ As a concrete example, consider the truth-preserving lifting of $F_\mathtt{Nat}$
 \begin{align*}
   \hat F_\mathtt{Nat}(A, P) &= \Sigma_{F_\mathtt{Nat}} \top(\hat F_\mathtt{Nat}\{(A, P)\})\\
     &= \Sigma_{F_\mathtt{Nat} \pi_{(A, P)}} \left(1 \oplus \{(A, P)\},\, \_ \mapsto 1\right)\\
-    &= \left(1 \oplus A,\, TODO: \right)
+    &\cong \left(1 \oplus A,\, b \mapsto \sum_{a \in F_\texttt{Nat} \pi_{(A, P)}^{-1}[\{b\}]} 1 \right)\\
+    &\cong \left(1 \oplus A, \begin{cases}\inl~() \mapsto \inl~()\\ \inr~a \mapsto \{\inr~((a, p), \star) \mid p \in P(a)\} \end{cases}\right)\\
+    &\cong \left(1 \oplus A, b \mapsto \left(\begin{array}{ll}1 & \text{if } b = \inl~() \\ \varnothing & \text{if } b = \inr~a \end{array}\right)
+           \oplus \left(\begin{array}{ll} \varnothing & \text{if } b = \inl~() \\ \{a\} \times P(a) & \text{if } b = \inr~a \end{array}\right)\right)
 \end{align*}
 
 Finally, since our objective was to obtain an endofunctor on $\FamSet_A$---not $\FamSet$---we define
@@ -1205,8 +1266,6 @@ from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions
     &\hspace{5.75em}\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ 2 \times (\{n_1\} \times P(n_1)) & \text{if } n = \mathtt{succ}(n_1) \end{array} \right)
   ))
 \end{align*}
-
-TODO: make this notation agree with functor-bitvec
 
 Up to isomorphism (specifically, with a minor rearrangement and reassociation in the right-hand
 summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equation
@@ -1328,8 +1387,58 @@ $f$.
 \end{lemma}
 
 \begin{proof}
-  TODO
+  Recall that $\FamSet$-morphisms from $(A, P)$ to $(B, Q)$ are pairs 
+  \[\left(h : A \to B, h^\sim : \prod_{a \in A}P(a) \to Q(h(a))\right). \]
+  The left-hand set in the lemma statement is the restriction of such pairs to those whose first
+  element is $f$, so they are of the form
+  \[ \left(f, h^\sim : \prod_{a \in A}P(a) \to Q(f(a))\right) .\]
+
+  By the definitions of $\FamSet_A$ and $f^*$, morphisms in the right-hand set are pairs
+  \[ \left(\mathsf{id}_A, f^\sim : \prod_{a \in A} P(a) \to Q(f(a))\right). \]
+
+  Since the first component of every pair in either set is fixed, both sets are isomorphic to the
+  set of functions of type
+  \[ \prod_{a \in A} P(a) \to Q(f(a)) \]
+  and thus to each other.
 \end{proof}
+
+We can now update Figure \ref{fig:famset-diag-no-adjoints} to summarize these additional results:
+
+\begin{center}
+\begin{tikzpicture}
+  \node (FamSet) at (0, 1.75) {};
+  \node (Set) at (0, -1.5) {};
+	\draw[draw=black, thin, solid] (FamSet) ellipse (3.75 and 1.75);
+	\draw[draw=black, thin, solid] (Set) ellipse (1.50 and 0.50);
+	\node[black, anchor=south west] at (1.3,-1.3) {$\Set$};
+	\node[black, anchor=south west] at (1.5,3.25) {$\FamSet$};
+	\node[black, anchor=south] at (-1.75,2.4) {$\FamSet_A$};
+	\node[black, anchor=south] at (1.75,2.4) {$\FamSet_B$};
+  \node (FamSetA) at (-1.75, 1.5) {};
+  \node (FamSetB) at (1.75, 1.5) {};
+	\draw[draw=black, thin, solid] (FamSetA) ellipse (1 and 1);
+	\draw[draw=black, thin, solid] (FamSetB) ellipse (1 and 1);
+	\draw[draw=black, thin, dashed] (-0.5,-1.3) -- (-1.5,0.50);
+	\draw[draw=black, thin, dashed] (0.5,-1.3) -- (1.5,0.50);
+	\node[black] (A) at (-0.5,-1.5) {$A$};
+	\node[black] (B) at (0.5,-1.5) {$B$};
+	\node[black] at (-1.75,1.75) {$(A, P)$};
+	\node[black] at (-1.75,1.25) {$(A, P')$};
+	\node[black] at (1.75,1.75) {$(B, Q)$};
+	\node[black] at (1.75,1.25) {$(B, Q')$};
+  \draw[draw=black, ->] (A) -- (B) node [midway, below=2pt, label=$f$] {};
+  \draw[draw=black, ->] (FamSetA)++(1,0.5) -- (0.75, 2) node [midway, below=2pt, label=$\Sigma_f$] {}; 
+  \draw[draw=black, <-] (FamSetA)++(1,-0.5) -- (0.75, 1) node [midway, below=2pt, label=$f^*$] {};
+  \node[black] at (0, 1.7) {$\bot$};
+  \draw[draw=black, <-] (Set)++(-1,0.5) -- (-1, 0) node [midway, below left=6pt, label=$U$] {};
+  \draw[draw=black, ->] (Set)++(0,0.5) -- (0, 0) node [midway, below left=6pt, label=$\top$] {};
+  \draw[draw=black, <-] (Set)++(1,0.5) -- (1, 0) node [midway, below right=10pt, label=$\{-\}$] {};
+  \node[black] at (-0.7, -0.4) {$\dashv$};
+  \node[black] at (0.5, -0.4) {$\dashv$};
+\end{tikzpicture}
+\captionof{figure}{A revision of Figure \ref{fig:famset-diag-no-adjoints}, now with adjoint relationships and
+the reindexing functor.}\label{fig:famset-diag-adjoints}
+\end{center}
 
 \subsection{A Proof of Correctness}
 
@@ -1344,7 +1453,7 @@ $\hat F$-algebras.
 Algebras over $\hat F$ are elements of the category $\Alg_{\hat F}$. Since $\FamSet$ ``sits atop''
 $\Set$ (in the sense that a family $P$ is ``atop'' its indexing set $UP$), the category $\Alg_{\hat
 F}$ likewise ``sits atop'' $\Alg_F$, a fact witnessed by the following \emph{algebras
-fibration}.\footnote{We will make this remark more precise later. TODO: see that this happens}
+fibration}.
 
 \begin{definition}[Algebras fibration]
   The \emph{algebras fibration} $U^\Alg$ induced by the families fibration $U$ is a functor
@@ -1355,12 +1464,12 @@ fibration}.\footnote{We will make this remark more precise later. TODO: see that
   \end{align*}
 \end{definition}
 
-It is worth pausing to type-check this definition. Recall that $U : \FamSet \to \Set$ maps families
-to their indexing sets. Since $\hat F$ is an endofunctor on \emph{families}, $P$ comprises a family
-indexed by some set; $k$ is a morphism of families, which is a pair of functions; and $f$ is an
-algebra morphism (as defined in Definition \ref{def:cat-of-algebras}) over an endofunctor on
-families and thus also a morphism of families (satisfying a certain commutativity condition). Thus,
-$U$ has an action on each of these.
+It is worth pausing to type-check this definition, in which we have taken some notational shortcuts
+for concision. Recall that $U : \FamSet \to \Set$ maps families to their indexing sets. Since $\hat
+F$ is an endofunctor on \emph{families}, $P$ comprises a family indexed by some set; $k$ is a
+morphism of families, which is a pair of functions; and $f$ is an algebra morphism (as defined in
+Definition \ref{def:cat-of-algebras}) over an endofunctor on families and thus also a morphism of
+families (satisfying a certain commutativity condition). Thus, $U$ has an action on each of these.
 
 The algebras over $F$ inherit an additional useful property from those over $F$: in particular, if
 $F$ has an initial algebra, than so does $\hat F$:
@@ -1380,20 +1489,28 @@ entirety. We thus restrict the category $\Alg_{\hat F}$ to an appropriate \emph{
 refining algebra. This definition, given below, is directly analogous to the definition of fibers
 over $\FamSet$; however, we phrase it slightly differently to suggest the generality of such a
 construction. (One may find it worthwhile to ``pattern-match'' the tuple-valued variables below and
-unfold the definitions of $U^\Alg$ and $U$ to see this correspondence more directly.)
+unfold the definitions of $U^\Alg$ and $U$ to see this correspondence more directly.) Note that we
+are also now adopting the convention of abbreviating $(A, \alpha)$ as simply $\alpha$.
 
-\begin{definition}[Fiber of the algebras fibration over $(A, \alpha)$]
-  The \emph{fiber} of the algebras fibration over $(A, \alpha)$, or equivalently the \emph{category
-  of $\hat F$-algebras over $\alpha$}, denoted by $(\Alg_{\hat F})_\alpha$, is defined as follows:
+\begin{definition}[Fiber of the algebras fibration over $\alpha$]
+  The \emph{fiber} of the algebras fibration over $\alpha$, or equivalently the \emph{category of
+  $\hat F$-algebras over $\alpha$}, denoted by $(\Alg_{\hat F})_\alpha$, is defined as follows:
   \begin{itemize}
-    \item Objects are $\hat F$-algebras $(P, k)$ such that $U^\Alg (P, k) = (A, \alpha)$.
+    \item Objects are $\hat F$-algebras $(P, k)$ such that $U^\Alg (P, k) = \alpha$.
     \item Morphisms are $\hat F$-algebra morphisms $f : (P, k) \to (Q, k')$ such that $U f =
-    \mathsf{id}_{(A, \alpha)}$.
+    \mathsf{id}_{\alpha}$.
   \end{itemize}
 \end{definition}
 
-In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just described as a
-``decomposition'' in terms of $\hat F$ and $\alpha$.
+Once again, it is worth briefly type-checking this definition. For instance, the criterion on
+objects is well defined: $k = (k_1, k_2)$ is a morphism $\hat F P \to P$, which is an abbreviation
+of $\hat F (A, P) \to (A, P)$ with the indexing set explicit. By the definition of $\FamSet$, $k_1$
+maps between the carriers; since $\hat F (A, P)$ has carrier $F A$ by definition, we thus have $k_1
+: F A \to A$. And since $U^\Alg (P, k) = U^\Alg ((A, P), (k_1, k_2)) = (A, k_1)$, this is of the
+same type as $\alpha$, i.e., as $(A, \alpha : F A \to A)$.
+
+Moreover, it turns out that $(\Alg_{\hat F})_\alpha$ is the same category as $\Alg_{F^\alpha}$, just
+described as a ``decomposition'' in terms of $\hat F$ and $\alpha$.
 
 \begin{lemma}
   \label{lem:alg-falpha-iso}
@@ -1417,7 +1534,7 @@ In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just 
 
   Next, consider a morphism $f : ((A, P), k) \to ((A, Q), k')$ in $(\Alg_{\hat F})_\alpha$. This is
   definitionally a map between the families $P$ and $Q$ respecting $\hat F$. The action of the
-  reindexing functor 
+  reindexing functor TODO
 \end{proof}
 
 In order to work with this new formulation of the category, we will reproduce for $(\Alg_{\hat
@@ -1447,6 +1564,41 @@ proofs are technical but not exceedingly difficult, so we elide them.
   $U^\Alg h = f$ and the set of morphisms $k \to f^{*\Alg}(k')$:
   \[ \{h \in \Alg_{\hat F}(k, k') \mid U^\Alg h = f\} \cong \Alg_{\hat F}(k, f^{*\Alg}(k')). \]
 \end{lemma}
+
+We can now draw a diagram analogous to Figure \ref{fig:famset-diag-adjoints} for the algebras
+fibration. Note that we temporarily drop our abbreviated notation for families and algebras to
+better analogize this diagram to that one.
+
+\begin{center}
+\begin{tikzpicture}
+  \node (FamSet) at (0, 1.75) {};
+  \node (Set) at (0, -1.5) {};
+	\draw[draw=black, thin, solid] (FamSet) ellipse (3.75 and 1.75);
+	\draw[draw=black, thin, solid] (Set) ellipse (1.50 and 0.50);
+	\node[black, anchor=south west] at (1.3,-1.3) {$\Alg_{F}$};
+	\node[black, anchor=south west] at (1.5,3.25) {$\Alg_{\hat F}$};
+	\node[black, anchor=south] at (-1.75,2.4) {$(\Alg_{F})_\alpha$};
+	\node[black, anchor=south] at (1.75,2.4) {$(\Alg_{F})_\beta$};
+  \node (FamSetA) at (-1.75, 1.5) {};
+  \node (FamSetB) at (1.75, 1.5) {};
+	\draw[draw=black, thin, solid] (FamSetA) ellipse (1.25 and 1);
+	\draw[draw=black, thin, solid] (FamSetB) ellipse (1.25 and 1);
+	\draw[draw=black, thin, dashed] (-0.75,-1.3) -- (-1.5,0.50);
+	\draw[draw=black, thin, dashed] (0.75,-1.3) -- (1.5,0.50);
+	\node[black] (A) at (-0.75,-1.5) {$(A, \alpha)$};
+	\node[black] (B) at (0.75,-1.5) {$(B, \beta)$};
+	\node[black] at (-1.75,1.75) {$((A, P), (\alpha, k))$};
+	\node[black] at (-1.75,1.25) {$((A, P'), (\alpha, k'))$};
+	\node[black] at (1.75,1.75) {$((B, Q), (\beta, j))$};
+	\node[black] at (1.75,1.25) {$((B, Q'), (\beta, j'))$};
+  \draw[draw=black, ->] (A) -- (B) node [midway, below=2pt, label=$f$] {};
+  \draw[draw=black, ->] (FamSetA)++(1.2,0.5) -- (0.55, 2) node [midway, below=2pt, label=$\Sigma_f^\Alg$] {}; 
+  \draw[draw=black, <-] (FamSetA)++(1.2,-0.5) -- (0.55, 1) node [midway, below=2pt, label=$f^{*\Alg}$] {};
+  \node[black] at (0, 1.7) {$\bot$};
+  \draw[draw=black, <-] (Set)++(0,0.5) -- (0, 0) node [midway, below left=10pt, label=$U^\Alg$] {};
+\end{tikzpicture}
+\captionof{figure}{A summary of constructions for the algebras fibration.}\label{fig:alg-diag-adjoints}
+\end{center}
 
 Equipped with these intermediate results, we can now finally prove what we set out to show: that
 $F^\alpha$ admits an initial algebra, and that its carrier is isomorphic to the ``na\"ive''
@@ -1499,6 +1651,10 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
   Accordingly, the algebra $\Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat F}$ is indeed initial in
   $(\Alg_{\hat F})_\alpha$, completing the proof.
 \end{proof}
+
+Before concluding this section, it is worth noting that the construction given here can be extended
+in various ways, such as to support refinements defined in terms of functions that are not directly
+expressed as folds. We direct the reader to Atkey et al. \citep{atkey2011refining} for details.
 
 % \begin{definition}[Reindexing functor]
 % \sloppy
@@ -1560,13 +1716,13 @@ References:
 \newpage
 \section*{Solutions to Exercises}
 
-\noindent\textbf{Solution \ref{ex:denote-bool}:}
+\soltitle{ex:denote-bool}
 
 Pick $\llbr{\texttt{true}} = i_1$ and $\llbr{\texttt{false}} = i_2$, respectively the left and right
 injections into the coproduct, and take $\llbr{\texttt{if}(t, e)} = \langle t, e \rangle$.
 Commutativity and recursor uniqueness are immediate from the universal property for coproducts.
 
-\noindent\textbf{Solution \ref{ex:interp-exnat}:}
+\soltitle{ex:interp-exnat}
 
 Since the recursor for \texttt{ExtNat} is not explicitly given, we first derive it:
 
@@ -1601,7 +1757,7 @@ rather than a pair of squares. It looks as follows:
 	\arrow["{e_\texttt{z}}"', from=7-1, to=5-3]
 \end{tikzcd}\]
 
-\noindent\textbf{Solution \ref{ex:self-trees}:}
+\soltitle{ex:self-trees}
 
 \begin{enumerate}
   \item The actions of $F_{\texttt{SelfTree}}$ on objects and morphisms are given below:
@@ -1615,13 +1771,13 @@ rather than a pair of squares. It looks as follows:
   \texttt{s}, as before, is the natural-number successor operation).
 \end{enumerate}
 
-\noindent\textbf{Solution \ref{ex:app-as-algebra}:}
+\soltitle{ex:app-as-algebra}
 
 Fix objects $A, B$ and consider their exponential. Since $\texttt{app} : B^A \times A \to B$, we are
 led to define the endofunctor $F(X) = X^A \times A$, whose action on morphisms is given by $F(e) =
 \langle (e \circ -) \circ \pi_1, \mathsf{id}_A \circ \pi_2\rangle$. (Notice that, despite the type
-of \texttt{app} containing two objects, there is only one possible choice of functor: if we tried to
-define the functor in $A$, it would not admit an initial algebra!)
+of \texttt{app} containing two objects, there is only one possible choice of endofunctor: if we
+tried to define the functor in $A$, it would be contravariant.)
 
 We claim that the identity morphism for the initial object $0$ is the initial $F$-algebra. To see
 why, first observe that $F(0) = 0^A \times A \cong 0 \times A \cong 0$, so the choice of initial
@@ -1636,7 +1792,7 @@ inductive Empty' (A : Type) : Type where
   | mk : (A -> Empty') -> Empty' -> Empty'
 \end{lstlisting}
 
-\noindent\textbf{Solution \ref{ex:isorec-translation}}:
+\soltitle{ex:isorec-translation}
 
 We translate each rule in turn.
 
@@ -1710,7 +1866,13 @@ We translate each rule in turn.
 Observe that (renaming \texttt{fold} to $c$, $e_1$ to $f_c$, and $\rho$ to $A$) we have now arrived
 at the same diagram we derived in our previous translation!
 
-\noindent \textbf{Solution \ref{ex:very-strong-coprods}:}
+\soltitle{ex:fin-functor}
+
+\[ F_{\texttt{Fin}}(\N, P) = \left(\N, \begin{cases}0 \mapsto \varnothing \\ \texttt{succ}(n) \mapsto
+  1 \oplus P(n)
+\end{cases}\right) \]
+
+\soltitle{ex:very-strong-coprods}
 
 First, note that the ``straightforward'' morphism $\psi$ is concretely
 \[ \psi(a, p) = (f, a \mapsto p \mapsto (a, p)). \]
@@ -1738,7 +1900,32 @@ First, note that the ``straightforward'' morphism $\psi$ is concretely
   so that $\{\psi\}$ is indeed an isomorphism with inverse $\iota$.
 \end{enumerate}
 
-\noindent \textbf{Solution \ref{ex:bh-indexed-rbtrees}:}
+\soltitle{ex:trivial-truth-pres}
+
+This is clearly a lifting, since
+\[ F(U(A, P)) = F A = U(FA, \_ \mapsto 1) = U(\hat F (A, P)) \]
+and
+\[ F(U(f, f^\sim)) = F f = U(f, \_ \mapsto \mathsf{id}_1) = U(\hat F(f, f^\sim)). \]
+
+Moreover, that it is truth preserving is witnessed by the natural isomorphism
+\[ \eta_{(A, P)} = \mathsf{id}_{(A, P)}  \]
+since, noting that
+\[ \top(F(A)) = (FA, \_ \mapsto 1) = \hat F(\top(A)) \]
+and
+\[ \top(F(f)) = (f, \_ \mapsto \mathsf{id}_1) = \hat F(\top(f)) \]
+the following square trivially commutes:
+% https://q.uiver.app/#q=WzAsNCxbMCwwLCIoXFx0b3AgXFxjaXJjIEYpKEEpIl0sWzIsMCwiKFxcaGF0IEYgXFxjaXJjIFxcdG9wKShBKSJdLFswLDIsIihcXHRvcCBcXGNpcmMgRikoQikiXSxbMiwyLCIoXFxoYXQgRiBcXGNpcmMgXFx0b3ApKEIpIl0sWzAsMSwiXFxldGFfeyhBLCBcXF9cXG1hcHN0byAxKX0iXSxbMiwzLCJcXGV0YV97KEIsIFxcXyBcXG1hcHN0byAxKX0iXSxbMCwyLCIoXFx0b3AgXFxjaXJjIEYpKGYpIiwxXSxbMSwzLCIoXFxoYXQgRiBcXGNpcmMgXFx0b3ApKGYpIiwxXV0=
+\[\begin{tikzcd}
+	{(\top \circ F)(A)} && {(\hat F \circ \top)(A)} \\
+	\\
+	{(\top \circ F)(B)} && {(\hat F \circ \top)(B)}
+	\arrow["{\eta_{(A, \_\mapsto 1)}}", from=1-1, to=1-3]
+	\arrow["{(\top \circ F)(f)}"{description}, from=1-1, to=3-1]
+	\arrow["{(\hat F \circ \top)(f)}"{description}, from=1-3, to=3-3]
+	\arrow["{\eta_{(B, \_ \mapsto 1)}}", from=3-1, to=3-3]
+\end{tikzcd}\]
+
+\soltitle{ex:bh-indexed-rbtrees}
 
 \begin{enumerate}
   \item
