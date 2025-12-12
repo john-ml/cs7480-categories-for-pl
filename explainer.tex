@@ -73,7 +73,7 @@ inductive Bool : Type where
   | true  : Bool
   | false : Bool
 \end{lstlisting}
-has elements isomorphic to those of $\mathtt{Unit} \oplus \mathtt{Unit}$, which we interpret
+has elements isomorphic to those of $\texttt{Unit} \oplus \texttt{Unit}$, which we interpret
 categorically as $1 \oplus 1$. We can even model finite parameterized datatypes: the option datatype
 \begin{lstlisting}
 inductive Option (A : Type) : Type where
@@ -179,8 +179,8 @@ this as a restricted form of function extensionality:
 
 As in our previous translations of equational laws, the $\beta$ laws correspond to equalities of
 morphisms, while the $\eta$ law is a uniqueness criterion. In particular, the $\beta$ laws require
-that if we have morphisms $t, e : 1 \to \llbr{\tau}$, then $\mathtt{if}(t,e) \circ \mathtt{true} =
-t$ and $\mathtt{if}(t,e) \circ \mathtt{false} = e$. Meanwhile, the $\eta$ law says that if we have
+that if we have morphisms $t, e : 1 \to \llbr{\tau}$, then $\texttt{if}(t,e) \circ \texttt{true} =
+t$ and $\texttt{if}(t,e) \circ \texttt{false} = e$. Meanwhile, the $\eta$ law says that if we have
 some expression $d$ such that it can be substituted for $\texttt{if}(t, e)$ in the preceding two
 equalities\footnote{Recall that we interpret substitution as composition of morphisms.}---i.e., $d
 \circ \texttt{true} \equiv t$ and $d \circ \texttt{false} \equiv e$---then it is equal to the
@@ -234,35 +234,35 @@ with a recursor $\texttt{rec}(e_z, x.~e_s)(n)$. Notice that, unlike \texttt{if},
 the recursor on the substructure of $n$. The typing rules are given below:
 
 \begin{mathpar}
-\inferrule*[right=T-z]{~}{\vdash z : \mathtt{Nat}}
+\inferrule*[right=T-z]{~}{\vdash z : \texttt{Nat}}
 
-\inferrule*[right=T-s]{~}{n : \mathtt{Nat} \vdash s(n) : \mathtt{Nat}}
+\inferrule*[right=T-s]{~}{n : \texttt{Nat} \vdash s(n) : \texttt{Nat}}
 
 \inferrule*[right=T-natrec]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
-  {n : \texttt{Nat} \vdash \mathtt{rec_{Nat}}(e_z, x. e_s)(n) : \tau}
+  {n : \texttt{Nat} \vdash \texttt{rec}_\texttt{Nat}(e_z, x. e_s)(n) : \tau}
 \end{mathpar}
 
 The $\beta$ rules for the recursor express its behavior as a fold over the structure of a natural
 number: applying the recursor to zero evaluates to the first arm, while applying it to a successor
 binds $x$ to the recursive result of folding over its predecessor, then evaluates $e_s$:
 \begin{mathpar}
-\inferrule*[right=$\beta^{\mathtt{rec_{Nat}}}_z$]
+\inferrule*[right=$\beta^{\texttt{rec}_\texttt{Nat}}_z$]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
-  {\vdash \mathtt{rec_{Nat}}(e_z, x. e_s)(z) \equiv e_z : \tau}
+  {\vdash \texttt{rec}_{\texttt{Nat}}(e_z, x. e_s)(z) \equiv e_z : \tau}
 
-\inferrule*[right=$\beta^{\mathtt{rec_{Nat}}}_s$]
+\inferrule*[right=$\beta^{\texttt{rec}_\texttt{Nat}}_s$]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau \\ \vdash n : \texttt{Nat}}
-  {\vdash \mathtt{rec_{Nat}}(e_z, x. e_s)(\mathtt{s}(n)) \equiv e_s[\mathtt{rec_{Nat}}(e_z, x. e_s)(n)/x] : \tau}
+  {\vdash \texttt{rec}_\texttt{Nat}(e_z, x. e_s)(\texttt{s}(n)) \equiv e_s[\texttt{rec}_\texttt{Nat}(e_z, x. e_s)(n)/x] : \tau}
 \end{mathpar}
 
 Finally, the $\eta$ rule says that any expression $e$ that satisfies the above equations is equal to
 the corresponding recursor application:
 
 \begin{mathpar}
-\inferrule*[right=$\eta^{\mathtt{rec_{Nat}}}$]
+\inferrule*[right=$\eta^{\texttt{rec}_\texttt{Nat}}$]
   {y : \texttt{Nat} \vdash e : \tau \\ \vdash e[z/y] \equiv e_z : \tau \\ n : \texttt{Nat} \vdash e[s(n)/y] \equiv e_s[e/x] : \tau }
-  {y : \texttt{Nat} \vdash e \equiv \texttt{rec}(e_z, x.e_s)(y) : \tau}
+  {y : \texttt{Nat} \vdash e \equiv \texttt{rec}_\texttt{Nat}(e_z, x.e_s)(y) : \tau}
 \end{mathpar}
 
 % TODO: a bit too metaphorical/scare-quote-y
@@ -297,7 +297,7 @@ numbers, however, the resulting construction has a special name: the \emph{natur
   \end{tikzcd}\]
 \end{definition}
 
-Here, $u$ is $\mathtt{rec_{Nat}}(e_z, x.e_s)$. As before, it will be helpful to instead view this
+Here, $u$ is $\texttt{rec}_\texttt{Nat}(e_z, x.e_s)$. As before, it will be helpful to instead view this
 diagram as a pair of squares:
 
 % https://q.uiver.app/#q=WzAsNyxbMCwwLCIxIl0sWzIsMCwiXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzQsMCwiXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzIsMiwiXFxsbGJye1xcdGF1fSJdLFswLDIsIjEiXSxbNCwyLCJcXGxsYnJ7XFx0YXV9Il0sWzMsMF0sWzAsMSwiXFx0ZXh0dHR7en0iXSxbMSwzLCJcXHRleHR0dHtyZWN9KGVfeix4Ln5lX3MpIiwyXSxbNCwzLCJlX3oiLDFdLFs1LDMsImVfcyIsMV0sWzIsNSwiXFx0ZXh0dHR7cmVjfShlX3oseC5+ZV9zKSIsMV0sWzAsNCwiXFxtYXRoc2Z7aWR9XzEiLDFdLFsyLDEsIlxcdGV4dHR0e3N9IiwyXV0=
@@ -308,9 +308,9 @@ diagram as a pair of squares:
 	1 && {\llbr{\tau}} && {\llbr{\tau}}
 	\arrow["{\texttt{z}}", from=1-1, to=1-3]
 	\arrow["{\mathsf{id}_1}"{description}, from=1-1, to=3-1]
-	\arrow["{\mathtt{rec_{Nat}}(e_z,x.~e_s)}"', from=1-3, to=3-3, dashed]
+	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.~e_s)}"', from=1-3, to=3-3, dashed]
 	\arrow["{\texttt{s}}"', from=1-5, to=1-3]
-	\arrow["{\mathtt{rec_{Nat}}(e_z,x.~e_s)}"{description}, from=1-5, to=3-5, dashed]
+	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.~e_s)}"{description}, from=1-5, to=3-5, dashed]
 	\arrow["{e_z}"{description}, from=3-1, to=3-3]
 	\arrow["{e_s}"{description}, from=3-5, to=3-3]
 \end{tikzcd}
@@ -375,8 +375,8 @@ Applying this rewriting to the \texttt{Nat} datatype depicted in diagram
 	\\
 	{1 \oplus A} && A
 	\arrow["{[ z, s]}", from=1-1, to=1-3]
-	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \mathtt{rec_{Nat}}([ f_z, f_s]) \right]}"', from=1-1, to=3-1]
-	\arrow["{\mathtt{rec_{Nat}}([ f_z, f_s])}", from=1-3, to=3-3, dashed]
+	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \texttt{rec}_\texttt{Nat}([ f_z, f_s]) \right]}"', from=1-1, to=3-1]
+	\arrow["{\texttt{rec}_\texttt{Nat}([ f_z, f_s])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ f_z, f_s]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
 and a similar transformation occurs for diagram (\ref{fig:bool-squares}). (Above and hereafter, we
@@ -398,7 +398,7 @@ constructor with domain $1 \oplus 1$:
 	{1 \oplus 1} && A
 	\arrow["{[ z, s]}", from=1-1, to=1-3]
 	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \mathsf{id}_1 \right]}"', from=1-1, to=3-1]
-	\arrow["{\mathtt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
+	\arrow["{\texttt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ t, e ]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
 % \begin{exercise}
@@ -588,8 +588,8 @@ using a ``combining morphism'' $f_c : F A \to A$. Or, as a diagram:
 	\\
 	{F A} && A
 	\arrow["c", from=1-1, to=1-3]
-	\arrow["{F (\mathtt{rec}_{f_c})}"{description}, from=1-1, to=3-1]
-	\arrow["{\mathtt{rec}_{f_c}}"{description}, from=1-3, to=3-3]
+	\arrow["{F (\texttt{rec}_{f_c})}"{description}, from=1-1, to=3-1]
+	\arrow["{\texttt{rec}_{f_c}}"{description}, from=1-3, to=3-3]
 	\arrow["{f_c}", from=3-1, to=3-3]
 \end{tikzcd}\]
 
@@ -614,7 +614,7 @@ producing a Boolean, this function should translate to a morphism of type $F_\te
 \end{align*}
 
 This becomes the $F_\texttt{Nat}$-algebra
-\[ \alpha_\texttt{even} = [\mathtt{true}, \mathtt{not}] \] which finally reveals our translation of
+\[ \alpha_\texttt{even} = [\texttt{true}, \texttt{not}] \] which finally reveals our translation of
 the parity function to be $\llpr{\alpha_\texttt{even}} : \llbr{\texttt{Nat}} \to
 \llbr{\texttt{Bool}}$.
 
@@ -641,18 +641,18 @@ inductive List (A : Type) : Type where
 Notice that this type is parameterized over a fixed type \texttt{A}; we will write $A$ for that
 type's categorical denotation. We can read the endofunctor of which \texttt{List A} is a least fixed
 point off of its constructors:\footnote{We again elide the action on morphisms.}
-\[ F_\mathtt{List_A}(X) = 1 \oplus A \times X. \]
-Lists are thus represented by the initial algebra $(\mu F_{\mathtt{List_A}},
-\mathsf{in}_{F_\mathtt{List_A}})$. Returning to our example from earlier, we can define the list
+\[ F_{\texttt{List}_\texttt{A}}(X) = 1 \oplus A \times X. \]
+Lists are thus represented by the initial algebra $(\mu F_{{\texttt{List}_\texttt{A}}},
+\mathsf{in}_{F_{\texttt{List}_\texttt{A}}})$. Returning to our example from earlier, we can define the list
 length function as the fold induced by the ``combining function''
 \begin{align*}
   \texttt{f}_\texttt{length} &: \texttt{Unit} \oplus \texttt{A} \times \texttt{Nat} \to \texttt{Nat}\\
   \texttt{f}_\texttt{length}~(\inl~()) &= 0\\
   \texttt{f}_\texttt{length}~(\inr~(a, \ell)) &= \texttt{succ}(\ell)
 \end{align*}
-which we translate into the $F_\mathtt{List_A}$-algebra
+which we translate into the $F_{\texttt{List}_\texttt{A}}$-algebra
 \[ \alpha_\texttt{length} = [z, s \circ \pi_1] \]
-to obtain the fold $\llpr{\alpha_\texttt{length}} : \mu F_\mathtt{List_A} \to \llbr{\texttt{Nat}}$.
+to obtain the fold $\llpr{\alpha_\texttt{length}} : \mu F_{\texttt{List}_\texttt{A}} \to \llbr{\texttt{Nat}}$.
 
 \begin{exercise}
   \label{ex:self-trees}
@@ -934,7 +934,7 @@ Notice that we can also interpret refinements of simple types in the category of
 \mu F$ is an inductive type, then given an $A$-valued combining function $f$ for $T$ (i.e., an
 $F$-algebra $f$ with carrier $A$) and a value $a : A$, the refinement of $T$ where $f$ yields value
 $a$, i.e.,
-\[ \texttt{\{} \mathtt{t : T} \mid \mathtt{rec_A(f)(t) = a} \texttt{\}} \]
+\[ \texttt{\{} \texttt{t : T} \mid \texttt{rec}_\texttt{A}\texttt{(f)(t) = a} \texttt{\}} \]
 can be translated as the family
 \[ (A, a \mapsto \{ x \in \mu F \mid \llpr{f}_{F}(x) = a \}). \]
 This is the ``na\"ive'' subset interpretation of refinements that we discussed previously. Our
@@ -968,8 +968,8 @@ inductive Even : Nat -> Type where
 \end{lstlisting}
 
 A natural number \texttt{n} is even if the type \texttt{Even n} is inhabited. Correpsondingly, the
-interpretation of this inductive type as a family of sets $(\N, P_\mathtt{Even})$ can be thought of
-as defining a \emph{predicate} $P_\mathtt{Even}$ on natural numbers. With this interpretation, we
+interpretation of this inductive type as a family of sets $(\N, P_\texttt{Even})$ can be thought of
+as defining a \emph{predicate} $P_\texttt{Even}$ on natural numbers. With this interpretation, we
 think of a family $(A, P)$ as containing proofs $P(a)$ that the represented predicate holds of
 elements $a \in A$. In particular, if $P(a)$ is inhabited, than the predicate holds of $a$; if it is
 empty, the predicate does not.
@@ -1180,11 +1180,11 @@ apparent:
     &\cong (FA, x \mapsto \{y \in F\{(A, P)\} \mid (F \pi_{(A,P)})(y) = x\})
 \end{align*}
 
-As a concrete example, consider the truth-preserving lifting of $F_\mathtt{Nat}$:
+As a concrete example, consider the truth-preserving lifting of $F_\texttt{Nat}$:
 
 \begin{align*}
-  \hat F_\mathtt{Nat}(A, P) &= \Sigma_{F_\mathtt{Nat}} \top(\hat F_\mathtt{Nat}\{(A, P)\})\\
-    &= \Sigma_{F_\mathtt{Nat} \pi_{(A, P)}} \left(1 \oplus \{(A, P)\},\, \_ \mapsto 1\right)\\
+  \hat F_\texttt{Nat}(A, P) &= \Sigma_{F_\texttt{Nat}} \top(\hat F_\texttt{Nat}\{(A, P)\})\\
+    &= \Sigma_{F_\texttt{Nat} \pi_{(A, P)}} \left(1 \oplus \{(A, P)\},\, \_ \mapsto 1\right)\\
     &\cong \left(1 \oplus A,\, b \mapsto \sum_{a \in F_\texttt{Nat} \pi_{(A, P)}^{-1}[\{b\}]} 1 \right)\\
     &\cong \left(1 \oplus A, \begin{cases}\inl~() \mapsto \inl~()\\ \inr~a \mapsto \{\inr~((a, p), \star) \mid p \in P(a)\} \end{cases}\right)\\
     &\cong \left(1 \oplus A, b \mapsto \left(\begin{array}{ll}1 & \text{if } b = \inl~() \\ \varnothing & \text{if } b = \inr~a \end{array}\right)
@@ -1202,13 +1202,13 @@ that characterize simple inductive types into analogous endofunctors on families
 not to produce an indexed inductive type that corresponds to the unrestricted simple one, but rather
 some refinement thereof. This refinement translation is the last piece we must develop.
 
-In fact, we already have the tool we need to do this: op-reindexing. Recall that indexed
-coproducts (or, more generally, the op-reindexing functor) let us take a family and reindex it, such
-that the resulting family contains only those elements which are mapped by the reindexing function
-to a given value in its codomain. This is precisely what we do when we refine a datatype: given
-$\mathtt{P : T \to A}$, the type $\mathtt{\{ t : T \mid P(t) = a \}}$ is an $\mathtt{A}$-indexed
-type that, at a given index $\mathtt{a}$, consists of the elements of $\mathtt{T}$ on which
-$\mathtt{P}$ produces value $\mathtt{a}$.
+In fact, we already have the tool we need to do this: op-reindexing. Recall that indexed coproducts
+(or, more generally, the op-reindexing functor) let us take a family and reindex it, such that the
+resulting family contains only those elements which are mapped by the reindexing function to a given
+value in its codomain. This is precisely what we do when we refine a datatype: given $\texttt{P} :
+\texttt{T} \to \texttt{A}$, the type $\{ \texttt{t} : \texttt{T} \mid \texttt{P(t) = a} \}$ is an
+$\texttt{A}$-indexed type that, at a given index $\texttt{a}$, consists of the elements of
+$\texttt{T}$ on which $\texttt{P}$ produces value $\texttt{a}$.
 
 Therefore, the construction to which we have building all this time can finally be written as
 follows:
@@ -1247,9 +1247,9 @@ thereover:
   F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
   F_\texttt{BitList}(f) &= [\inl \circ \id_1, \inr \circ \langle \mathsf{id}_2, f\rangle]\\
   \\[-10pt] % Spacing hack
-  % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\mathtt{z}, \mathtt{s} \circ \pi_2]
+  % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\texttt{z}, \texttt{s} \circ \pi_2]
   \texttt{length} ~ (\inl~ ()) &= 0\\
-  \texttt{length} ~ (\inr~ (b, \ell)) &= \mathtt{succ}(\ell)
+  \texttt{length} ~ (\inr~ (b, \ell)) &= \texttt{succ}(\ell)
 \end{align*}
 
 We now compute the corresponding indexed inductive type. Note that we use the isomorphic expansion
@@ -1258,17 +1258,17 @@ from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions
 \begin{align*}
   &F^\texttt{length}_\texttt{BitList}(\N, P)\\
   &\cong (\N, n \mapsto \{ y \in F_\texttt{BitList}\{(\N, P)\} \mid \texttt{length}((F_\texttt{BitList} \pi_{(\N, P)})(y)) = n\})\\
-  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \inl~() \text{ and } 0 = n) \text{ or } (y = \inr~(b, (n_1, p)) \text{ and } \mathtt{succ}(n_1) = n) \right\})\\
+  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \inl~() \text{ and } 0 = n) \text{ or } (y = \inr~(b, (n_1, p)) \text{ and } \texttt{succ}(n_1) = n) \right\})\\
   &= \left(\N, \begin{cases}0 \mapsto \{\inl~()\} \\ \mathsf{succ}(n_1) \mapsto \{\inr~(b, (n_1, p)) \mid b \in 2, p \in P(n_1)\} \end{cases} \right)\\
   &= (\N, (n \mapsto
     \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
     \oplus\\
-    &\hspace{5.75em}\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ 2 \times (\{n_1\} \times P(n_1)) & \text{if } n = \mathtt{succ}(n_1) \end{array} \right)
+    &\hspace{5.75em}\left(\begin{array}{ll} \varnothing & \text{if } n = 0 \\ 2 \times (\{n_1\} \times P(n_1)) & \text{if } n = \texttt{succ}(n_1) \end{array} \right)
   ))
 \end{align*}
 
 Up to isomorphism (specifically, with a minor rearrangement and reassociation in the right-hand
-summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equation
+summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in equation
 (\ref{eqn:functor-bitvec})!
 
 \begin{exercise}
@@ -1284,12 +1284,12 @@ summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equatio
 \end{lstlisting}
 
   \begin{enumerate}
-    \item Define the endofunctor $F_\mathtt{RBTree} : \Set \to \Set$ such that
-          $\llbr{\mathtt{RBTree}} \cong \mu F_\mathtt{RBTree}$.
-    \item Define an $F_\mathtt{RBTree}$-algebra $\mathtt{bh}$ that computes the \emph{black height}
+    \item Define the endofunctor $F_\texttt{RBTree} : \Set \to \Set$ such that
+          $\llbr{\texttt{RBTree}} \cong \mu F_\texttt{RBTree}$.
+    \item Define an $F_\texttt{RBTree}$-algebra $\texttt{bh}$ that computes the \emph{black height}
           of an \texttt{RBTree}, i.e., the maximum number of black nodes on a path from the root to
           a leaf. You may assume a function $\texttt{max} : \N \times \N \to \N$.
-    \item Using the above, compute $F_\mathtt{RBTree}^\mathtt{bh} : \FamSet_\N \to \FamSet_\N$, and
+    \item Using the above, compute $F_\texttt{RBTree}^\texttt{bh} : \FamSet_\N \to \FamSet_\N$, and
           read off of this expression an indexed inductive type of black height-indexed colored
           trees. Verify that your definition matches how you would intuitively define this type from
           scratch.
@@ -1701,8 +1701,6 @@ presenting the material so as to admit a generalization to the abstract language
 \emph{fibrations}. Regrettably, we do not have the space here to present that generalization.
 Instead, we direct the reader to the following sources TODO: finish (full Cartesian Lawvere w v.s. coprods)
 
-TODO: texttt and mathtt are not the same --- settle on one
-
 
 References:
 - Article
@@ -1949,7 +1947,7 @@ the following square trivially commutes:
     &= (\N, (n \mapsto
     \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
     \oplus\\
-    &\hspace{5.75em}(\left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \mathtt{succ}(\texttt{max}(m_\ell, m_r)) \\ \varnothing & \text{else}\end{array} \right)\oplus\\
+    &\hspace{5.75em}(\left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{succ}(\texttt{max}(m_\ell, m_r)) \\ \varnothing & \text{else}\end{array} \right)\oplus\\
     &\hspace{6.25em} \left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{max}(m_\ell, m_r) \\ \varnothing & \text{else} \end{array} \right))
   ))
   \end{align*}
