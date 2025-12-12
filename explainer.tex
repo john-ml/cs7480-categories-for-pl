@@ -3,7 +3,7 @@
 
 % Try to find better workaround for \sloppy (cf https://tex.stackexchange.com/q/153872)
 
-\newcommand{\llpr}[1]{\llparenthesis #1 \rrparenthesis}
+\newcommand{\llpr}[1]{{\llparenthesis #1 \rrparenthesis}}
 \newcommand{\FamSet}{{\mathsf{Fam}(\mathsf{Set})}}
 \newcommand{\Alg}{\mathsf{Alg}}
 \newcommand{\inl}{\mathsf{inl}}
@@ -159,10 +159,8 @@ The recursor is operationally characterized by $\beta$ and $\eta$ laws. The $\be
 input, and to its ``else'' branch on a \texttt{false} one. The $\eta$ law, meanwhile, says that
 ``things that behave like \texttt{if}s are judgmentally equal to \texttt{if}s;'' one can think of
 this as a restricted form of function extensionality:
-% TODO: can one so think of it?
 
 \begin{mathpar}
-% TODO: contexts? typing judgments?
 \inferrule*[right=$\beta^{\texttt{if}}_1$]
   {\vdash t : \tau \\ \vdash e : \tau}{\vdash \texttt{if}(t, e)(\texttt{true}) \equiv t : \tau}
 
@@ -400,7 +398,6 @@ constructor with domain $1 \oplus 1$:
 	\arrow["{\mathtt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ t, e ]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
-% TODO: exercise here?
 % \begin{exercise}
 % \sloppy
 %   ``Consolidate'' diagram (\ref{fig:bool-squares}) as we did for diagram (\ref{fig:nat-squares})
@@ -606,8 +603,6 @@ its input is even and \texttt{false} if it is odd, as an application of the natu
 First, we identify the appopriate ``combining function'' for this fold. Since we are ultimately
 producing a Boolean, this function should translate to a morphism of type $F_\texttt{Nat}
 \llbr{\texttt{Bool}} \to \llbr{\texttt{Bool}}$. We first define its programmatic version below:
-%\footnote{We assume predefined operations on Booleans} % TODO: include this note if delete exercise
-%below
 
 \begin{align*}
 \texttt{f}_\texttt{even} &: 1 \oplus \texttt{Bool} \to \texttt{Bool}\\
@@ -616,18 +611,19 @@ producing a Boolean, this function should translate to a morphism of type $F_\te
 \end{align*}
 
 This becomes the $F_\texttt{Nat}$-algebra
-% TODO: does this type-check?
-\[ \alpha_\texttt{even} = [\mathtt{true}, \mathtt{not}] \] which finally
-reveals our translation of the parity function to be $\llpr{\alpha_\texttt{even}} :
-\llbr{\texttt{Nat}}
-\to
+\[ \alpha_\texttt{even} = [\mathtt{true}, \mathtt{not}] \] which finally reveals our translation of
+the parity function to be $\llpr{\alpha_\texttt{even}} : \llbr{\texttt{Nat}} \to
 \llbr{\texttt{Bool}}$.
 
-\begin{exercise}
-\sloppy
-  Fill in the missing piece of the above translation by categorifying \texttt{not} using a suitable
-  algebra over the endofunctor characterizing Booleans.
-\end{exercise}
+Note that \texttt{not} is, in turn, defined by an algebra over $F_\texttt{Bool}$, the constant-$1
+\oplus 1$ functor. In particular, $\llbr{not} = \llpr{\alpha_\texttt{not}}$ where
+$\alpha_\texttt{not} : 1 \oplus 1 \to 1 \oplus 1$ is $[\inr, \inl]$.
+
+% \begin{exercise}
+% \sloppy
+%   Fill in the missing piece of the above translation by categorifying \texttt{not} using a suitable
+%   algebra over the endofunctor characterizing Booleans.
+% \end{exercise}
 
 To put together the developments in this section, let's consider one more example of a categorified
 inductive datatype, now expressed in terms of initial algebras. Recall the inductive datatype of
@@ -652,40 +648,52 @@ length function as the fold induced by the ``combining function''
   \texttt{f}_\texttt{length}~(\inr~(a, \ell)) &= \texttt{succ}(\ell)
 \end{align*}
 which we translate into the $F_\mathtt{List_A}$-algebra
-% TODO: does this type-check?
 \[ \alpha_\texttt{length} = [z, s \circ \pi_1] \]
 to obtain the fold $\llpr{\alpha_\texttt{length}} : \mu F_\mathtt{List_A} \to \llbr{\texttt{Nat}}$.
 
 \begin{exercise}
-Categorify the type of \emph{rose trees} defined below:
+  \label{ex:self-trees}
+Below, we define a strange type of so-called ``self-trees:'' each node can have as many children as
+the parameterizing type has elements (i.e., a \texttt{SelfTree A} node can have, as it were,
+``\texttt{A} many children'').
 \begin{lstlisting}
-inductive Rose (A : Type) : Type where
-  | node : A -> List Rose -> Rose
+inductive SelfTree (A : Type) : Type where
+  | node : A -> (A -> SelfTree A) -> SelfTree A
+  | leaf : SelfTree A
 \end{lstlisting}
-TODO: finish OR just make the length example above an exercise
+
+\begin{enumerate}
+  \item Specify the functor $F_{\texttt{SelfTree}}$ that characterizes this type.
+  \item We define the ``self-height'' of a self-tree to be the number of nodes encountered by
+        successively visiting the $a$th child of a node containing $a$. (The self-height of a leaf
+        is 0.) Categorify this operation using a suitable $F_{\texttt{SelfTree}}$-algebra.
+\end{enumerate}
 \end{exercise}
+
+\begin{exercise}
+\label{ex:app-as-algebra}
+  Show that the morphism $\mathsf{app}$ induced by the universal property of exponentials is the
+  structure map for an algebra whose carrier is the initial object. Use this to give a non-empty
+  definition of an inductive type (i.e., an \texttt{inductive} declaration listing at least one
+  putative constructor) that is isomorphic to the empty type.
+
+  \emph{Hint:} Recall that in a CCC, $0^A \cong 0 \times A \cong 0$.
+\end{exercise}
+
+\subsection{On the Existence of Initial Algebras}
 
 Up to this point, we have simply assumed that, given an endofunctor $F$, we can always find an
 initial $F$-algebra. This is not, however, always the case. And we should expect as much: after all,
 not all recursive type equations admit a least fixed point---this is why we insist that no
 non-positive occurrences of $t$ appear in $\tau$ when defining an inductive type $\mu t.~\tau$. The
 failure to obtain a least fixed point in a recursive type equation corresponds to an analogous lack
-of an initial algebra for the corresponding functor. For instance, $\mu t.~t \to 2$ does not admit a
-least fixed point, motivating the following exercise:
-
-\begin{exercise}
-Show that the endofunctor $F(X) = 2^X$ on $\Set$ does not admit an initial algebra.
-(\emph{Hint:} recall Lambek's lemma.)
-
-TODO: not sure this is a functor
-\end{exercise}
-
-Of course, such results generalize to arbitrary categories, not just $\Set$, but examining
-them in depth would take us too far afield. It suffices to note that all the usual strictly positive
+of an initial algebra for the corresponding functor. For instance, $\mu t.~t \to 2$ (i.e., $F(X) =
+2^X$) does not admit a least fixed point in an arbitrary Cartesian closed category: for one,
+Lambek's lemma says that this would induce an isomorphism $\mu F \cong 2^{\mu F}$, which by Cantor's
+theorem never holds in the CCC $\Set$. In fact, we can more generally prove the non-existence of
+certain initial algebras in arbitrary categories, not just $\Set$, but this would take us too far
+afield. For the purposes of this explainer, it suffices to note that all the usual strictly positive
 inductive types of interest are characterized by endofunctors that admit initial algebras.
-
-The following two exercises provide some pleasing generalizations to conclude this section. However,
-they are not necessary to follow the remainder of this explainer.
 
 \begin{exercise}
 \label{ex:isorec-translation}
@@ -764,27 +772,25 @@ Your translation should give an account of what these definitions mean categoric
 \end{itemize}
 \end{exercise}
 
-\begin{exercise}
-\sloppy
-(Note that this exercise is independent of the preceding one.)
+% \begin{exercise}
+% \sloppy
+% (Note that this exercise is independent of the preceding one.)
 
-\noindent
-  We now face the perennial categorical question: can we dualize this? (Spoiler: yes.) That is,
-  given an endofunctor $F$, let us consider \emph{$F$-coalgebras} $(A,\, \eta : A \to F A)$ instead
-  of $F$-algebras, and examine the \emph{terminal} $F$-coalgebra rather than the initial one.
-  
-  TODO: More scaffolding, give a specific functor example (e.g., streams --- have them give an
-  explicit terminal coalgebra in set)
+% \noindent
+%   We now face the perennial categorical question: can we dualize what we have done? (Spoiler: yes.)
+%   That is, given an endofunctor $F$, let us consider \emph{$F$-coalgebras} $(A,\, \eta : A \to F A)$
+%   instead of $F$-algebras, and examine the \emph{terminal} $F$-coalgebra rather than the initial
+%   one.
 
-  \begin{enumerate}
-    \item What type does the carrier of the terminal $F$-coalgebra represent? (\emph{Hint}: It will
-          turn out that the carrier of the terminal $F$-coalgebra is also a fixed point of $F$ up to
-          isomorphism.) What about its structure map?
+%   \begin{enumerate}
+%     \item What type does the carrier of the terminal $F$-coalgebra represent? (\emph{Hint}: It will
+%           turn out that the carrier of the terminal $F$-coalgebra is also a fixed point of $F$ up to
+%           isomorphism.) What about its structure map?
 
-    \item How do we interpret the unique $F$-coalgebra morphism from another $F$-coalgebra into the
-          terminal one?
-  \end{enumerate}
-\end{exercise}
+%     \item How do we interpret the unique $F$-coalgebra morphism from another $F$-coalgebra into the
+%           terminal one?
+%   \end{enumerate}
+% \end{exercise}
 
 \section{The Families Fibration: Indexing Inductive Types}
 
@@ -816,7 +822,6 @@ will see yet another denotation of $\sum$ later on), so the meanings of these no
 context-sensitive.}
 
 \begin{definition}[Families fibration]
-  TODO: maybe don't name the category
   The \emph{category of families (of sets)} $\FamSet$ is defined as follows:
   \begin{itemize}
     \item Objects are pairs $(A, P : A \to \Ob(\Set))$ of an indexing set $A$ and a \emph{family} of
@@ -949,12 +954,11 @@ inductive Even : Nat -> Type where
 \end{lstlisting}
 
 A natural number \texttt{n} is even if the type \texttt{Even n} is inhabited. Correpsondingly, the
-interpretation of this inductive type as a family of sets $(\N, P_\mathtt{Even})$ can thus be
-thought of as defining a \emph{predicate} $P_\mathtt{Even}$ on natural numbers.\footnote{Recall that
-the standard set-theoretic semantics of first-order logic interprets a predicate as a set of the
-values of which it holds.} With this interpretation, we think of a family $(A, P)$ as containing
-proofs $P(a)$ that the represented predicate holds of elements $a \in A$. In particular, if $P(a)$
-is inhabited, than the predicate holds of $a$; if it is empty, the predicate does not.
+interpretation of this inductive type as a family of sets $(\N, P_\mathtt{Even})$ can be thought of
+as defining a \emph{predicate} $P_\mathtt{Even}$ on natural numbers. With this interpretation, we
+think of a family $(A, P)$ as containing proofs $P(a)$ that the represented predicate holds of
+elements $a \in A$. In particular, if $P(a)$ is inhabited, than the predicate holds of $a$; if it is
+empty, the predicate does not.
 
 Adopting the logical perspective on families suggested by the Curry--Howard correspondence, it is
 natural to consider the family that represents the constantly-true predicate on a given set, known
@@ -1023,10 +1027,28 @@ characterization of $\Sigma_f (A, P)$ is given by
 \end{equation}
 
 \begin{exercise}
-  TODO: maybe take the very strong coproducts diagram and have them show that (a) it commutes and
-  (b) $\{\psi\}$ is an iso
-\end{exercise}
+  \label{ex:very-strong-coprods}
+  Fix a family $(A, P)$. Let $f : A \to B$ be a set function. Consider the following diagram, where
+  $\psi : (A, P) \to \Sigma_f (A, P)$ acts in the straightforward way:
 
+  % https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHsoQSxQKVxcfSJdLFsyLDAsIlxce1xcU2lnbWFfZihBLCBQKVxcfSJdLFswLDIsIkEiXSxbMiwyLCJCIl0sWzAsMSwiXFx7XFxwc2lcXH0iXSxbMCwyLCJcXHBpX3soQSwgUCl9IiwyXSxbMiwzLCJmIiwyXSxbMSwzLCJcXHBpX3tcXFNpZ21hX2YoQSwgUCl9Il1d
+  \[\begin{tikzcd}
+    {\{(A,P)\}} && {\{\Sigma_f(A, P)\}} \\
+    \\
+    A && B
+    \arrow["{\{\psi\}}", from=1-1, to=1-3]
+    \arrow["{\pi_{(A, P)}}"', from=1-1, to=3-1]
+    \arrow["{\pi_{\Sigma_f(A, P)}}", from=1-3, to=3-3]
+    \arrow["f"', from=3-1, to=3-3]
+  \end{tikzcd}\]
+
+  \begin{enumerate}
+    \item Show that this diagram commutes.
+    \item Show that $\{\psi\}$ is an isomorphism.
+  \end{enumerate}
+
+  This shows that the families fibration has \emph{very strong coproducts}.
+\end{exercise}
 
 \subsection{Liftings}
 
@@ -1191,21 +1213,23 @@ summand), this is precisely the functor $F_{\mathtt{BitVec}}$ derived in equatio
 (\ref{eqn:functor-bitvec})!
 
 \begin{exercise}
+\label{ex:bh-indexed-rbtrees}
 \sloppy
   Consider the following inductive type of trees with colored nodes (we refrain from calling these
   ``red-black trees'' in prose because they need not maintain the relevant invariants):
 \begin{lstlisting}
-  inductive RBTree (A : Type) where
+  inductive RBList (A : Type) where
     | leaf  : RBTree
     | red   : A -> RBTree -> RBTree -> RBTree
     | black : A -> RBTree -> RBTree -> RBTree
 \end{lstlisting}
+
   \begin{enumerate}
     \item Define the endofunctor $F_\mathtt{RBTree} : \Set \to \Set$ such that
           $\llbr{\mathtt{RBTree}} \cong \mu F_\mathtt{RBTree}$.
     \item Define an $F_\mathtt{RBTree}$-algebra $\mathtt{bh}$ that computes the \emph{black height}
           of an \texttt{RBTree}, i.e., the maximum number of black nodes on a path from the root to
-          a leaf.
+          a leaf. You may assume a function $\texttt{max} : \N \times \N \to \N$.
     \item Using the above, compute $F_\mathtt{RBTree}^\mathtt{bh} : \FamSet_\N \to \FamSet_\N$, and
           read off of this expression an indexed inductive type of black height-indexed colored
           trees. Verify that your definition matches how you would intuitively define this type from
@@ -1298,8 +1322,8 @@ $f$.
   an isomorphism between the set of $\FamSet$-morphisms $h : (A, P) \to (B, Q)$ such that $Uh = f$
   and $\FamSet_A$ morphisms $(A, P) \to f^*(B, Q)$:
   \begin{align*}
-  &\{ h \in \Hom_{\FamSet}((A, P), (B, Q)) \mid Uh = f \} \cong\\
-  &\Hom_{\FamSet_A}((A, P), f^*(B, Q))
+  &\{ h \in \FamSet((A, P), (B, Q)) \mid Uh = f \} \cong\\
+  &\FamSet_A((A, P), f^*(B, Q))
   \end{align*}
 \end{lemma}
 
@@ -1354,17 +1378,17 @@ However, since $F^\alpha$ is a restriction of $\hat F$ by values of an algebra $
 want to look at a correspondingly restricted category of algebras, not $\Alg_{\hat F}$ in its
 entirety. We thus restrict the category $\Alg_{\hat F}$ to an appropriate \emph{fiber} over our
 refining algebra. This definition, given below, is directly analogous to the definition of fibers
-over $\FamSet$; however, we phrase it slightly differently to motivate a later generalization. (One
-may find it worthwhile to ``pattern-match'' the tuple-valued variables below and unfold the
-definitions of $U^\Alg$ and $U$ to see this correspondence more directly.)
+over $\FamSet$; however, we phrase it slightly differently to suggest the generality of such a
+construction. (One may find it worthwhile to ``pattern-match'' the tuple-valued variables below and
+unfold the definitions of $U^\Alg$ and $U$ to see this correspondence more directly.)
 
 \begin{definition}[Fiber of the algebras fibration over $(A, \alpha)$]
   The \emph{fiber} of the algebras fibration over $(A, \alpha)$, or equivalently the \emph{category
   of $\hat F$-algebras over $\alpha$}, denoted by $(\Alg_{\hat F})_\alpha$, is defined as follows:
   \begin{itemize}
-    \item Objects are $\hat F$-algebras $(P, k)$ such that $U^\Alg (P, k) = (A, \alpha)$
+    \item Objects are $\hat F$-algebras $(P, k)$ such that $U^\Alg (P, k) = (A, \alpha)$.
     \item Morphisms are $\hat F$-algebra morphisms $f : (P, k) \to (Q, k')$ such that $U f =
-    \mathsf{id}_{(A, \alpha)}$
+    \mathsf{id}_{(A, \alpha)}$.
   \end{itemize}
 \end{definition}
 
@@ -1378,7 +1402,22 @@ In fact, it turns out that this is the same category as $\Alg_{F^\alpha}$, just 
 \end{lemma}
 
 \begin{proof}
-  TODO
+  We treat objects and morphisms in turn.
+
+  Observe that an object of $(\Alg_{\hat F})_\alpha$ is a pair of a family and a $\FamSet$-morphism,
+  of the form $((A, P), k : \hat F(A, P) \to (A, P))$ such that $Uk = \alpha$. By Lemma
+  \ref{lem:famset-morphism-iso}, we can characterize such a $\FamSet$-morphism as a
+  $\FamSet_{FA}$-morphism via the reindexing functor, so the object is equivalently expressed as
+  $((A, P), k' : \hat F(A, P) \to \alpha^*(A, P))$. In turn, we observe that morphisms $k' : \hat
+  F(A, P) \to \alpha^*(A, P)$ are themselves in isomorphism with $\FamSet_A$-morphisms $k'' :
+  \Sigma_\alpha \hat F(A, P) \to (A, P)$ by Lemma \ref{lem:reindex-adjoint}. Recalling the
+  definition of $F^\alpha$, we can rewrite this as $k'' : F^\alpha(A, P) \to (A, P)$. Thus, we can
+  again equivalently rewrite our object as $((A, P), k'' : F^\alpha(A, P) \to (A, P))$, which is
+  precisely an object in $\Alg_{F^\alpha}$.
+
+  Next, consider a morphism $f : ((A, P), k) \to ((A, Q), k')$ in $(\Alg_{\hat F})_\alpha$. This is
+  definitionally a map between the families $P$ and $Q$ respecting $\hat F$. The action of the
+  reindexing functor 
 \end{proof}
 
 In order to work with this new formulation of the category, we will reproduce for $(\Alg_{\hat
@@ -1387,6 +1426,7 @@ lemmas are analogues of Lemmas \ref{lem:reindex-adjoint} and \ref{lem:famset-mor
 proofs are technical but not exceedingly difficult, so we elide them.
 
 \begin{lemma}
+\label{lem:opreindex-alg-adjoint}
   Let $f$ be an $F$-algebra morphism $(A, \alpha) \to (B, \beta)$. Then there are functors
   $\Sigma_f^\Alg : (\Alg_{\hat F})_\alpha \to (\Alg_{\hat F})_\beta$ and $f^{*\Alg} : (\Alg_{\hat
   F})_\beta \to (\Alg_{\hat F})_\alpha$ such that $\Sigma_f^\Alg \dashv f^{*\Alg}$ and for any $\hat
@@ -1398,13 +1438,14 @@ proofs are technical but not exceedingly difficult, so we elide them.
 \end{lemma}
 
 \begin{lemma}
+\label{lem:alg-hom-iso-reindex}
   Let $(A, \alpha)$ and $(B, \beta)$ be $\hat F$-algebras. Fix an object $((A, P), k)$ in
   $(\Alg_{\hat F})_\alpha$ and $((B, Q), k')$ in $(\Alg_{\hat F})_\beta$. Let $f : (A, \alpha) \to
   (B, \beta)$ be an $\hat F$-algebra morphism.
   
   Then there is an isomorphism between the set of $\Alg_{\hat F}$-morphisms $h : k \to k'$ such that
   $U^\Alg h = f$ and the set of morphisms $k \to f^{*\Alg}(k')$:
-  \[ \{h \in \Hom_{\Alg_{\hat F}}(k, k') \mid U^\Alg h = f\} \cong \Hom_{\Alg_{\hat F}}(k, f^{*\Alg}(k')). \]
+  \[ \{h \in \Alg_{\hat F}(k, k') \mid U^\Alg h = f\} \cong \Alg_{\hat F}(k, f^{*\Alg}(k')). \]
 \end{lemma}
 
 Equipped with these intermediate results, we can now finally prove what we set out to show: that
@@ -1422,9 +1463,9 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 \end{theorem}
 
 \begin{proof}
-  We will first construct a candidate $F^\alpha$-algebra, then show that it is initial. By Lemma
-  \ref{lem:alg-falpha-iso}, it suffices to find an initial object in $(\Alg_{\hat F})_\alpha$
-  instead.
+  We will first construct a candidate algebra in $(\Alg_{\hat F})_\alpha$, then show that it is
+  initial. Note that, by Lemma \ref{lem:alg-falpha-iso}, this is equivalent to identifying an
+  $F^\alpha$-algebra and showing its initiality in $\Alg_{F^\alpha}$.
   
   From Theorem \ref{thm:lifting-init-alg}, we obtain an inital algebra $(\top(\mu F),
   \mathsf{in}_{\hat F})$ in $\Alg_{\hat F}$. We will use this to construct an initial object in the
@@ -1432,9 +1473,31 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
   $\Sigma_{\llpr{\alpha}}^\Alg$ for the algebras fibration to obtain
   \[ \left(\Sigma_{\llpr{\alpha}}^\Alg \top(\mu F),~ \Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat
      F} : \hat F (\top(\mu F)) \to \top(\mu F) \right). \]
-  Note that this type-checks because $\llbr{\alpha} : F A \to A$. TODO: figure out why this actually
-  type checks!
-  We will aim to show that this object is initial in $(\Alg_{\hat F})_\alpha$.
+  We will aim to show that this object is our desired initial object in $(\Alg_{\hat F})_\alpha$.
+
+  First, observe that by Lemma \ref{lem:opreindex-alg-adjoint}, we have
+  \[ \Sigma_{\llpr{\alpha}}^\Alg \top(\mu F) \cong \Sigma_\llpr{\alpha} \top(\mu F), \]
+  i.e., the carrier of this algebra is our na\"ive refinement encoding. So it remains only to show
+  that the algebra is indeed initial.
+
+  We show initiality directly from the definition: we show that there is exactly one morphism
+  between $\Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat F}$ and an arbitrary $\hat F$-algebra $k :
+  \hat F(A, P) \to (A, P)$ (hereafter we will denote each algebra under discussion by its structure
+  map alone). We proceed by considering a series of isomorphisms of hom-sets:
+  \begin{align*}
+    &(\Alg_{\hat F})_\alpha\left(\Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat F},~ k\right)\\
+    &\cong (\Alg_{\hat F})_{\mathsf{in}_F}\left(\mathsf{in}_{\hat F},~ \llpr{\alpha}^*(k)\right) \tag{Adjointness portion of Lemma \ref{lem:opreindex-alg-adjoint}}\\
+    &\cong \{ h \in \Alg_{\hat F}(in_{\hat F}, k) \mid U^\Alg h = \llpr{\alpha} \} \tag{Lemma \ref{lem:alg-hom-iso-reindex}}
+  \end{align*}
+  Notice that this final set is a subset of morphisms out of an initial object, so it can have at
+  most one element (namely, $\llpr{k}$). If this is to be a singleton set, then it must indeed
+  contain $\llpr{k}$, so in particular it must be that
+  \[ U^\Alg \llpr{k} = \llpr{\alpha}. \]
+  Recall that $U^\Alg$ is left adjoint, so it preserves colimits: the above equation (of morphisms
+  from initial objects) thus holds.
+
+  Accordingly, the algebra $\Sigma_{\llpr{\alpha}}^\Alg \mathsf{in}_{\hat F}$ is indeed initial in
+  $(\Alg_{\hat F})_\alpha$, completing the proof.
 \end{proof}
 
 % \begin{definition}[Reindexing functor]
@@ -1480,9 +1543,7 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 Throughout this explainer, we have followed Atkey et al. \citep{atkey2011refining} in carefully
 presenting the material so as to admit a generalization to the abstract language of
 \emph{fibrations}. Regrettably, we do not have the space here to present that generalization.
-Instead, we direct the reader to the following sources TODO: finish
-
-TODO: write exercise solutions! (and harder exercises)
+Instead, we direct the reader to the following sources TODO: finish (full Cartesian Lawvere w v.s. coprods)
 
 TODO: texttt and mathtt are not the same --- settle on one
 
@@ -1495,13 +1556,15 @@ References:
 - Ghani et al., Fibrational Induction Rules for Initial Algebras
 - The Bart Jacobs book on fibered category theory (Cat Log and ...)
 
+
+\newpage
 \section*{Solutions to Exercises}
 
 \noindent\textbf{Solution \ref{ex:denote-bool}:}
 
 Pick $\llbr{\texttt{true}} = i_1$ and $\llbr{\texttt{false}} = i_2$, respectively the left and right
 injections into the coproduct, and take $\llbr{\texttt{if}(t, e)} = \langle t, e \rangle$.
-Commutativity and recursor  are immediate from the universal property for coproducts.
+Commutativity and recursor uniqueness are immediate from the universal property for coproducts.
 
 \noindent\textbf{Solution \ref{ex:interp-exnat}:}
 
@@ -1538,7 +1601,42 @@ rather than a pair of squares. It looks as follows:
 	\arrow["{e_\texttt{z}}"', from=7-1, to=5-3]
 \end{tikzcd}\]
 
-\textbf{Solution \ref{ex:isorec-translation}}:
+\noindent\textbf{Solution \ref{ex:self-trees}:}
+
+\begin{enumerate}
+  \item The actions of $F_{\texttt{SelfTree}}$ on objects and morphisms are given below:
+  \begin{align*}
+    F_{\texttt{SelfTree}}(X) &= 1 \oplus A \times X^A\\
+    F_{\texttt{SelfTree}}(e) &= [\mathsf{id}_1, \langle (e \circ -) \circ \pi_1, \mathsf{id}_A \circ \pi_2\rangle]
+  \end{align*}
+  \item The relevant algebra is
+  \[ \alpha_{\texttt{selfHeight}} : F_{\texttt{SelfTree}} \llbr{\texttt{Nat}} \to \llbr{\texttt{Nat}} = [0, \texttt{s} \circ \mathsf{app} \circ \mathsf{flip} ] \]
+  where $\mathsf{flip}$ is the isomorphism that witnesses the commutativity of products (and
+  \texttt{s}, as before, is the natural-number successor operation).
+\end{enumerate}
+
+\noindent\textbf{Solution \ref{ex:app-as-algebra}:}
+
+Fix objects $A, B$ and consider their exponential. Since $\texttt{app} : B^A \times A \to B$, we are
+led to define the endofunctor $F(X) = X^A \times A$, whose action on morphisms is given by $F(e) =
+\langle (e \circ -) \circ \pi_1, \mathsf{id}_A \circ \pi_2\rangle$. (Notice that, despite the type
+of \texttt{app} containing two objects, there is only one possible choice of functor: if we tried to
+define the functor in $A$, it would not admit an initial algebra!)
+
+We claim that the identity morphism for the initial object $0$ is the initial $F$-algebra. To see
+why, first observe that $F(0) = 0^A \times A \cong 0 \times A \cong 0$, so the choice of initial
+algebra $\mathsf{id}_0 : F(0) \to 0$ (transported across the relevant isomorphisms) type-checks.
+Moreover, its initiality is immediate from the fact that $0$ is initial.
+
+By Lambek's lemma, we thus have that $\mu F \cong 0$, so the inductive type that this functor
+characterizes is empty. We can read off the corresponding \texttt{inductive} definition:
+
+\begin{lstlisting}
+inductive Empty' (A : Type) : Type where
+  | mk : (A -> Empty') -> Empty' -> Empty'
+\end{lstlisting}
+
+\noindent\textbf{Solution \ref{ex:isorec-translation}}:
 
 We translate each rule in turn.
 
@@ -1611,3 +1709,69 @@ We translate each rule in turn.
 \end{itemize}
 Observe that (renaming \texttt{fold} to $c$, $e_1$ to $f_c$, and $\rho$ to $A$) we have now arrived
 at the same diagram we derived in our previous translation!
+
+\noindent \textbf{Solution \ref{ex:very-strong-coprods}:}
+
+First, note that the ``straightforward'' morphism $\psi$ is concretely
+\[ \psi(a, p) = (f, a \mapsto p \mapsto (a, p)). \]
+
+(Note that we are using the isomorphic formulation of indexed coproducts given in Equation
+(\ref{eqn:indexed-coprod-simplified}) to minimize bureaucracy.)
+
+\begin{enumerate}
+  \item Unfolding definitions, we find that
+  \[ (f \circ \pi_{(A, P)})(a, p) = f(a) \]
+  and
+  \[ (\pi_{\Sigma_f(A, P)}\circ \{\psi\})(a, p) = \pi_{\Sigma_f(A, P)}(f(a), a, p) = f(a) \]
+  so that
+  \[ f \circ \pi_{(A, P)} = \pi_{\Sigma_f(A, P)}\circ \{\psi\} \]
+  as required.
+
+  \item Define the putative inverse of $\{\psi\}$ to be $\iota : \{\Sigma_f(A, P)\} \to \{(A, P)\}$
+  given by
+  \[ \iota(b, (a, p)) = (a, p) \]
+
+  Then observe that
+  \[ \{\psi\}(\iota(b, (a, p))) = \{\psi\}(a, p) = (f(a), (a, p)) = (b, (a, p)) \]
+  where the last equality follows by the definition of $\Sigma_f(A, P)$, and moreover
+  \[ \iota(\{\psi\}(a, p)) = \iota(f(a), (a, p)) = (a, p) \]
+  so that $\{\psi\}$ is indeed an isomorphism with inverse $\iota$.
+\end{enumerate}
+
+\noindent \textbf{Solution \ref{ex:bh-indexed-rbtrees}:}
+
+\begin{enumerate}
+  \item
+    \begin{align*}
+      F_{\texttt{RBTree}}(X) &= 1 \oplus ((A \times (X \times X)) \oplus (A \times (X \times X)))\\
+      F_{\texttt{RBTree}}(e) &= [\inl \circ \mathsf{id}_1, \inl \circ \inr \circ m, \inr \circ \inr \circ m ]\\
+      &\text{where } m = \langle\mathsf{id}_A \circ \pi_1 \circ \pi_1, \langle e \circ \pi_1 \circ \pi_2, e \circ \pi_2 \circ \pi_2\rangle\rangle
+    \end{align*}
+
+  \item
+  \[ \alpha_{\texttt{bh}} = [0, \texttt{s} \circ \texttt{max} \circ \pi_2, \texttt{max} \circ \pi_2] \]
+
+  \item 
+  \begin{align*}
+    &F^\texttt{bh}_\texttt{RBTree}(\N, P)\\
+    &\cong (\N, n \mapsto \{y \in F_\texttt{RBTree}(\N, P) \mid \texttt{bh}((F_\texttt{RBTree}\pi_{(\N, P)})(y)) = n\})\\
+    &= (\N, n \mapsto \{y \in 1 \oplus ((A \times ((\N, P) \times (\N, P))) \oplus (A \times ((\N, P) \times (\N, P)))) \mid\\
+    &\hspace{6em} (y = \inl~() \text{ and } 0 = n)\text{ or}\\
+    &\hspace{6em} (y = \inr~(\inl~(a, ((m_\ell, p_\ell), (m_r, p_r)))) \text{ and } n = \texttt{succ}(\texttt{max}(n_\ell, n_r)))\\
+    &\hspace{6em} (y = \inr~(\inr~(a, ((m_\ell, p_\ell), (m_r, p_r)))) \text{ and } n = \texttt{max}(n_\ell, n_r))\})\\
+    &= (\N, (n \mapsto
+    \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
+    \oplus\\
+    &\hspace{5.75em}(\left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \mathtt{succ}(\texttt{max}(m_\ell, m_r)) \\ \varnothing & \text{else}\end{array} \right)\oplus\\
+    &\hspace{6.25em} \left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{max}(m_\ell, m_r) \\ \varnothing & \text{else} \end{array} \right))
+  ))
+  \end{align*}
+
+  One can verify that this is isomorphic to the translation of the following inductive type:
+\begin{lstlisting}
+inductive BHRBTree : Nat -> Type where
+  | leaf : BHRBTree 0
+  | red  : {m n : Nat} -> A -> BHRBTree m -> BHRBTree n -> BHRBTree (succ (max m n))
+  | red  : {m n : Nat} -> A -> BHRBTree m -> BHRBTree n -> BHRBTree (max m n)
+\end{lstlisting}
+\end{enumerate}
