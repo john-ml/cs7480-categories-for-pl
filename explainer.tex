@@ -24,14 +24,14 @@ For example, the type of lists of length \texttt{n} can be written
 \[ \texttt{\{xs : List A | length(xs) = n\}} \]
 
 In dependently typed languages, such refinement types can be na\"ively translated as dependent
-pairs, adjoining to values of the list type proofs that they satisfy the length constraint:
+pairs, attaching to lists proofs that they satisfy the length constraint:
 
 \[ \sum_{xs ~:~ \texttt{List}~\alpha} \texttt{length}(xs) = n \]
 
 However, dependent types permit a more elegant encoding: such constraints can be directly ``baked
 into'' the definition of an inductive type via type indices, ensuring that all values inhabiting the
 type are correct by construction. Our example above, for instance, yields the type of length-indexed
-vectors:\footnote{Throughout this explainer, we will write code snippets in a syntax similar to that
+vectors:\footnote{Throughout this chapter, we will write code snippets in a syntax similar to that
 of Lean 4, though we assume all constructors live in the global namespace. Those familiar with Agda
 can read \texttt{inductive} as \texttt{data} and \texttt{Type} as \texttt{Set}.}
 
@@ -42,12 +42,12 @@ inductive Vector (A : Type) : Nat -> Type
 \end{lstlisting}
 
 The type \texttt{Vector} naturally internalizes the \texttt{length} refinement from the simply typed
-setting. In this explainer, we will use a categorical construction to generalize this transformation
+setting. In this chapter, we will use a categorical construction to generalize this transformation
 to arbitrary inductive types and a broad class of refinements. In other words, we answer the
 following question: how can a refinement of a type in a simply typed language be translated into an
 indexed inductive type in a dependently typed one?
 
-Although this question serves as our motivation, the actual aim of this explainer is threefold:
+Although this question serves as our motivation, the actual aim of this chapter is threefold:
 \begin{itemize}
   \item To give an account of a categorical semantics of inductive and indexed inductive types;
   \item To illustrate an application of these tools in the form of the translation discussed above;
@@ -55,8 +55,10 @@ Although this question serves as our motivation, the actual aim of this explaine
         not have space to treat herein.
 \end{itemize}
 
-The content of this explainer is largely based on the work of Atkey, Johann, and Ghani
-\citep{atkey2011refining}.
+The content of this chapter is largely based on the work of Atkey, Johann, and
+Ghani~\citep{atkey2011refining}. The content of the first section on inductive types also draws on
+Wadler's ``Recursive Types for Free!''~\citep{wadler1990recursive} and scribed lecture notes from
+New's presentation of similar material \citep{new2023category}.
 
 \section{Categorifying Inductive Types}
 
@@ -85,12 +87,13 @@ $\llbr{\texttt{A}} \oplus 1$ (assuming that we are able to interpret \texttt{A})
 interpret the elements of a given inductive type, we can treat each constructor argument as a term
 in a product, then sum together the representations of each constructor. Where lies the problem?
 
-You may notice that our wording above is somewhat roundabout: this is intentional. An inductive type
-is characterized not merely by its ground inhabitants, but also by the \emph{maps into} the type
-(i.e., its constructor forms). An inductive type also comes equipped with a \emph{recursor} (also
-known as an \emph{iterator} or \emph{fold}) that admits recursive definitions over the type. The
-account above, which describes only the object denoted by the type itself, does not directly
-characterize these facets of an inductive definition.
+You may notice that our wording above---interpreting ``elements of the type'' induced by the
+definition, rather than the ``definition'' itself---is somewhat roundabout: this is intentional. An
+inductive type is characterized not merely by its ground inhabitants, but also by the \emph{maps
+into} the type (i.e., its constructor forms). An inductive type also comes equipped with a
+\emph{recursor} (also known as an \emph{iterator} or \emph{fold}) that admits recursive definitions
+over the type. The account above, which describes only the object denoted by the type itself, does
+not directly characterize these facets of an inductive definition.
 
 Moreover---and more problematically---we also currently lack the facilities to provide a general
 categorical account of infinite inductive types, such as the type of natural numbers
@@ -228,15 +231,15 @@ of \texttt{true}, \texttt{false}, and $\texttt{if}(t,e)$?
 \subsection{Categorifying Natural Numbers}
 
 We now perform a similar translation for natural numbers. The type \texttt{Nat} has two
-constructors, which we abbreviate as \texttt{z} (zero) and \texttt{s} (successor), and is equipped
-with a recursor $\texttt{rec}(e_z, x.~e_s)(n)$. Notice that, unlike \texttt{if}, the recursor for
-\texttt{Nat} binds a variable in the successor case: this will be the recursive result of evaluating
-the recursor on the substructure of $n$. The typing rules are given below:
+constructors, \texttt{zero} and \texttt{succ}, and is equipped with a recursor $\texttt{rec}(e_z,
+x.e_s)(n)$. Notice that, unlike \texttt{if}, the recursor for \texttt{Nat} binds a variable in the
+successor case: this will be the recursive result of evaluating the recursor on the substructure of
+$n$. The typing rules are given below:
 
 \begin{mathpar}
-\inferrule*[right=T-z]{~}{\vdash z : \texttt{Nat}}
+\inferrule*[right=T-z]{~}{\vdash \texttt{zero} : \texttt{Nat}}
 
-\inferrule*[right=T-s]{~}{n : \texttt{Nat} \vdash s(n) : \texttt{Nat}}
+\inferrule*[right=T-s]{~}{n : \texttt{Nat} \vdash \texttt{succ}(n) : \texttt{Nat}}
 
 \inferrule*[right=T-natrec]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
@@ -249,11 +252,11 @@ binds $x$ to the recursive result of folding over its predecessor, then evaluate
 \begin{mathpar}
 \inferrule*[right=$\beta^{\texttt{rec}_\texttt{Nat}}_z$]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
-  {\vdash \texttt{rec}_{\texttt{Nat}}(e_z, x. e_s)(z) \equiv e_z : \tau}
+  {\vdash \texttt{rec}_{\texttt{Nat}}(e_z, x. e_s)(\texttt{zero}) \equiv e_z : \tau}
 
 \inferrule*[right=$\beta^{\texttt{rec}_\texttt{Nat}}_s$]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau \\ \vdash n : \texttt{Nat}}
-  {\vdash \texttt{rec}_\texttt{Nat}(e_z, x. e_s)(\texttt{s}(n)) \equiv e_s[\texttt{rec}_\texttt{Nat}(e_z, x. e_s)(n)/x] : \tau}
+  {\vdash \texttt{rec}_\texttt{Nat}(e_z, x. e_s)(\texttt{succ}(n)) \equiv e_s[\texttt{rec}_\texttt{Nat}(e_z, x. e_s)(n)/x] : \tau}
 \end{mathpar}
 
 Finally, the $\eta$ rule says that any expression $e$ that satisfies the above equations is equal to
@@ -261,18 +264,18 @@ the corresponding recursor application:
 
 \begin{mathpar}
 \inferrule*[right=$\eta^{\texttt{rec}_\texttt{Nat}}$]
-  {y : \texttt{Nat} \vdash e : \tau \\ \vdash e[z/y] \equiv e_z : \tau \\ n : \texttt{Nat} \vdash e[s(n)/y] \equiv e_s[e/x] : \tau }
+  {y : \texttt{Nat} \vdash e : \tau \\ \vdash e[\texttt{zero}/y] \equiv e_z : \tau \\ n : \texttt{Nat} \vdash e[\texttt{succ}(n)/y] \equiv e_s[e/x] : \tau }
   {y : \texttt{Nat} \vdash e \equiv \texttt{rec}_\texttt{Nat}(e_z, x.e_s)(y) : \tau}
 \end{mathpar}
 
-% TODO: a bit too metaphorical/scare-quote-y
 As with Booleans, categorifying the rules for natural numbers yields an object representing the type
-\texttt{Nat}, a morphism for each constructor, and, for each pair of ``folding-function'' morphisms
-running ``parallel to'' the constructors, a unique morphism denoted by the recursor.\footnote{Note
-that we obtain from the $\eta$ law the uniqueness condition---that any morphism $e$ satisfying the
-$\beta$-derived equalities $e \circ z = e_z$ and $e \circ s = e_s$ is equal to the recursor
-morphism---by recalling that substitution is interpreted as composition.} In the case of natural
-numbers, however, the resulting construction has a special name: the \emph{natural numbers object}.
+\texttt{Nat}, a morphism for each constructor, and, for each pair of ``combining-function''
+morphisms running ``parallel to'' the constructors, a unique morphism denoted by the
+recursor.\footnote{Note that we obtain from the $\eta$ law the uniqueness condition---that any
+morphism $e$ satisfying the $\beta$-derived equalities $e \circ \texttt{zero} = e_z$ and $e \circ
+\texttt{succ} = e_s$ is equal to the recursor morphism---by recalling that substitution is
+interpreted as composition.} In the case of natural numbers, however, the resulting construction has
+a special name: the \emph{natural numbers object}.
 
 \begin{definition}[Natural numbers object]
 \sloppy
@@ -306,11 +309,11 @@ diagram as a pair of squares:
 	1 && {\llbr{\texttt{Nat}}} & {} & {\llbr{\texttt{Nat}}} \\
 	\\
 	1 && {\llbr{\tau}} && {\llbr{\tau}}
-	\arrow["{\texttt{z}}", from=1-1, to=1-3]
+	\arrow["{\texttt{zero}}", from=1-1, to=1-3]
 	\arrow["{\mathsf{id}_1}"{description}, from=1-1, to=3-1]
-	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.~e_s)}"', from=1-3, to=3-3, dashed]
-	\arrow["{\texttt{s}}"', from=1-5, to=1-3]
-	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.~e_s)}"{description}, from=1-5, to=3-5, dashed]
+	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.e_s)}"', from=1-3, to=3-3, dashed]
+	\arrow["{\texttt{succ}}"', from=1-5, to=1-3]
+	\arrow["{\texttt{rec}_\texttt{Nat}(e_z,x.e_s)}"{description}, from=1-5, to=3-5, dashed]
 	\arrow["{e_z}"{description}, from=3-1, to=3-3]
 	\arrow["{e_s}"{description}, from=3-5, to=3-3]
 \end{tikzcd}
@@ -695,20 +698,21 @@ $F(X) = 2^{2^X}$) does not admit a least fixed point in every Cartesian closed c
 Lambek's lemma says that this would induce an isomorphism $\mu F \cong 2^{2^{\mu F}}$, which by
 Cantor's theorem never holds in the CCC $\Set$. In fact, we can more generally prove the
 non-existence of certain initial algebras in arbitrary categories, not just $\Set$, but this would
-take us too far afield. For the purposes of this explainer, it suffices to know that all the usual
+take us too far afield. For the purposes of this chapter, it suffices to know that all the usual
 strictly positive inductive types of interest are characterized by endofunctors that admit initial
 algebras.
 
 \begin{exercise}
 \label{ex:isorec-translation}
-While we gave an interpretation of inductive types by translating the components of their structure
-into categorical terms, we could have alternatively followed our previous method and directly
-translated the generalized inference rules for isorecursively formulated inductive types (cf.\
-Harper, \emph{Practical Foundations for Programming Languages (2\textsuperscript{nd}
-ed.)}, Ch.\ 15).
+\sloppy
+There is another way to think about interpreting inductive types. While we gave an interpretation by
+translating the various features of inductive types' structure into categorical terms, we could have
+alternatively followed our previous method and directly translated the generalized inference rules
+for isorecursively formulated inductive types (cf.\ Harper, \emph{Practical Foundations for
+Programming Languages (2\textsuperscript{nd} ed.)}, Ch.\ 15).
 
-Your task: give a translation of these rules (shown below), and verify that it yields the
-same construction at which we just arrived.
+Give a translation of these rules (shown below), and verify that it yields the same construction at
+which we just arrived.
 
 \begin{mathpar}
 \inferrule*[right=T-fold]
@@ -728,7 +732,7 @@ same construction at which we just arrived.
   {y : \mu t.\tau \vdash e \equiv \texttt{rec}(x.e_1)(y) : \rho}
 \end{mathpar}
 
-These rules introduce two new auxiliary definitions:
+Note that these rules introduce two new auxiliary definitions:
 \gdef\NL{\\} % See https://tex.stackexchange.com/a/519322 and https://tex.stackexchange.com/a/234314
 \begin{itemize}
   \item The judgment $\vdash t. \tau~\mathsf{pos}$ asserts that $t$ has only \emph{positive}
@@ -819,7 +823,7 @@ Cartesian closed and contains finite coproducts---i.e., it is \emph{bicartesian 
 The category $\Set$ alone, however, lacks the structure to give an elegant semantics to indexed
 inductive types. Instead, we will turn to a new category built atop $\Set$ that is equipped with a
 notion of ``indexing'' that will afford a straightforward interpretation of our inductive types'
-indices.\footnote{Be careful when reading the following definition and elsewhere in this explainer:
+indices.\footnote{Be careful when reading the following definition and elsewhere in this chapter:
 the notation $\prod_{a \in A} S(a)$ below refers to a \emph{set-theoretic} indexed product, not,
 e.g., a $\Pi$-type. The symbols $\prod$, $\sum$, and $\to$ are regrettably highly overloaded (we
 will see yet another denotation of $\sum$ later on), so the meanings of these notations are highly
@@ -845,7 +849,7 @@ context-sensitive.}
 Note that, while we will not treat them in full generality, \emph{(Grothendieck) fibrations} are
 objects of particular interest in category theory and characterize a certain kind of structure
 (which we will attempt to intuitively motivate at several points hereafter). Throughout this
-explainer, you will encounter definitions phrased as features ``of the families fibration:'' these
+chapter, you will encounter definitions phrased as features ``of the families fibration:'' these
 should be read as referring to the entire structure of $\FamSet$, $\Set$, and this mapping between
 them, rather than particular characteristics of a single forgetful functor.
 
@@ -923,38 +927,35 @@ inductive Fin : Nat -> Type where
   | finZero : {n : Nat} -> Fin (succ n)
   | finSucc : {n : Nat} -> Fin n -> Fin (succ n)
 \end{lstlisting}
-% Sol: F(N,X) = (N, { 0 -> Empty | n + 1 -> Unit + X n })
 
 \emph{Hint:} Notice that, for a given index, there maybe multiple (or no) applicable constructors.
 \end{exercise}
-
-%%%%%%%
 
 Notice that we can also interpret refinements of simple types in the category of families. If $T =
 \mu F$ is an inductive type, then given an $A$-valued combining function $f$ for $T$ (i.e., an
 $F$-algebra $f$ with carrier $A$) and a value $a : A$, the refinement of $T$ where $f$ yields value
 $a$, i.e.,
-\[ \texttt{\{} \texttt{t : T} \mid \texttt{rec}_\texttt{A}\texttt{(f)(t) = a} \texttt{\}} \]
+\[ \texttt{\{t : T | }\texttt{rec}_\texttt{A}\texttt{(f)(t) = a} \texttt{\}} \]
 can be translated as the family
 \[ (A, a \mapsto \{ x \in \mu F \mid \llpr{f}_{F}(x) = a \}). \]
 This is the ``na\"ive'' subset interpretation of refinements that we discussed previously. Our
 objective will be to turn this family into one that is the denotation of an indexed inductive type.
 
-Our basic recipe for this conversion will be as follows:
+\section{Constructing a Refinement Translation}
+
+Our basic recipe for the translation of $\texttt{\{t : T | }\texttt{rec}_\texttt{A}\texttt{(f)(t) =
+a} \texttt{\}}$ into an indexed inductive type will be as follows:
 \begin{enumerate}
   \item Lift $F$, an endofunctor on $\Set$, to an endofunctor $\hat F_A$ on $\FamSet_A$.
   \item Restrict the family produced by our lifting to those elements which are mapped to the
-        appropriate value by $f$.
+        appropriate value by $\texttt{rec}_\texttt{A}\texttt{(f)}$.
 \end{enumerate}
-
 This recipe will require a number of auxiliary constructions, on which we now embark.
-
-\section{Constructing a Refinement Translation}
 
 \subsection{Another View of Families}
 
-For some of the constructions we give in this explainer, it will be helpful to have in mind an
-alternative interpretation of $\FamSet$. This interpretation is inspired by the Curry--Howard
+For some of the constructions we give in this chapter, it will be helpful to have in mind an
+alternative perspective on $\FamSet$. This perspective is inspired by the Curry--Howard
 correspondence between propositions and types.
 
 Recall that the Curry--Howard correspondence suggests another way to interpret indexed inductive
@@ -1010,7 +1011,7 @@ in $\FamSet$ into a single object in $\Set$.
 
 The comprehension functor $\{-\}$ and forgetful functor $U$ are related by the natural
 transformation $\pi : \{-\} \Rightarrow U$ whose morphisms project (hence the notation $\pi$) the
-index from an element of an indexed family:
+index from an element of a (``comprehended'') indexed family:
 \[ \pi_{(A,P)}(a, p) = a \]
 
 We will also require means of mapping between $\FamSet_A$ and $\FamSet_B$ for distinct indexing sets
@@ -1020,7 +1021,7 @@ over an indexed inductive type into a distinct output type. This will be accompl
 functor, known as the \emph{op-reindexing functor}.
 
 \begin{definition}[Indexed coproduct]
-% \sloppy
+% \sloppy % Not worth it
   Let $f : A \to B$ be a set function, and let $(A, P)$ be a family of sets. The \emph{indexed
   coproduct of $(A, P)$ along $f$}, written $\Sigma_f (A, P)$, is defined as
   \[ \left(B, b \mapsto \sum_{a \in A} (b = f(a)) \times P(a)\right) \]
@@ -1153,23 +1154,21 @@ is captured by natural isomorphism.
 \end{exercise}
 
 The truth-preserving lifting above, however, is degenerate in the sense that it entirely forgets the
-% structure of the original family. We therefore instead define the following truth-preserving
-lifting:\footnote{While we have attempted to provide some intuition here, the motivation for this
-construction is largely found in its more general form in the setting of fibrational category
-theory, which is developed on page 347 of \citep{ghani2010fibrational}. There, one can also find a
-description of the lifting's action on morphisms along with a proof that it is truth-preserving.}
+structure of the original family. We therefore instead define the following truth-preserving
+lifting:\footnote{One can find a description of the lifting's action on morphisms, along with a proof
+that it is truth-preserving, in~\citep{ghani2010fibrational}.}
 
 % We define a truth-preserving lifting of an arbitrary endofunctor $F : \Set \to \Set$ as
 % follows:\footnote{We elide its action on morphisms and the proof that it is truth-preserving; both
-% can be found in Ghani et al. \citep{ghani2010fibrational}.}
+% can be found in Ghani et al.~\citep{ghani2010fibrational}.}
 
 \[ \hat F(A, P) = \Sigma_{F\pi_{(A, P)}} \top(F\{(A, P)\}) \]
 
 Unlike in the exercise, we incorporate the ``structure of $P$ under $F$'' by applying $F$ to the
-\emph{comprehension} of the original family. We then re-separate the indexing set $A$ and associated
-family $P$ ``under $F$'' by taking an indexed coproduct along $F \pi_{(A, P)}$. Thus, the resulting
-family can be seen as containing those elements which ``wrap the structure of $P$ in $F$'' (or, from
-a logical perspective, the resulting predicate holds only of those elements of $F A$ whose
+\emph{comprehension} of the original family. We then re-separate the indexing set $F A$ and
+associated family ``under $F$'' by taking an indexed coproduct along $F \pi_{(A, P)}$. Thus, the
+resulting family can be seen as containing those elements which ``wrap the structure of $P$ in $F$''
+(or, from a logical perspective, the resulting predicate holds only of those elements of $F A$ whose
 ``contents'' in $A$ were validated by $P$). Unfolding definitions makes these intuitions more
 apparent:
 
@@ -1197,7 +1196,7 @@ the functor $\hat F_A$ to be the restriction of $\hat F$ to $\FamSet_A$.
 \subsection{Translating Refinements}
 
 Recalling our original objective---to translate type refinements into indexed inductive types---we
-can see that truth-preserving liftings get us halfway to our goal: they transport the endofunctors
+can see that truth-preserving liftings get us halfway to our goal: they transform the endofunctors
 that characterize simple inductive types into analogous endofunctors on families. But our aim is
 not to produce an indexed inductive type that corresponds to the unrestricted simple one, but rather
 some refinement thereof. This refinement translation is the last piece we must develop.
@@ -1208,7 +1207,8 @@ resulting family contains only those elements which are mapped by the reindexing
 value in its codomain. This is precisely what we do when we refine a datatype: given $\texttt{P} :
 \texttt{T} \to \texttt{A}$, the type $\{ \texttt{t} : \texttt{T} \mid \texttt{P(t) = a} \}$ is an
 $\texttt{A}$-indexed type that, at a given index $\texttt{a}$, consists of the elements of
-$\texttt{T}$ on which $\texttt{P}$ produces value $\texttt{a}$.
+$\texttt{T}$ on which $\texttt{P}$ produces value $\texttt{a}$. In other words, op-reindexing by $f$
+corresponds precisely to refinement by $f$.
 
 Therefore, the construction to which we have building all this time can finally be written as
 follows:
@@ -1288,7 +1288,7 @@ summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in equatio
           $\llbr{\texttt{RBTree}} \cong \mu F_\texttt{RBTree}$.
     \item Define an $F_\texttt{RBTree}$-algebra $\texttt{bh}$ that computes the \emph{black height}
           of an \texttt{RBTree}, i.e., the maximum number of black nodes on a path from the root to
-          a leaf. You may assume a function $\texttt{max} : \N \times \N \to \N$.
+          a leaf. You may assume the existence of a function $\texttt{max} : \N \times \N \to \N$.
     \item Using the above, compute $F_\texttt{RBTree}^\texttt{bh} : \FamSet_\N \to \FamSet_\N$, and
           read off of this expression an indexed inductive type of black height-indexed colored
           trees. Verify that your definition matches how you would intuitively define this type from
@@ -1303,13 +1303,13 @@ always characterizes the indexed inductive type of interest. To begin with, we d
 the functor $F^\alpha$ admits an initial algebra in the first place, nor---if it does---whether the
 carrier of this algebra is in fact isomorphic to our na\"ive subset formulation of the refinement of
 $\mu F$ by $\alpha$. In this section, we will sketch the proof of these facts, referring the reader
-to the paper by Atkey et al. \citep{atkey2011refining} for further details.
+to the paper by Atkey et al.~\citep{atkey2011refining} for further details.
 
 \subsection{Preliminaries}
 
 We begin with a few auxiliary lemmas and definitions we will require for our proofs. First, recall
-our previous remark that the functors $\top : \Set \to \FamSet$ and $U : \FamSet \to \Set$ map in
-oppposite directions. In fact, we can say more: these form an adjoint pair.
+our observation from the previous section that the functors $\top : \Set \to \FamSet$ and $U :
+\FamSet \to \Set$ map in oppposite directions. In fact, we can say more: these form an adjoint pair.
 
 \begin{lemma}
   \label{lem:fam-fibration-adjoint}
@@ -1322,13 +1322,13 @@ oppposite directions. In fact, we can say more: these form an adjoint pair.
   Elements of the right-hand set are pairs of morphisms $(f : A
   \to B, f^\sim : \prod_{a \in A}, P(a) \to 1)$. But by terminality, there is only ever one choice
   of $f^\sim$, so the right-hand side is isomorphic to the set of functions $f : A \to B$, i.e.,
-  $\Set(A, B)$.
+  $\Set(A, B)$. Naturality is straightforward.
 \end{proof}
 
 As before, we now turn from functors between $\FamSet$ and $\Set$---i.e., between families and their
-index sets---to those between fibers $\FamSet_A$---i.e., between families with distinct index sets.
-While our construction required only the op-reindexing functor $\Sigma_f$, the following alternative
-means of reindexing will be useful for our proof.
+index sets---to those between fibers $\FamSet_A$ and $\FamSet_B$---i.e., between families with
+distinct index sets. While our construction in the previous section required only the op-reindexing
+functor $\Sigma_f$, the following alternative means of reindexing will be useful for our proof.
 
 \begin{definition}[Reindexing functor]
   Let $f : A \to B$ be a function (of sets). The \emph{reindexing functor} $f^* : \FamSet_B \to
@@ -1340,9 +1340,9 @@ means of reindexing will be useful for our proof.
 \end{definition}
 
 Notice that this functor, in contrast with $\Sigma_f$, is contravariant: the domain of $f^*$ is the
-fiber over the codomain of $f$, and vice versa. Thus, given a function $f : A \to B$, we can produce
-functors running in both directions between $\FamSet_B$ and $\FamSet_A$. Moreover, these functors
-are adjoint, as we now prove.
+fiber over the codomain of $f$, and vice versa. (Hence the ``op'' prefix in ``op-reindexing.'')
+Thus, given a function $f : A \to B$, we can produce functors running in both directions between
+$\FamSet_B$ and $\FamSet_A$. Moreover, these functors are adjoint.
 
 \begin{lemma}
   \label{lem:reindex-adjoint}
@@ -1361,19 +1361,20 @@ are adjoint, as we now prove.
   their mapping on families), so, unfolding definitions (and using the isomorphic representation of
   the indexed coproduct from equation (\ref{eqn:indexed-coprod-simplified})), it suffices to show
   \[ \left\{ g : \prod_{b \in B} \sum_{a \in f^{-1}[\{b\}]} P(a) \to Q(b) \right\} \cong \left\{ h :
-  \prod_{a \in A} P(a) \to Q(f(a)) \right\}. \] It is straightforward to check that $\iota$ (mapping
-  from left to right) and its putative inverse defined below indeed form an isomorphism between
-  these sets:
+  \prod_{a \in A} P(a) \to Q(f(a)) \right\} \]
+  satisfying naturality. It is straightforward to check that $\iota$ (mapping from left to right)
+  and its putative inverse defined below indeed form such an isomorphism between these sets:
   \begin{align*}
-    \iota(g) &= a \mapsto p \mapsto g(f(a))(a)(p)\\
-    \iota^{-1}(h) &= b \mapsto (a, p) \mapsto h(a)(p)(b)
+    \iota(g) &= a \mapsto p \mapsto g(f(a))(a, p)\\
+    \iota^{-1}(h) &= b \mapsto (a, p) \mapsto h(a)(p)
     \qedhere
   \end{align*}
+  % Note that the inverse definition type-checks because $h(a)(p) \in Q(f(a)) = Q(b)$ since $a \in
+  % f^{-1}[\{b\}]$.
 \end{proof}
 
-We also prove a lemma for later use that characterizes the morphisms into a reindexed family: they
-are isomorphic to those morphisms into the original family that mapped indexing sets according to
-$f$.
+We will also make use of a lemma that characterizes the morphisms into a reindexed family: they are
+isomorphic to those morphisms into the original family that mapped indexing sets according to $f$.
 
 \begin{lemma}
   \label{lem:famset-morphism-iso}
@@ -1386,21 +1387,10 @@ $f$.
   \end{align*}
 \end{lemma}
 
-\begin{proof}
-  Recall that $\FamSet$-morphisms from $(A, P)$ to $(B, Q)$ are pairs 
-  \[\left(h : A \to B, h^\sim : \prod_{a \in A}P(a) \to Q(h(a))\right). \]
-  The left-hand set in the lemma statement is the restriction of such pairs to those whose first
-  element is $f$, so they are of the form
-  \[ \left(f, h^\sim : \prod_{a \in A}P(a) \to Q(f(a))\right) .\]
-
-  By the definitions of $\FamSet_A$ and $f^*$, morphisms in the right-hand set are pairs
-  \[ \left(\mathsf{id}_A, f^\sim : \prod_{a \in A} P(a) \to Q(f(a))\right). \]
-
-  Since the first component of every pair in either set is fixed, both sets are isomorphic to the
-  set of functions of type
-  \[ \prod_{a \in A} P(a) \to Q(f(a)) \]
-  and thus to each other.
-\end{proof}
+\begin{exercise}
+  \label{ex:famset-morphism-iso}
+  Prove Lemma \ref{lem:famset-morphism-iso}.
+\end{exercise}
 
 We can now update Figure \ref{fig:famset-diag-no-adjoints} to summarize these additional results:
 
@@ -1437,7 +1427,7 @@ We can now update Figure \ref{fig:famset-diag-no-adjoints} to summarize these ad
   \node[black] at (0.5, -0.4) {$\dashv$};
 \end{tikzpicture}
 \captionof{figure}{A revision of Figure \ref{fig:famset-diag-no-adjoints}, now with adjoint relationships and
-the reindexing functor.}\label{fig:famset-diag-adjoints}
+the reindexing functor ($\pi$ has been removed for clarity).}\label{fig:famset-diag-adjoints}
 \end{center}
 
 \subsection{A Proof of Correctness}
@@ -1480,7 +1470,13 @@ $F$ has an initial algebra, than so does $\hat F$:
   $\top(\mu F)$.
 \end{theorem}
 \begin{proof}
-  TODO
+  The key insight for this proof is that $F$-algebras with carrier $\{(A, P)\}$ are interderivable
+  with $\hat F$-algebras with carrier $\{(A, P)\}$. A proof is provided by Ghani et
+  al.~\citep{ghani2010fibrational}; we will not give one here. Using this fact, the result follows
+  almost immediately: the carrier $\mu F$ of the initial $F$-algebra is isomorphic to $\sum_{t \in
+  \mu F}\{(\_ \mapsto \star)\}$ as a set, since the summand is a singleton. This set is precisely
+  $\{\top(\mu F)\}$, so that $\top(\mu F)$ is the carrier of the initial $\hat F$-algebra by the
+  aforementioned interderivability fact.
 \end{proof}
 
 However, since $F^\alpha$ is a restriction of $\hat F$ by values of an algebra $(A, \alpha)$, we
@@ -1519,22 +1515,17 @@ described as a ``decomposition'' in terms of $\hat F$ and $\alpha$.
 \end{lemma}
 
 \begin{proof}
-  We treat objects and morphisms in turn.
-
-  Observe that an object of $(\Alg_{\hat F})_\alpha$ is a pair of a family and a $\FamSet$-morphism,
-  of the form $((A, P), k : \hat F(A, P) \to (A, P))$ such that $Uk = \alpha$. By Lemma
-  \ref{lem:famset-morphism-iso}, we can characterize such a $\FamSet$-morphism as a
-  $\FamSet_{FA}$-morphism via the reindexing functor, so the object is equivalently expressed as
+  Observe that an object of $(\Alg_{\hat F})_\alpha$ is a pair of a family and a
+  $\FamSet$-morphism---i.e., a tuple $((A, P), k : \hat F(A, P) \to (A, P))$---such that $Uk =
+  \alpha$. By Lemma \ref{lem:famset-morphism-iso}, we can characterize such a $\FamSet$-morphism as
+  a $\FamSet_{FA}$-morphism via the reindexing functor, so the object is equivalently expressed as
   $((A, P), k' : \hat F(A, P) \to \alpha^*(A, P))$. In turn, we observe that morphisms $k' : \hat
   F(A, P) \to \alpha^*(A, P)$ are themselves in isomorphism with $\FamSet_A$-morphisms $k'' :
   \Sigma_\alpha \hat F(A, P) \to (A, P)$ by Lemma \ref{lem:reindex-adjoint}. Recalling the
   definition of $F^\alpha$, we can rewrite this as $k'' : F^\alpha(A, P) \to (A, P)$. Thus, we can
   again equivalently rewrite our object as $((A, P), k'' : F^\alpha(A, P) \to (A, P))$, which is
-  precisely an object in $\Alg_{F^\alpha}$.
-
-  Next, consider a morphism $f : ((A, P), k) \to ((A, Q), k')$ in $(\Alg_{\hat F})_\alpha$. This is
-  definitionally a map between the families $P$ and $Q$ respecting $\hat F$. The action of the
-  reindexing functor TODO
+  precisely an object in $\Alg_{F^\alpha}$. Transporting a morphism along the corresponding sequence
+  of isomorphic transformations yields the required action on morphisms.
 \end{proof}
 
 In order to work with this new formulation of the category, we will reproduce for $(\Alg_{\hat
@@ -1558,16 +1549,14 @@ proofs are technical but not exceedingly difficult, so we elide them.
 \label{lem:alg-hom-iso-reindex}
   Let $(A, \alpha)$ and $(B, \beta)$ be $\hat F$-algebras. Fix an object $((A, P), k)$ in
   $(\Alg_{\hat F})_\alpha$ and $((B, Q), k')$ in $(\Alg_{\hat F})_\beta$. Let $f : (A, \alpha) \to
-  (B, \beta)$ be an $\hat F$-algebra morphism.
-  
-  Then there is an isomorphism between the set of $\Alg_{\hat F}$-morphisms $h : k \to k'$ such that
+  (B, \beta)$ be an $\hat F$-algebra morphism. Then there is an isomorphism between the set of $\Alg_{\hat F}$-morphisms $h : k \to k'$ such that
   $U^\Alg h = f$ and the set of morphisms $k \to f^{*\Alg}(k')$:
   \[ \{h \in \Alg_{\hat F}(k, k') \mid U^\Alg h = f\} \cong \Alg_{\hat F}(k, f^{*\Alg}(k')). \]
 \end{lemma}
 
 We can now draw a diagram analogous to Figure \ref{fig:famset-diag-adjoints} for the algebras
 fibration. Note that we temporarily drop our abbreviated notation for families and algebras to
-better analogize this diagram to that one.
+better analogize this diagram to the one for the families fibration.
 
 \begin{center}
 \begin{tikzpicture}
@@ -1577,8 +1566,8 @@ better analogize this diagram to that one.
 	\draw[draw=black, thin, solid] (Set) ellipse (1.50 and 0.50);
 	\node[black, anchor=south west] at (1.3,-1.3) {$\Alg_{F}$};
 	\node[black, anchor=south west] at (1.5,3.25) {$\Alg_{\hat F}$};
-	\node[black, anchor=south] at (-1.75,2.4) {$(\Alg_{F})_\alpha$};
-	\node[black, anchor=south] at (1.75,2.4) {$(\Alg_{F})_\beta$};
+	\node[black, anchor=south] at (-1.75,2.4) {$(\Alg_{\hat F})_\alpha$};
+	\node[black, anchor=south] at (1.75,2.4) {$(\Alg_{\hat F})_\beta$};
   \node (FamSetA) at (-1.75, 1.5) {};
   \node (FamSetB) at (1.75, 1.5) {};
 	\draw[draw=black, thin, solid] (FamSetA) ellipse (1.25 and 1);
@@ -1603,9 +1592,10 @@ better analogize this diagram to that one.
 Equipped with these intermediate results, we can now finally prove what we set out to show: that
 $F^\alpha$ admits an initial algebra, and that its carrier is isomorphic to the ``na\"ive''
 refinement interpretation. We make one brief observation: we can rewrite our previous ``na\"ive''
-interpretation of refinements using the truth and op-reindexing functors as follows:
+interpretation of a refinement by $\llpr{\alpha} : \mu F \to A$ using the truth and op-reindexing
+functors as follows:
 
-\[ (A, a \mapsto \{x \in \mu F \mid \llpr{\alpha}_F(x) = a\}) \cong \Sigma_{\llpr{\alpha}_F} \top(\mu F). \]
+\[ (A, a \mapsto \{x \in \mu F \mid \llpr{\alpha}(x) = a\}) \cong \Sigma_{\llpr{\alpha}} \top(\mu F). \]
 
 Using this formulation, we now state our main theorem.
 
@@ -1654,69 +1644,36 @@ The endofunctor $F^\alpha$ has an initial algebra, and its carrier is $\Sigma_{\
 
 Before concluding this section, it is worth noting that the construction given here can be extended
 in various ways, such as to support refinements defined in terms of functions that are not directly
-expressed as folds. We direct the reader to Atkey et al. \citep{atkey2011refining} for details.
-
-% \begin{definition}[Reindexing functor]
-% \sloppy
-%   Let $f : A \to B$ be a set function. The \emph{reindexing functor} $f^* : \FamSet_B \to \FamSet_A$
-%   is defined as follows:
-%   \begin{align*}
-%     f^*(B, Q) &= (A, Q \circ f : A \to \Set)\\
-%     f^*(\id_B, g^\sim) &= (\id_A, g^\sim \circ f)
-%   \end{align*}
-% \end{definition}
-
-% Notice that the reindexing functor operates contravariantly
-
-
-% Deleted: I think we actually just use the families fibration
-% It may not be a surprise that our categorical interpretation of \emph{indexed} inductive types will
-% be in the category of indexed sets, which we now define.\footnote{This definition carries with it
-% the usual provisos about Grothendieck universes, which we elide.}
-
-% \begin{definition}[Category of indexed sets]
-% \sloppy
-%   Given a set $I$, the category $\Set_I$ of $I$-indexed sets is defined as follows:
-  
-%   \begin{itemize}
-%     \item Objects are $I$-indexed sets $\{S_i\}_{i \in I}$
-%     \item Morphisms from $\{S_i\}_{i \in I}$ to $\{T_i\}_{i \in I}$ are set functions $f :
-%     \prod_{i \in I} S_i \to T_i$
-%     \item Composition and identities are defined using the corresponding set definitions at each
-%     index
-%     % Should we spell out composition?
-%     % \item Given $f : \{S_i\}_{i \in I} \to \{T_i\}_{i \in I}$ and $g : \{T_i\}_{i \in I} \to
-%     % \{U_i\}_{i \in I}$, their composite $g \circ f : \{S_i\}_{i \in I} \to \{U_i\}_{i \in I}$ is
-%     % defined by $i \mapsto g(i) \circ f(i)$
-%     % \item Identities
-%   \end{itemize}
-% \end{definition}
-
-
+expressed as folds. We direct the reader to Atkey et al.~\citep{atkey2011refining} for details.
 
 \section{A (Literal) Invitation to Fibered Category Theory}
 
-Throughout this explainer, we have followed Atkey et al. \citep{atkey2011refining} in carefully
+Throughout this chapter, we have followed Atkey et al.~\citep{atkey2011refining} in carefully
 presenting the material so as to admit a generalization to the abstract language of
-\emph{fibrations}. Regrettably, we do not have the space here to present that generalization.
-Instead, we direct the reader to the following sources TODO: finish (full Cartesian Lawvere w v.s. coprods)
+\emph{fibrations}, and have gradually adjusted our presentation over the course of the chapter
+toward a more abstract framing in terms of fibrational constructions. Regrettably, we do not have
+the space here to present the full generalization---a construction that can be carried out in any
+\emph{full Cartesian Lawvere category with very strong coproducts}---or to discuss fibrations in
+their own right.
 
-
-References:
-- Article
-- Max New lecture notes (buggy)
-- Wadler, Recursive types for free!
-- \href{https://courses.grainger.illinois.edu/cs522/sp2016/ComphrehensionCategoriesAndTheSemanticsOfTypeDependency.pdf}{Comprehension cat paper}
-- Ghani et al., Fibrational Induction Rules for Initial Algebras
-- The Bart Jacobs book on fibered category theory (Cat Log and ...)
-
+Instead, we direct the reader to the following sources. The original development of this material by
+Atkey et al.~\citep{atkey2011refining} gestures further toward its generalization, in addition to
+providing several further constructions that translate broader classes of refinements into indexed
+inductive types. Ghani et al.'s paper~\citep{ghani2010fibrational} includes the original, abstract
+derivation of the truth-preserving lifting $\hat F$ we employ in this paper. Some relevant
+background can also be found in Jacobs' paper on comprehension
+categories~\citep{jacobs1993comprehension}, while the same author's textbook \emph{Categorical Logic
+and Type Theory}~\citep{jacobs1999categorical} provides an exposition of fibered category theory and
+several applications. A relatively limited selection of reading from among these sources should
+provide sufficient background to interpret this chapter in a general fibrational setting, thereby
+characterizing the precise categorical structure required to unify refinement and indexed types.
 
 \newpage
 \section*{Solutions to Exercises}
 
 \soltitle{ex:denote-bool}
 
-Pick $\llbr{\texttt{true}} = i_1$ and $\llbr{\texttt{false}} = i_2$, respectively the left and right
+Pick $\llbr{\texttt{true}} = \inl$ and $\llbr{\texttt{false}} = \inr$, respectively the left and right
 injections into the coproduct, and take $\llbr{\texttt{if}(t, e)} = \langle t, e \rangle$.
 Commutativity and recursor uniqueness are immediate from the universal property for coproducts.
 
@@ -1761,12 +1718,11 @@ rather than a pair of squares. It looks as follows:
   \item The actions of $F_{\texttt{SelfTree}}$ on objects and morphisms are given below:
   \begin{align*}
     F_{\texttt{SelfTree}}(X) &= 1 \oplus A \times X^A\\
-    F_{\texttt{SelfTree}}(e) &= [\mathsf{id}_1, \langle (e \circ -) \circ \pi_1, \mathsf{id}_A \circ \pi_2\rangle]
+    F_{\texttt{SelfTree}}(e) &= [\mathsf{id}_1, \langle \mathsf{id}_A \circ \pi_2, (e \circ -) \circ \pi_1\rangle]
   \end{align*}
   \item The relevant algebra is
-  \[ \alpha_{\texttt{selfHeight}} : F_{\texttt{SelfTree}} \llbr{\texttt{Nat}} \to \llbr{\texttt{Nat}} = [0, \texttt{s} \circ \mathsf{app} \circ \mathsf{flip} ] \]
-  where $\mathsf{flip}$ is the isomorphism that witnesses the commutativity of products (and
-  \texttt{s}, as before, is the natural-number successor operation).
+  \[ \alpha_{\texttt{selfHeight}} : F_{\texttt{SelfTree}} \llbr{\texttt{Nat}} \to \llbr{\texttt{Nat}} = [0, \texttt{succ} \circ \mathsf{app} \circ \mathsf{flip} ] \]
+  where $\mathsf{flip}$ is the isomorphism that witnesses the commutativity of products.
 \end{enumerate}
 
 \soltitle{ex:app-as-algebra}
@@ -1787,7 +1743,7 @@ characterizes is empty. We can read off the corresponding \texttt{inductive} def
 
 \begin{lstlisting}
 inductive Empty' (A : Type) : Type where
-  | mk : (A -> Empty') -> Empty' -> Empty'
+  | mk : (A -> Empty' A) -> Empty' A -> Empty' A
 \end{lstlisting}
 
 \soltitle{ex:isorec-translation}
@@ -1934,7 +1890,7 @@ the following square trivially commutes:
     \end{align*}
 
   \item
-  \[ \alpha_{\texttt{bh}} = [0, \texttt{s} \circ \texttt{max} \circ \pi_2, \texttt{max} \circ \pi_2] \]
+  \[ \alpha_{\texttt{bh}} = [0, \texttt{succ} \circ \texttt{max} \circ \pi_2, \texttt{max} \circ \pi_2] \]
 
   \item 
   \begin{align*}
@@ -1960,3 +1916,19 @@ inductive BHRBTree : Nat -> Type where
   | red  : {m n : Nat} -> A -> BHRBTree m -> BHRBTree n -> BHRBTree (max m n)
 \end{lstlisting}
 \end{enumerate}
+
+\soltitle{ex:famset-morphism-iso}
+
+Recall that $\FamSet$-morphisms from $(A, P)$ to $(B, Q)$ are pairs 
+\[\left(h : A \to B, h^\sim : \prod_{a \in A}P(a) \to Q(h(a))\right). \]
+The left-hand set in the lemma statement is the restriction of such pairs to those whose first
+element is $f$, so they are of the form
+\[ \left(f, h^\sim : \prod_{a \in A}P(a) \to Q(f(a))\right) .\]
+
+By the definitions of $\FamSet_A$ and $f^*$, morphisms in the right-hand set are pairs
+\[ \left(\mathsf{id}_A, f^\sim : \prod_{a \in A} P(a) \to Q(f(a))\right). \]
+
+Since the first component of every pair in either set is fixed, both sets are isomorphic to the
+set of functions of type
+\[ \prod_{a \in A} P(a) \to Q(f(a)) \]
+and thus to each other.
