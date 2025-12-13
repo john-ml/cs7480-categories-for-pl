@@ -1,0 +1,327 @@
+\chapter{Realizability}
+\marginnote{This chapter is heavily based on~\citep{bauer25:notes_realizability}.  The reader is only assumed to have acquaintance with previous chapters in this book.}
+
+Realizability originated from Kleene~\citep{kleene45:interpretation_intuitionistic_number} as a semantics for Heyting arithmetic.  In this article, Kleene motivates the concept by calling logical statements ``incomplete communication'' and ``partial judgment'' from the perspective of constructivists and intuitionists.
+For instance, a proposition ``\(A\) implies \(B\)'', when interpreted intuitionistically, is an incomplete communication of another statement which gives a general procedure that: when receiving the information that completes \(A\), it finds the information that completes \(B\).
+In other words, Kleene is seeking the computational content of logical statements.
+To achieve this, Kleene presents a way of encoding the items of information with partial recursive functions\footnote{In G\"odel numbers, which is what you will get if you search for ``realizability'' on Wikipedia.}.
+Then, we may say that certain recursive function \emph{realizes} a statement, as a kind of intuitionistic truth notion of the statement.
+
+In the context of PL research, the more relevant way of viewing realizability is motivated by a generalized question: ``given a mathematical structure, what should its implementation look like?''~\citep{bauer25:notes_realizability}
+Such interpretation of realizability is of great interest in the area of compiler correctness~\citep{benton10:realizability_compositional_compiler, patterson22:interoperability_realizability_expressing}, since it naturally establishes a relation between implementations and specifications.
+Also, instead of partial recursive functions in G\"odel numbers, we will use a generalization of the \(\lambda\)-calculus that allows applications to be partially defined for our realizers, namely the \emph{partial combinatory algebra}, or PCA.
+But before defining PCAs, let's first introduce an even more generalized structure underlying them, namely the \emph{partial applicative structure}, or PAS.
+
+\marginnote{The discussion on PAS, PCA, and combinatory completeness is largely taken from~\citep{hofstra:partial_combinatory_algebras}.}
+
+% the spacing here is suspicious, guess due to the tuftebook class.
+\begin{definition}[Partial applicative structure (PAS)]
+   A \emph{partial applicative structure} \((A, \rzapp)\) is a set \(A\) equipped with a \emph{partial} binary operation:
+   \[
+        \rzapp : A \times A \rightharpoonup A
+   \]
+
+   For \(f, a \in A\), if \((f, a) \in \dom(\rzapp)\), we write \(f \rzapp a \rzdef\), otherwise \(f \rzapp a \rzundef\).  Sometimes people may omit \(\rzapp\) and just write \(fa\) for \(f \rzapp a\).  Application associates to the left, just like that in \(\lambda\)-calculus, so \(abc\) stands for \((ab)c\).
+\end{definition}
+
+The definition of PAS reveals a key feature of combinatorial structures.  Consider \(f, a \in A\) and the application \(f \rzapp a\), the element \(f\) acts as a function, while the element \(a\) acts as an argument.  In other words, the program (functions) and the data (arguments) live in the same realm and are represented in the same way.
+
+Using our intuition from \(\lambda\)-calculus, a PAS defines an operation analogous to \(\lambda\)-applications, but what about \(\lambda\)-abstractions?  To talk about them, we first need to incorporate variables. 
+
+\begin{definition}[Terms (PAS)]
+    Let \(V = \{x_{0}, x_{1}, \ldots\}\) be a countable set of fresh variables, the set of \emph{terms} over \(A\), written \(T(A)\), is the least set satisfying:
+    \begin{itemize}
+        \item if \(x \in V\), then \(x \in T(A)\);
+        \item if \(a \in A\), then \(a \in T(A)\);
+        \item if \(t_1, t_2 \in T(A)\), then \(t_1 \rzapp t_2 \in T(A)\).
+    \end{itemize}
+\end{definition}
+
+We will use the familiar notations from the \(\lambda\)-calculus for free variables and substitutions.
+
+\begin{notation}
+    \(FV(t)\) denotes the set of free variables in the term \(t \in T(A)\).  A term \(t\) is \emph{closed} if \(FV(t) = \emptyset\).
+\end{notation}
+
+\begin{notation}
+    \(t[a/x]\) stands for ``substituting \(a\) for \(x\) in term \(t\)'', exactly as in the \(\lambda\)-calculus.
+\end{notation}
+
+Unfortunately, we are still not yet able to get something like \(\lambda\)-abstraction, but what exactly is going wrong?
+
+\begin{example}
+    Let \(A \coloneq \{1, 2\}\) and \(\rzapp : A \times A \rightarrow A\) be natural number multiplication.  Of course, we are able to write square of elements in \(A\) in our PAS \((A, \rzapp)\):
+    \begin{align*}
+        1 \rzapp 1 \rzdef \\
+        2 \rzapp 2 \rzundef
+    \end{align*}
+    Now, suppose we want to abstract over the squaring operation, immediately we try to write a term \(t \in T(A)\) such that
+    \[
+        t = x \rzapp x
+    \]
+    Next, we need an element \(f \in A\) in our PAS that behaves like \(t\), so that we can actually apply it for the square of an arbitrary \(a\):
+    \[
+      f \rzapp a = t[a/x] = a \rzapp a
+    \]
+    However, by inspection, none of the elements in \(A\) suffices.
+    \label{ex:rzrep}
+\end{example}
+
+The above example reveals the discrepancy that, when given a term \(t \in T(A)\), we might fail to find an element that behaves like it in \(A\).  In order to fill the gap, we shall first formalize what ``behaves like'' generally means for partial functions.
+
+\marginnote{Unfortunately, the notation for Kleene equality collides with that for categorical equivalence.  We will reserve \(\rzkeq\) for Kleene equality exclusively throughout this chapter.}
+\begin{definition}[Kleene equality]
+    \emph{Kleene equality} establishes the quality between partial functions.  Given an argument, either both functions are undefined, or both are defined and their values on that arguments agree.  We write \(f \rzkeq g\) for Kleene equality.
+\end{definition}
+
+Then, we are able to state what it means to have an element \(a \in A\) that behaves like a specific term \(t\).
+
+\begin{definition}[Representability]
+    Let \(t \in T(A)\) be a term with \(FV(t) \subseteq \{x_0, \ldots, x_n\}\) and \(f \in A\) an element of A, we say that \(f\) \emph{represents} \(t\) if for all \(a_0, \ldots, a_n \in A\):
+    \begin{itemize}
+        \item \(f \rzapp a_0 \rzapp \ldots \rzapp a_{n-1}\rzdef\)
+        \item \(t[a_0/x_0, \ldots, a_n/x_n] \rzkeq f \rzapp a_0 \rzapp \ldots \rzapp a_n\)
+    \end{itemize}
+    In words, \(f\) is a total function in the first \(n\) arguments, and as an \(n + 1\)-ary partial function, \(f\) is equal to \(t\).
+\end{definition}
+
+When a term \(t\) is representable (i.e., represented by one or more elements in \(A\)), we have the internalization of \(t\) in \(A\).
+In other words, if all of the terms \(t \in T(A)\) are representable, we can always find at least one element that encodes our desired abstraction (e.g., the squaring operation in~\cref{ex:rzrep}). % why is crefname not respected...?
+
+\begin{definition}[Combinatory completeness]
+    A PAS \((A, \rzapp)\) is \emph{combinatorially complete} if every term \(t \in T(A)\) can be represented by some \(a \in A\).
+\end{definition}
+
+\begin{remark}
+    From the perspective of recursion theory, the definition of PAS abstracts the concept of the \emph{enumeration theorem}~\citep{kleene52:introduction_metamathematics}\footnote{Note that a PAS is not necessarily \emph{universal}, therefore we are not referring to the \emph{utm theorem}.}: let \(A\) be \(\N\) (the G\"odel numbers) and define \(\rzapp\) to be the universal function \(\Phi\), we have \(f \rzapp a \coloneq \Phi(f, a)\).
+    
+    Conversely, combinatory completeness corresponds to the \emph{smn theorem}.  Thus, an equivalent definition of combinatory completeness is: for a term \(t \in T(A)\) and a variable \(x\), there is a term \(t'\) such that \(x \notin FV(t')\) and \(t' \rzdef\), satisfying \(t' \rzapp a \rzkeq t[a/x]\) for all \(a \in A\).
+\end{remark}
+
+\begin{definition}[Partial combinatory algebra (PCA)]
+    A PAS \((A, \rzapp)\) is called a \emph{partial combinatory algebra} if it is combinatory complete.
+\end{definition}
+
+\marginnote{The usual way of defining PCAs is to say that a PCA is a PAS with \(\rzK, \rzS \in A\).  This simplification is due to Curry~\citep{curry58:combinatory_logic}, known as the \emph{bracket abstraction} algorithm.  For more related details in the context of PCAs, see~\citep{longley94:realizability_toposes_language}.}
+\begin{proposition}
+    A PAS \((A, \rzapp)\) is combinatory complete if and only if there exists \(\rzK, \rzS \in A\) such that for all \(a, b, c \in A\):
+    \begin{itemize}
+        \item \(\rzK \rzapp a \rzapp b = a\), and
+        \item \(\rzS \rzapp a \rzapp b \rzapp c \rzkeq (a \rzapp b) \rzapp (b \rzapp c)\) and \(\rzS \rzapp a \rzapp b \rzdef\).
+    \end{itemize}
+\end{proposition}
+
+\begin{fact}
+    The first Kleene algebra \(\mathcal{K}_1\), combinatory logic \(\mathbb{CL}\), and untyped \(\lambda\)-calculus \(\Lambda\) are all PCAs.
+\end{fact}
+
+Availing us with the language of PCAs, we can now return to the discussion of realizability.
+
+\begin{definition}[Assembly]
+    An \emph{assembly} \(X\) over a PCA \((A, \rzapp)\) is a pair \(\rzasmp{X}\) where \(\rzset{X}\) is the underlying set and \(\rzrz_X\) is a relation between \(A\) and \(\rzset{X}\), such that for every \(x \in \rzset{X}\), there exists an \(r \in A\) and \(r \rzrz_X x\).  We read \(r \rzrz_X x\) as ``\(r\) realizes \(x\)''.
+\end{definition}
+
+\marginnote{
+    John always has a comment that ``when you ask Amal about realizability, she will likely tell you it's just \emph{binary logical relations}.''  Indeed, an equivalent formulation is to view the realizability relation as the subset: \(\rzrz_X \subseteq A_{\tau} \times \rzset{X}\).  Note that we just sneaked in types for our PCA (we intend to not discuss typed-PCAs~\citep{longley99:matching_typed_untyped, longley99:unifying_typed_untyped} due to the lack of space).  Then, we can write the realizability relation as a binary \(\mathcal{V}\)-relation:
+    \[
+        (r, x) \in \mathcal{V}\dbracket{\tau}
+    \]}
+    
+Tthe assembly requires every \(x \in \rzset{X}\) to be realized by some \(r \in A\), but there is no constraint about their correspondence.  Therefore, an \(x \in \rzset{X}\) may be realized by one or more realizers in \(A\), and an \(r \in A\) may also realize one or more elements in \(\rzset{X}\).
+
+\begin{definition}[Tracker]
+   For two assemblies \(\rzasmp{X}\) and \(\rzasmp{Y}\) over the same PCA \((A, \rzapp)\), and a function \(f : \rzset{X} \rightarrow \rzset{Y}\), a \emph{tracker} for \(f\) is an element \(t \in A\) such that for every \(a \rzrz_X x\), we have \(t \rzapp a \rzdef\) and \(t \rzapp a \rzrz_Y f(x)\).  We say that \(f\) is \emph{realized} (or \emph{tracked}) by \(t\).
+\end{definition}
+
+\begin{definition}[Assembly map]
+    An \emph{assembly map} \(X \rightarrow Y\) between assemblies \(X\) and \(Y\) over a PCA \(\rzpca{A}\) is the pair \((f, t)\) where \(f : \rzset{X} \rightarrow \rzset{Y}\) and \(t \in A\) tracks \(f\).
+\end{definition}
+
+\begin{definition}[Assembly category (\(\rzasm\))]
+    Assemblies over a PCA \(\rzpca{A} = (A, \rzapp)\) form a category \(\rzasm(\rzpca{A})\) where:
+    \begin{itemize}
+        \item objects are assemblies \(X = \rzasmp{X}\) over \(\rzpca{A}\);
+        \item morphisms are assembly maps;
+        \item for two morphisms \((f, t)\) and \((g, t')\) where \(f : \rzset{X} \rightarrow \rzset{Y}\) and \(g : \rzset{Y} \rightarrow \rzset{Z}\), composition is defined as
+        \[
+            (g, t') \circ (f, t) = (g \circ f, \rzB \rzapp t' \rzapp t)
+        \]
+        where \(\rzB \in A \coloneq \rzS \rzapp (\rzK \rzapp \rzS) \rzapp \rzK\);
+        \item the identity morphism is given by the pair \((\id, \rzI)\), where \(\id\) is the identity function and \(\rzI \in A \coloneq \rzS \rzapp \rzK \rzapp \rzK\).
+    \end{itemize}
+\end{definition}
+
+The combinator \(\rzB\) used in the above definition is not in the standard \(\rzS\rzK\rzI\) basis of combinatory logic, but is a handy combinator for composition:
+\[
+    \rzB \rzapp g \rzapp f \rzapp x \rzkeq g \rzapp (f \rzapp x)
+\]
+
+\begin{example}[Unit assembly \(\rzunit\)]
+    The \emph{terminal} assembly \(\rzunit\) over \(\rzpca{A}\) is \((\{\star\}, \rzrz_{\rzunit})\), where for all \(r \in A\), we have the trivial realizability relation \(r \rzrz_{\rzunit} \star\).  The unit assembly \(\rzunit\) is the terminal object in \(\rzasm(\rzpca{A})\).
+\end{example}
+
+Previously, we said that a realizer \(a \in A\) may realize more than one elements in \(\rzset{X}\), which is not ideal for some cases.  Therefore, we introduce a restricted version of an assembly in which no two elements share a common realizer.
+
+\begin{definition}[Modest set]
+    A \emph{modest} assembly \(X\), also called a \emph{modest set}, is an assembly in which elements do not share realizers.  That is, for any two \(x, y \in \rzset{X}\), if an \(r \in A\) realizes both \(x\) and \(y\), we have \(x = y\).
+\end{definition}
+
+\begin{fact}
+    Modest sets over a PCA \(\rzpca{A}\) form a full subcategory \(\rzmod(\rzpca{A})\) of \(\rzasm(\rzpca{A})\).
+\end{fact}
+
+\begin{proposition}
+    Both \(\rzasm(\rzpca{A})\) and \(\rzmod(\rzpca{A})\) are cartesian-closed.  The proofs is left as an exercise for the readers (\citep[Chapter 3.6]{bauer25:notes_realizability} has some of the proofs).
+\end{proposition}
+
+\begin{definition}[Partial equivalence relation (PER)]
+    Given a modest set \(X\), we may induce a \emph{partial equivalence relation} \(\approx_X\) on \(A\) which relates \(r\) and \(r'\) when they realize the same element \(x \in \rzset{X}\):
+    \[
+        r \approx_X r' \iff \exists x \in \rzset{X}.\,r \rzrz_X x \land r' \rzrz_X x
+    \]
+\end{definition}
+
+\begin{definition}[Total realizer]
+    A realizer \(r \in A\) is \emph{total} if \(r \approx_X r\).  The set of total realizers is denoted by \(\rzty{X} = \{r \in A \mid r \approx_X r\}\).  Each \(r \in \rzty{X}\) determines the equivalence class \([r]_{\approx_X} = \{a \in A \mid r \approx_X a\}\).
+\end{definition}
+
+The name for total realizers is confusing--it is not the converse of ``partial'' in the computational sense.  Replacing the other realizer \(r'\) with another \(r\) in the above definition reduces to:
+\[
+        r \approx_X r \iff \exists x \in \rzset{X}.\,r \rzrz_X x
+\]
+which amounts to the fact that \(r\) realizes something in \(\rzset{X}\), and therefore is not some syntactic ``junk'' in \(A\).
+A total realizer \(r\) can definitely realize a partial function such as integer division.  However, a realizer for \(n/0\) is not total, since \(n/0\) is absent in \(\rzset{X}\).
+
+\begin{example}
+    Let us consider the modest assembly \(B = (\{\top, \bot\}, \rzrz_B)\) over some PCA \(\rzpca{A}\), and the induced PER \(\approx_B\).  The set of total realizers \(\rzty{B}\) contains those who realize something in \(\rzset{B}\), namely for all \(r \in \rzset{B}\), ether \(r \rzrz_B \top\) or \(r \rzrz_B \bot\).  Then, we have the following two equivalence classes:
+    \begin{align*}
+        [r_{\top}]_{\approx_B} &= \{r \in A \mid r_{\top} \approx_B r\} \text{\qquad where \(r_{\top} \rzrz_B \top\)} \\
+        [r_{\bot}]_{\approx_B} &= \{r \in A \mid r_{\bot} \approx_B r\} \text{\qquad where \(r_{\bot} \rzrz_B \bot\)}
+    \end{align*}
+    Note that since \(B\) is modest, \([r_{\top}]_{\approx_B}\) and \([r_{\bot}]_{\approx_B}\) are disjoint.
+\end{example}
+
+\begin{definition}[Extensional realizer]
+    Given two PERs \(\approx_X\) and \(\approx_Y\), an \emph{extensional realizer} between them is a \(p \in A\) such that, for all \(r, r' \in A\), if \(r \approx_X r'\) then \(p\ r \rzdef\), \(p\ r' \rzdef\), and \(p\ r \approx_Y p\ r'\).  Extensional realizers \(p\) and \(p'\) are \emph{equivalent} when \(r \approx_X r'\) implies \(p\ r \approx_Y p'\ r'\).
+\end{definition}
+
+\begin{remark}
+    An extensional realizer therefore ``sends related inputs to related outputs'', where the relation is induced by the modest set.
+\end{remark}
+
+\begin{example}
+    Let us consider an extensional realizer between \(B\) and itself.  We have already discussed the set of total realizers and equivalence classes of \(B\) above.
+
+    An example extensional realizer \(p\) sends the input to the same equivalence class for the output: if the input is in \([r_{\top}]_{\approx_B}\), then the output is also in \([r_{\bot}]_{\approx_B}\), and vice versa.  If our \(\rzpca{A}\) is \(\lambda\)-calculus, we have \(p\ r \rzdef\) and \(p\ r' \rzdef\) for free since application of two \(\lambda\) terms is always defined.  One qualified \(p\) is the identity \(\lambda x.\,x\), and the extensionality condition is trivially true.
+\end{example}
+
+\begin{notation}
+    In stead of writing \(\approx_X\) for the PER induced by the modest set \(X\), it is common to denote it by \(X\) directly.  This convention is slightly ambiguous, but is somewhat reasonable since the correspondence is one-to-one.
+\end{notation}
+
+\begin{remark}
+    Note that in the discussion of extensional realizers, we did not mention what in \(\rzset{X}\) is realized by \(p\).  This is fundamentally different from what we did when defining trackers, where we said \(f : \rzset{X} \rightarrow \rzset{Y}\) is realized by \(t\).  In fact, the underlying set \(\rzset{X}\) only appeared at the very beginning for defining the PER itself throughout our discussion of PERs.
+
+    This marks a fundamental perspective shift.  In the assembly view, we relate ``implementations'' (the realizers) to ``specifications'' (the mathematical objects in \(\rzset{X}\)).  In the PER view, we relate implementations to implementations, by quotienting them through a PER.
+\end{remark}
+
+\begin{definition}[PER category \(\rzper(\rzpca{A})\)]
+    PERs and equivalence classes of extensional realizers form a category \(\rzper(\rzpca{A})\) where:
+    \begin{itemize}
+        \item objects are PERs \(X\) on \(\rzpca{A}\);
+        \item morphisms \(X \rightarrow Y\) are equivalence classes of extensional realizers \([p] : X \rightarrow Y\);
+        \item for two morphisms \([p] : X \rightarrow Y\) and \([q] : Y \rightarrow Z\), composition is defined as
+        \[
+          [q] \circ [p] = [q \circ p]
+        \]
+        where \([q \circ p]\) is defined as \([\rzB \rzapp q \rzapp p]\).
+        \item the identity morphism is \(\rzI\).
+    \end{itemize}
+\end{definition}
+
+\marginnote{For details of the equivalence proof, consult~\citep[Chapter 3.3.3]{bauer25:notes_realizability}.  There is also an Agda mechanization of this proof in~\citep{chhabra24:modest_sets_are}.}
+\begin{proposition}
+    The categories \(\rzmod(\rzpca{A})\) and \(\rzper(\rzpca{A})\) are equivalent.
+\end{proposition}
+
+\begin{definition}[Uniform assembly]
+    Let \(X\) be a set and \(\rzpca{A}\) a PCA, the \emph{uniform assembly} (or \emph{constant assembly})
+    \[
+        \nabla_{\rzpca{A}}X = (X, \rzrz_{\nabla_{\rzpca{A}} X})
+    \]
+    is the assembly in which the elements are ``uniformly realized''.  That is, for all \(r \in A\) and \(x \in X\):
+    \[
+        r \rzrz_{\nabla_{\rzpca{A}} X} x
+    \]
+\end{definition}
+
+\begin{notation}
+    When not ambiguous, we write \(\nabla X\) for \(\nabla_{\rzpca{A}} X\).
+\end{notation}
+
+\begin{fact}
+    Uniform assemblies over a PCA \(\rzpca{A}\) form a full subcategory of \(\rzasm(\rzpca{A})\).
+\end{fact}
+
+\begin{proposition}
+    The unit assembly \(\rzunit\) is uniform.
+\end{proposition}
+
+In a uniform assembly \(\nabla X\), every \(x \in X\) is realized by every \(r \in A\), meaning that the realizability condition is trivial and the realizers provide \emph{no information} about the elements in \(X\).  Think about the trackers: normally, a tracker \(t\) of \(f\) needs to carefully maintain the condition that when applied to an argument that realizes a valid input \(x\) of \(f\), it should realize the result \(f(x)\).  But within uniform assemblies, the condition collapses to only require \(t \rzapp a \rzdef\), since it is guaranteed to realize \(f(x)\).  In this sense, \(\nabla X\) is devoid of any computational content.
+
+\begin{proposition}
+    \label{prop:set-func-asm-map}
+    Given an assembly \(X\) and a uniform assembly \(\nabla Y\) over a PCA \(\rzpca{A}\), every set function \(\rzset{X} \rightarrow Y\) is an assembly map \(X \rightarrow \nabla Y\).
+\end{proposition}
+
+\begin{proof}
+    For a set function \(f : \rzset{X} \rightarrow Y\), we pair it with a trivial tracker \(\rzI\), where for all \(a \in A\), \(\rzI \rzapp a\) is always defined.
+\end{proof}
+
+\begin{definition}[Uniform assembly functor (\(\nabla\))]
+    Let \(\nabla : \Set \rightarrow \rzasm(\rzpca{A})\) be the functor defined as follows:
+    \begin{itemize}
+        \item on objects, it sends a set \(X\) to the uniform assembly \(\nabla X\);
+        \item on \(\Set\) morphism \(f : X \rightarrow Y\), \(\nabla f = f\).
+    \end{itemize}
+\end{definition}
+
+\begin{proposition}
+    The functor \(\nabla\) is fully faithful.
+\end{proposition}
+
+\begin{proposition}
+    An assembly \(X\) is uniform if and only if it is isomorphic to some \(\nabla Y\).  Therefore, the functor \(\nabla_{\rzpca{A}}\) is essentially surjective onto the full subcategory of uniform assemblies over a PCA \(\rzpca{A}\).
+\end{proposition}
+
+\begin{corollary}
+    The category of uniform assemblies over a PCA \(\rzpca{A}\) is equivalent to \(\Set\).
+\end{corollary}
+
+\begin{definition}[Forgetful functor (\(\Gamma\))]
+    Let \(\Gamma : \rzasm(\rzpca{A}) \rightarrow \Set\) be the forgetful functor defined as follows:
+    \begin{itemize}
+        \item on objects, \(\Gamma X = \rzset{X}\);
+        \item on assembly map \((f, t) : X \rightarrow Y\), \(\Gamma(f, t) = f\).
+    \end{itemize}
+\end{definition}
+
+\begin{proposition}
+    The the forgetful functor \(\Gamma\) is left adjoint to the uniform assembly functor \(\nabla\).
+\end{proposition}
+
+\begin{proof}
+    Recall the natural transformations \(\eta : \id_{\rzasm(\rzpca{A})} \Rightarrow \nabla \Gamma\) and \(\varepsilon : \Gamma \nabla \Rightarrow \id_{\Set}\) are the unit and counit of the adjunction.
+    \begin{itemize}
+        \item For any \(X \in \rzasm(\rzpca{A})\), the component of the unit \(\eta_X : X \rightarrow \nabla \Gamma X\) is defined by the assembly map \((\id_{\rzset{X}}, \rzI)\), where \(\rzI\) is a trivial tracker.
+        \item For any \(S \in \Set\), the component of the counit \(\varepsilon_S : \Gamma \nabla S \rightarrow S\) is given by the identity set function \(\id_S\).
+        \item Show \(\varepsilon \Gamma \circ \Gamma \eta = \id_{\Gamma}\): for an assembly \(X \in \rzasm(\rzpca{A})\),
+        \[
+            (\varepsilon \Gamma \circ \Gamma \eta)_X = \varepsilon_{\Gamma X} \circ \Gamma(\eta_X) = \id_{\rzset{X}} \circ \id_{\rzset{X}} = \id_{\rzset{X}}
+        \]
+        \item Show \(\nabla \varepsilon \circ \eta \nabla = \id_{\nabla}\): for a set \(S \in \Set\),
+        \[
+            (\nabla \varepsilon \circ \eta \nabla)_S = \nabla(\varepsilon_S) \circ \eta_{\nabla S} = (\id_S, \rzI) \circ (\id_S, \rzI) = (\id_S, \rzI)
+        \]
+    \end{itemize}
+\end{proof}
