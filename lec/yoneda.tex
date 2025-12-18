@@ -113,7 +113,7 @@ Just as polymorphic functions in System F
 respect ``change of representation'' for the type variables that they are polymorphic over~\citep{reynolds1983types},
 we will require that the family of functions \((\mathsf{Fst}_\Gamma)_{\Gamma\in\mathsf{Ob}(\calC)}\)
 respect ``change of \(\Gamma\)''.
-Concretely, this means that if any input \(f\) as shown in the pictue above is changed into \(f \circ s\) via some morphism
+Concretely, this means that if any input \(f\) as shown in the picture above is changed into \(f \circ s\) via some morphism
 $s : \Gamma' \to \Gamma$,
 it must be the case that \(\mathsf{Fst}_\Gamma(f)\) is changed into \(\mathsf{Fst}_{\Gamma'}(f\circ s)\)
 via \(s\) too. Formally, the following \emph{naturality condition} must hold for any such \(f\) and \(s\):\marginnote{We will save a formal abstract definition
@@ -167,7 +167,7 @@ that takes in two morphisms and bundles them together into a morphism into the p
    &\text{such that }\forall s : \Gamma' \to \Gamma,
     \mathsf{Pair}_\Gamma(f, g)\circ s = \mathsf{Pair}_\Gamma(f \circ s, g \circ s)
 \end{align*}
-Finally, the $\beta$ and $\eta$ laws become equations between nested applications of the functinos \(\mathsf{Fst}\), \(\mathsf{Snd}\),
+Finally, the $\beta$ and $\eta$ laws become equations between nested applications of the functions \(\mathsf{Fst}\), \(\mathsf{Snd}\),
 and \(\mathsf{Pair}\).
 \begin{align*}
   \inferrule
@@ -234,7 +234,7 @@ This theorem breaks down into multiple components.
 The proof tackles each piece separately.
 \begin{construction} \label{cons:pl-prod-to-prod}
 Every PL product of $A$ and $B$
-can be turned into a categorical product.\footnote{In general, we will use the word ``'construction'' to signal a lemma whose proof details are going to be relevant later. In this case, we will need the precise definition of how PL products are turned into categorical ones later on, to prove that the two constructions we have done round-trip to the identity.}
+can be turned into a categorical product.\footnote{In general, we will use the word ``construction'' to signal a lemma whose proof details are going to be relevant later. In this case, we will need the precise definition of how PL products are turned into categorical ones later on, to prove that the two constructions we have done round-trip to the identity.}
 \end{construction}
 \begin{proof}
   Suppose you have $(A \times B, \mathsf{Fst}_\Gamma, \mathsf{Snd}_\Gamma, 
@@ -648,7 +648,7 @@ are composition of morphisms, and some are composition of functions.}
 \end{definition}
 \marginnote{We will see soon that a $\calC$-indexed set is an 
 instance of a general phenomenon called a \emph{functor}, 
-which can be thought of us a structure-preserving map 
+which can be thought of as a structure-preserving map 
 between categories.}
 A $\calC$-indexed set is also known as a \textbf{presheaf}.
 Let's see some examples of $\calC$-indexed sets:
@@ -666,7 +666,7 @@ Let's see some examples of $\calC$-indexed sets:
   $F(\bullet) = \{a, b\}$. By identity preservation, we must 
   have that $F(\id) = \id_{\{a, b\}}$. Since there's only 
   one morphism, composition preservation is trivial.
-  \item Next, let's explore what $\calC$-indexed sets on a more interesting 
+  \item Next, let's explore what $\calC$-indexed sets look like on a more interesting 
   indexing category, a category with two objects each with an identity morphism:
   \begin{equation}
 \begin{tikzcd}
@@ -701,7 +701,7 @@ X \arrow["\id_X"', loop, distance=2em, in=125, out=55]  \arrow[r, "f"]
 
 
 It can be convenient to visualize $\calC$-indexed sets $F$ as 
-``balloon'' diagrams, (1) above each object $X$ in $\calC$ there is a visualization
+``balloon'' diagrams: (1) above each object $X$ in $\calC$ there is a visualization
 of the set $F(X)$, and (2) for each morphism $X \mor{f} Y$
 in $\calC$ there is an internal picture of the function $f : Y \to X$. 
 For example, we can draw $F$ above as the following balloon diagram:
@@ -777,11 +777,11 @@ functions between sets. Concretely, suppose $F(\bullet) = \{a, b\}$ and
 $G(\bullet) = \{c, d\}$. Then, there is a $\calC$-indexed function $\alpha$ 
 where $\alpha_\bullet : F(\bullet) \to G(\bullet)$ is a function. The naturality
 constraint is somewhat trivially satisfied, but is worth checking as an
-exercise. Note that there are 4 possible of $\alpha$ here, one for each possible 
+exercise. Note that there are 4 possible choices of $\alpha$ here, one for each possible 
 function between the sets $F(\bullet)$ and $G(\bullet)$.
 
-A much more interesting case is the 2 object category with a morphism between 
-then in (\ref{cat:2obj}). We can visualize the data 
+A much more interesting case is the 2-object category with a morphism between 
+them in (\ref{cat:2obj}). We can visualize the data 
 of a particular $\calC$-indexed function $\alpha$ in this category 
 by drawing a ``stacked balloon diagram'':
 
@@ -847,7 +847,7 @@ F(X) \arrow[r, "\beta_X"']                & G(X) \arrow[r, "\alpha_X"']         
 From this we can conclude the following definition 
 is well-formed:\footnote{This definition technically runs afoul of some cardinality 
 limitations in our original definition of a category (\cref{def:category}). 
-Do not worry; the original definition of category can adjusted to account 
+Do not worry; the original definition of category can be adjusted to account 
 for this fact without invalidating anything we have done so far.}
 \begin{definition}[Category of $\calC$-indexed sets]
   \sloppy
@@ -1068,7 +1068,7 @@ then it must be defined as above.
 The crucial idea of the Yoneda lemma is that a copy of $\calC$ lives inside of
 its corresponding presheaf category.  This lets ideas, definitions, and
 intuitions from the $\calC$-indexed category 
--- which, as we've already described, has fantastically rich structure,
+-- which, as we've already described, has fantastically rich structure
 -- including products, exponentials, etc. -- 
 be reflected back into the indexing category $\calC$. 
 
@@ -1177,9 +1177,9 @@ First let's inspect $\yo 12$. We can compute its action on objects:
 
 Note that in this category there is at most 1 morphism between any 2 objects
 (i.e., we have that the morphisms $f \circ d \circ c = f \circ e \circ b$, 
-so we only include 1 of them in $(\yo 12)(1)$).  So, each representable $\yo X$ is either a singleton (meaning, $X \preceq
+so we only include 1 of them in $(\yo 12)(1)$).  So, each representable $\yo X$ is either a singleton (meaning $X \preceq
 12$), or it is an empty set (meaning $X \not\preceq 12$). The action of $\yo 12$
-on morphisms is not complicated, let's see what it is by unfolding definitions:
+on morphisms is not complicated; let's see what it is by unfolding definitions:
 \begin{align*}
   (\yo 12)(c) &: (\yo 12)(2) \to (\yo 12) (1) \\
   &= (f \circ d) \mapsto (f \circ d) \circ c
@@ -1187,7 +1187,7 @@ on morphisms is not complicated, let's see what it is by unfolding definitions:
 
 In this case we see that to shift perspective from $1$ to $2$, we should 
 precompose by the $c$ morphism.
-From this, we can observe that there is single morphism $\yo Y \to \yo X$ 
+From this, we can observe that there is a single morphism $\yo Y \to \yo X$ 
 if and only if there is a morphism $X \to Y$ in $\calC$.
 
 Now, let's closely examine the structure of a representable $\yo 12$ and try 
@@ -1348,7 +1348,7 @@ in the next chapter, we will use the Yoneda lemma in full to show:
 We will not prove this theorem here -- it is a direct consequence of the 
 Yoneda lemma, which we are now ready to appreciate -- but
 one can understand this theorem as: an object $P$ is a product of $A$ 
-and $B$ internally if and only if if behaves like a product externally.
+and $B$ internally if and only if it behaves like a product externally.
 
 % \section{The category of elements}
 
@@ -1637,7 +1637,7 @@ action of $\yo Z$ on all the other morphisms $Z \to Z$. Let's see this visually.
 Suppose we have as our indexing category the monoid corresponding to the 
 natural numbers mod 3 under addition, the category $\mathbb{Z}_3$. This category has a single object $\star$ and 
 3 morphisms: the identity morphism $0$, and morphisms $1$ and  $2$, 
-together which equations stipulating that $1 \circ 1 = 2, 1 \circ 2 = \id, 2 \circ 2 = 1, 2 \circ 1 = \id$.
+together with equations stipulating that $1 \circ 1 = 2, 1 \circ 2 = \id, 2 \circ 2 = 1, 2 \circ 1 = \id$.
 Let's visualize some of this data:
 
 \begin{center}
@@ -2297,10 +2297,10 @@ From now on we assume the following axiom.
 The set \(\calU\) splits the world of sets into two halves:
 \begin{itemize}
 \item On one side there are the sets \(X\) such that \(X \in \calU\). These sets are ``small enough to fit into \(\calU\)'', so called \emph{\(\calU\)-small}.
-\item On the other side there aer sets \(X\) such that \(X \notin \calU\). these sets are ``too large to fit'', so called \emph{\(\calU\)-large}.
+\item On the other side there are sets \(X\) such that \(X \notin \calU\). These sets are ``too large to fit'', so called \emph{\(\calU\)-large}.
 \end{itemize}
 
-The key point is that, we cannot define a category of \emph{all} sets, we  can define a category of \emph{\(\calU\)-small} ones.
+The key point is that, while we cannot define a category of \emph{all} sets, we can define a category of \emph{\(\calU\)-small} ones.
 \begin{definition}[the category of (\(\calU\)-small) sets]
   \(\Set\) is the category whose
   \begin{itemize}
