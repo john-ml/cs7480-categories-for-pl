@@ -11,6 +11,7 @@
 \newcommand{\soltitle}[1]{\vspace{12pt}\noindent\textbf{Solution \ref{#1}:}}
 
 \chapter{Type Refinements as Indexed Inductive Types}
+\marginnote{This chapter was written by Joseph Rotella.}
 
 In the course of writing code in a simply typed language, one may find oneself wishing to constrain
 the values of a type based on some ``feature'' of its values. For instance, when writing functions
@@ -51,6 +52,7 @@ Although this question serves as our motivation, the actual aim of this chapter 
 \begin{itemize}
   \item To give an account of a categorical semantics of inductive and indexed inductive types;
   \item To illustrate an application of these tools in the form of the translation discussed above;
+        and
   \item To provide motivating intuition for the study of \emph{fibrations}, which we regrettably do
         not have space to treat herein.
 \end{itemize}
@@ -58,7 +60,7 @@ Although this question serves as our motivation, the actual aim of this chapter 
 The content of this chapter is largely based on the work of Atkey, Johann, and
 Ghani~\citep{atkey2011refining}. The content of the first section on inductive types also draws on
 Wadler's ``Recursive Types for Free!''~\citep{wadler1990recursive} and scribed lecture notes from
-New's presentation of similar material \citep{new2023category}.
+New's presentation of similar material~\citep{new2023category}.
 
 \section{Categorifying Inductive Types}
 
@@ -108,11 +110,9 @@ inductive List (A : Type) : Type where
   | cons : A -> List A -> List A
 \end{lstlisting}
 since the tools we have previously used to give the semantics of lambda calculi---(finite)
-(co)products, exponential objects, and initial and terminal objects---do not (at least
-straightforwardly)\footnote{We would prefer a more ``natural'' account of inductive types than, say,
-Church encodings.} admit the construction of sums and products of unbounded arity. To give a
-complete account of general inductive definitions, we will need to develop some new (and repurpose
-some old) tools.
+(co)products, exponential objects, and initial and terminal objects---do not admit the construction
+of sums and products of unbounded arity. To give a complete account of general inductive
+definitions, we will need to develop some new (and repurpose some old) tools.
 
 We will motivate our translation of inductive datatypes using our standard approach to translating
 PL concepts into category theory: translating inference rules. Specifically, we will translate the
@@ -136,7 +136,7 @@ existence of two \emph{global elements} $\texttt{true}, \texttt{false} : 1 \to \
 
 \begin{definition}[Global element]
   In a category with terminal objects, a \emph{global element} of an object $A$ is a morphism
-  $1 \to A$. It is the categorical interpretation of an ``element'' of an object.
+  $1 \to A$. It is the categorical interpretation of an ``element'' of an object $A$.
 \end{definition}
 
 Here, our use of global elements corresponds to the fact that \texttt{true} and \texttt{false} are
@@ -237,9 +237,9 @@ successor case: this will be the recursive result of evaluating the recursor on 
 $n$. The typing rules are given below:
 
 \begin{mathpar}
-\inferrule*[right=T-z]{~}{\vdash \texttt{zero} : \texttt{Nat}}
+\inferrule*[right=T-zero]{~}{\vdash \texttt{zero} : \texttt{Nat}}
 
-\inferrule*[right=T-s]{~}{n : \texttt{Nat} \vdash \texttt{succ}(n) : \texttt{Nat}}
+\inferrule*[right=T-succ]{~}{n : \texttt{Nat} \vdash \texttt{succ}(n) : \texttt{Nat}}
 
 \inferrule*[right=T-natrec]
   {\vdash e_z : \tau \\ x : \texttt{Nat} \vdash e_s : \tau}
@@ -271,18 +271,19 @@ the corresponding recursor application:
 As with Booleans, categorifying the rules for natural numbers yields an object representing the type
 \texttt{Nat}, a morphism for each constructor, and, for each pair of ``combining-function''
 morphisms running ``parallel to'' the constructors, a unique morphism denoted by the
-recursor.\footnote{Note that we obtain from the $\eta$ law the uniqueness condition---that any
-morphism $e$ satisfying the $\beta$-derived equalities $e \circ \texttt{zero} = e_z$ and $e \circ
-\texttt{succ} = e_s$ is equal to the recursor morphism---by recalling that substitution is
-interpreted as composition.} In the case of natural numbers, however, the resulting construction has
-a special name: the \emph{natural numbers object}.
+recursor.\footnote{Note that we obtain the uniqueness condition from the $\eta$ law by recalling
+that substitution is interpreted as composition. Like the corresponding condition for \texttt{Bool},
+this uniqueness condition says that any morphism $e$ satisfying the $\beta$-equalities $e \circ
+\texttt{zero} = e_z$ and $e \circ \texttt{succ} = e_s$ is equal to the corresponding recursor
+morphism.} In the case of natural numbers, however, the resulting construction has a special name:
+the \emph{natural numbers object}.
 
 \begin{definition}[Natural numbers object]
 \sloppy
   A \emph{natural numbers object} in a Cartesian closed category $\calC$ consists of
   \begin{itemize}
-    \item An object $N$ of $\calC$ and
-    \item Morphisms $z : 1 \to N$ and $s : N \to N$
+    \item An object $N$ of $\calC$, and
+    \item Morphisms $z : 1 \to N$ and $s : N \to N$,
   \end{itemize}
   such that, for every object $A$ of $\calC$ and pair of morphisms $f_z : 1 \to A$ and $f_s : A \to
   A$, there exists a unique morphism $u$ such that the following diagram commutes:
@@ -356,51 +357,65 @@ translations above, we did the following:
   all objects $A$ and morphisms
   \[ f_1 : \llbr{\texttt{Bool}} \to A \quad\text{and}\quad
      f_2 : A \times \llbr{\texttt{Nat}} \to A. \]
-  Moreover, the resulting squares must commute.
+  so that the following squares commute:\footnote{Given morphisms $f : X \to Z$ and $g : Y \to W$,
+  we write $f \times g$ to denote the morphism $\langle f \circ \pi_1, g \circ \pi_2 \rangle : X
+  \times Y \to Z \times W$.}
+
+  % https://q.uiver.app/#q=WzAsNixbMCwwLCJcXGxsYnJ7XFx0ZXh0dHR7Qm9vbH19Il0sWzIsMCwiXFxsbGJye1xcdGV4dHR0e1R9fSJdLFs0LDAsIlxcbGxicntcXHRleHR0dHtUfX0gXFx0aW1lcyBcXGxsYnJ7XFx0ZXh0dHR7TmF0fX0iXSxbMiwyLCJBIl0sWzAsMiwiXFxsbGJye1xcdGV4dHR0e0Jvb2x9fSJdLFs0LDIsIkEgXFx0aW1lcyBcXGxsYnJ7XFx0ZXh0dHR7Qm9vbH19Il0sWzEsMywidV97Zl8xLGZfMn0iLDAseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMCw0LCJcXG1hdGhzZntpZH1fe1xcbGxicntcXHRleHR0dHtCb29sfX19Il0sWzIsNSwidV97Zl8xLGZfMn0gXFx0aW1lcyBcXG1hdGhzZntpZH1fe1xcbGxicntcXHRleHR0dHtOYXR9fX0iXSxbMCwxLCJjXzEiLDFdLFsyLDEsImNfMiIsMV0sWzQsMywiZl8xIiwxXSxbNSwzLCJmXzIiLDFdXQ==
+\[\begin{tikzcd}
+	{\llbr{\texttt{Bool}}} && {\llbr{\texttt{T}}} && {\llbr{\texttt{T}} \times \llbr{\texttt{Nat}}} \\
+	\\
+	{\llbr{\texttt{Bool}}} && A && {A \times \llbr{\texttt{Bool}}}
+	\arrow["{c_1}"{description}, from=1-1, to=1-3]
+	\arrow["{\mathsf{id}_{\llbr{\texttt{Bool}}}}", from=1-1, to=3-1]
+	\arrow["{u_{f_1,f_2}}", dashed, from=1-3, to=3-3]
+	\arrow["{c_2}"{description}, from=1-5, to=1-3]
+	\arrow["{u_{f_1,f_2} \times \mathsf{id}_{\llbr{\texttt{Nat}}}}", from=1-5, to=3-5]
+	\arrow["{f_1}"{description}, from=3-1, to=3-3]
+	\arrow["{f_2}"{description}, from=3-5, to=3-3]
+\end{tikzcd}\]
 \end{itemize}
 
 This procedure is a useful heuristic but is not yet a precise categorical account of an inductive
 type. For instance, the ``replacement'' performed in the second step is merely a syntactic
 operation. We will now make this categorical translation more precise.
 
-We start by consolidating our commutative squares. Recall that any inductive type with multiple
+We start by consolidating our commutative squares. Observe that any inductive type with multiple
 constructors can be equivalently expressed as a having a single constructor whose domain is the sum
 of the domains of the original constructors. That is, the constructors $c_1 : A \to T$, $c_2 : B \to
 T$, and $c_3 : C \to T$ can be equivalently represented by a single constructor $c : A \oplus B
 \oplus C \to T$. The recursor is then parameterized by a single morphism running  ``parallel'' to
 the constructor that maps into $A$ from an analogous coproduct over $A$.
 
-Applying this rewriting to the \texttt{Nat} datatype depicted in diagram
+Applying this rewriting to the \texttt{Nat} datatype depicted in Diagram
 (\ref{fig:nat-squares}), we obtain
 % https://q.uiver.app/#q=WzAsNCxbMCwwLCIxIFxcb3BsdXMgXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzIsMCwiXFxsbGJye1xcdGV4dHR0e05hdH19Il0sWzAsMiwiMSBcXG9wbHVzIEEiXSxbMiwyLCJBIl0sWzAsMSwiXFxsYW5nbGUgeiwgc1xccmFuZ2xlIl0sWzEsMywiXFxtYXRodHR7aXRlcn0oXFxsYW5nbGUgZl96LCBmX3NcXHJhbmdsZSkiXSxbMiwzLCJcXGxhbmdsZSBmX3osIGZfc1xccmFuZ2xlIiwyXSxbMCwyLCJcXGxlZnRcXGxhbmdsZSBcXG1hdGhzZntpbmx9IFxcY2lyYyBcXG1hdGhzZntpZH1fMSwgXFxtYXRoc2Z7aW5yfSBcXGNpcmMgXFxtYXRoc2Z7aXRlcn0oXFxsYW5nbGUgZl96LCBmX3NcXHJhbmdsZSkgXFxyaWdodFxccmFuZ2xlIiwyXV0=
 \[\begin{tikzcd}
 	{1 \oplus \llbr{\texttt{Nat}}} && {\llbr{\texttt{Nat}}} \\
 	\\
-	{1 \oplus A} && A
-	\arrow["{[ z, s]}", from=1-1, to=1-3]
-	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \texttt{rec}_\texttt{Nat}([ f_z, f_s]) \right]}"', from=1-1, to=3-1]
-	\arrow["{\texttt{rec}_\texttt{Nat}([ f_z, f_s])}", from=1-3, to=3-3, dashed]
-	\arrow["{[ f_z, f_s]}"', from=3-1, to=3-3]
-\end{tikzcd}\]
-and a similar transformation occurs for diagram (\ref{fig:bool-squares}). (Above and hereafter, we
-use the notation $[f, g]$ to denote the unique morphism obtained from the universal property of
-coproducts. Thinking of morphisms as functions, $[f, g]$ does a case split on its input, mapping
-elements of the left-hand summand using $f$ and those of the right-hand summand using
-$g$.)
+	{1 \oplus A} && A \arrow["{[ z, s]}", from=1-1, to=1-3] \arrow["{\mathsf{id}_1 \oplus
+	\texttt{rec}_\texttt{Nat}([ f_z, f_s])}"', from=1-1, to=3-1] \arrow["{\texttt{rec}_\texttt{Nat}([
+	f_z, f_s])}", from=1-3, to=3-3, dashed] \arrow["{[ f_z, f_s]}"', from=3-1, to=3-3] \end{tikzcd}\]
+	and a similar transformation occurs for Diagram (\ref{fig:bool-squares}).\footnote{Above and
+	hereafter, we use the notation $[f, g]$ to denote the unique morphism obtained from the universal
+	property of coproducts. Thinking of morphisms as functions, $[f, g]$ does a case split on its
+	input, mapping elements of the left-hand summand using $f$ and those of the right-hand summand
+	using $g$. By analogy with $f \times g$, we write $f \oplus g$ for $[\mathsf{inl} \circ f,
+	\mathsf{inr} \circ g]$.}
 
 The top-left corner should look familiar: it is the body of the recursive type equation that defines
 the natural numbers. That is, using a least-fixed-point operator $\mu$, we would write
 \[ \texttt{Nat} \triangleq \mu t.~1 \oplus t, \]
 so that \texttt{Nat} is the (smallest) type satisfying the type isomorphism
 \[ \texttt{Nat} \cong 1 \oplus \texttt{Nat}. \]
-Similarly, diagram (\ref{fig:bool-squares}) is ``consolidated'' into a single square with a
+Similarly, Diagram (\ref{fig:bool-squares}) is ``consolidated'' into a single square with a
 constructor with domain $1 \oplus 1$:
 \[\begin{tikzcd}
 	{1 \oplus 1} && {\llbr{\texttt{Bool}}} \\
 	\\
 	{1 \oplus 1} && A
 	\arrow["{[ z, s]}", from=1-1, to=1-3]
-	\arrow["{\left[ \inl \mathop\circ \mathsf{id}_1,~ \inr \mathop\circ \mathsf{id}_1 \right]}"', from=1-1, to=3-1]
+	\arrow["{\mathsf{id}_1 \oplus \mathsf{id}_1}"', from=1-1, to=3-1]
 	\arrow["{\texttt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ t, e ]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
@@ -415,11 +430,7 @@ corner of the square), a single morphism (the constructor), and a universal prop
 the recursor. The ``shape'' of the objects on the left-hand side of the commutative square are
 determined by the ``shape'' of the inductive type. More precisely, using the observation in the
 preceding paragraph, that ``shape'' is determined precisely by the expression $\tau$ in the
-fixed-point equation $\mu t.~\tau$ for the inductive type.\footnote{You may wonder why we do not
-give a general categorification of inductive types simply by translating the general typing rules
-for recursive types, as we did for the examples above. Indeed, this is one viable path, but the
-relevant abstracted definitions acquire some bureaucratic machinery that we prefer not to deal
-with.}
+fixed-point equation $\mu t.~\tau$ for the inductive type.
 
 Adopting a categorical lens, we might observe that an expression $t.~\tau$ defines a mapping from a
 type $t$ to some type $\tau$ parameterized thereby. In our categorical interpretation, types form a
@@ -428,7 +439,7 @@ specifically, since we are mapping from a category (of types) into itself, this 
 \emph{endofunctor}. The endofunctor associated with the type of natural numbers is defined by
 \begin{align*}
   F_\texttt{Nat}(X) &= 1 \oplus X\\
-  F_\texttt{Nat}(f : X \to Y) &= [\inl \circ \mathsf{id}_1, \inr \circ f] : 1 \oplus X \to 1 \oplus Y
+  F_\texttt{Nat}(f : X \to Y) &= \mathsf{id}_1 \oplus f : 1 \oplus X \to 1 \oplus Y
 \end{align*}
 
 Of course, the mapping $t.~\tau$ is not itself a type; rather, we apply the least-fixed-point
@@ -475,15 +486,15 @@ in terms of initiality. In particular, $F$-algebras form a category $\Alg_F$, so
     \item Objects are $F$-algebras $(A, \alpha : F A \to A)$.
     \item Morphisms from $(A, \alpha)$ to $(B, \beta)$ are morphisms $f : A \to B$ in $\calC$ such
           that the following square commutes:
-    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGIEEiXSxbMiwwLCJBIl0sWzAsMiwiRiBCIl0sWzIsMiwiQiJdLFswLDEsIlxcYWxwaGEiXSxbMSwzLCJmIl0sWzIsMywiXFxiZXRhIiwyXSxbMCwyLCJGIGYiLDJdXQ==
+    % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGIEEiXSxbMiwwLCJGIEIiXSxbMCwyLCJBIl0sWzIsMiwiQiJdLFswLDEsIkYgZiJdLFsxLDMsIlxcYmV0YSJdLFsyLDMsImYiLDJdLFswLDIsIlxcYWxwaGEiLDJdXQ==
     \[\begin{tikzcd}
-      {F A} && A \\
+      {F A} && {F B} \\
       \\
-      {F B} && B
-      \arrow["\alpha", from=1-1, to=1-3]
-      \arrow["{F f}"', from=1-1, to=3-1]
-      \arrow["f", from=1-3, to=3-3]
-      \arrow["\beta"', from=3-1, to=3-3]
+      A && B
+      \arrow["{F f}", from=1-1, to=1-3]
+      \arrow["\alpha"', from=1-1, to=3-1]
+      \arrow["\beta", from=1-3, to=3-3]
+      \arrow["f"', from=3-1, to=3-3]
     \end{tikzcd}\]
     \item Identity and composition are lifted from $\calC$.
   \end{itemize}
@@ -531,52 +542,108 @@ to) a fixed point of $F$. In other words, if $(A, \alpha)$ is the initial $F$-al
 
   Thus, we have the following diagram in $\Alg_F$:
 
-  % https://q.uiver.app/#q=WzAsMyxbMCwwLCIoQSwgXFxhbHBoYSkiXSxbMCwyLCIoRiBBLCBGIFxcYWxwaGEpIl0sWzAsNCwiKEEsIFxcYWxwaGEpIl0sWzAsMSwiXFxsbHBye0YgXFxhbHBoYX0iXSxbMSwyLCJcXGFscGhhIl0sWzAsMiwiXFxtYXRoc2Z7aWR9X3soQSwgXFxhbHBoYSl9IiwyLHsiY3VydmUiOjR9XV0=
-  \[\begin{tikzcd}
-    {(A, \mathsf{in}_F)} \\
-    \\
-    {(F A, F~\mathsf{in}_F)} \\
-    \\
-    {(A, \mathsf{in}_F)}
-    \arrow["{\llpr{F~\mathsf{in}_F}}", from=1-1, to=3-1]
-    \arrow["{\mathsf{id}_A}"', curve={height=36pt}, from=1-1, to=5-1]
-    \arrow["\mathsf{in}_F", from=3-1, to=5-1]
-  \end{tikzcd}\]
+  % https://q.uiver.app/#q=WzAsMyxbMCwwLCIoQSwgXFxtYXRoc2Z7aW59X0YpIl0sWzIsMCwiKEYgQSwgRn5cXG1hdGhzZntpbn1fRikiXSxbNCwwLCIoQSwgXFxtYXRoc2Z7aW59X0YpIl0sWzAsMSwiXFxsbHBye0Z+XFxtYXRoc2Z7aW59X0Z9Il0sWzEsMiwiXFxtYXRoc2Z7aW59X0YiXSxbMCwyLCJcXG1hdGhzZntpZH1fe0F9IiwyLHsiY3VydmUiOjR9XV0=
+  \begin{equation}
+    \label{eqn:lambek-algf-diag}
+    \begin{tikzcd}
+      {(A, \mathsf{in}_F)} && {(F A, F~\mathsf{in}_F)} && {(A, \mathsf{in}_F)}
+      \arrow["{\llpr{F~\mathsf{in}_F}}", from=1-1, to=1-3]
+      \arrow["{\mathsf{id}_{A}}"', curve={height=24pt}, from=1-1, to=1-5]
+      \arrow["{\mathsf{in}_F}", from=1-3, to=1-5]
+    \end{tikzcd}
+  \end{equation}
   
   Since $(A, \mathsf{in}_F)$ is initial, there is only one $F$-algebra morphism from $(A,
   \mathsf{in}_F)$ to itself, so this diagram must commute, i.e.,
-  \[ \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} = \mathsf{id}_A.\]
+  \begin{equation}
+    \label{eqn:lambek-right-inv}
+    \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} = \mathsf{id}_A.
+  \end{equation}
   Accordingly, $\llpr{F~\mathsf{in}_F}$ is a right inverse for $\mathsf{in}_F$.
   
-  To show that it is also a left inverse, we apply $F$ to both sides of the preceding equation and
-  rewrite using the functor laws:
-  \[ F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{id}_{F A}. \]
-  Then we observe that
-  \[ F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} \]
-  from the fact that $\llpr{F~\mathsf{in}_F}$ is an $F$-algebra morphism:
-  % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGIEEiXSxbMiwwLCJBIl0sWzAsMiwiRiAoRiBBKSJdLFsyLDIsIkYgQSJdLFswLDEsIlxcbWF0aHNme2lufV9GIl0sWzIsMywiRn5cXG1hdGhzZntpbn1fRiJdLFswLDIsIkYgXFxsbHBye0Z+XFxtYXRoc2Z7aW59X0Z9IiwxXSxbMSwzLCJcXGxscHJ7Rn5cXG1hdGhzZntpbn1fRn0iLDFdXQ==
+  To show that it is also a left inverse, we first expand the $F$-algebra morphisms in Diagram
+  (\ref{eqn:lambek-algf-diag}) into commutative squares:
+
+  % https://q.uiver.app/#q=WzAsNixbMCwwLCJGIEEiXSxbMCwyLCJBIl0sWzIsMCwiRiAoRiBBKSJdLFsyLDIsIkYgQSJdLFs0LDAsIkYgQSJdLFs0LDIsIkEiXSxbMCwxLCJcXG1hdGhzZntpbn1fRiIsMl0sWzIsMywiRn5cXG1hdGhzZntpbn1fRiIsMl0sWzAsMiwiRiBcXGxscHJ7Rn5cXG1hdGhzZntpbn1fRn0iXSxbMSwzLCJcXGxscHJ7Rn5cXG1hdGhzZntpbn1fRn0iLDJdLFsyLDQsIkZ+XFxtYXRoc2Z7aW59X0YiXSxbMyw1LCJcXG1hdGhzZntpbn1fRiIsMl0sWzQsNSwiXFxtYXRoc2Z7aW59X0YiXSxbMSw1LCJcXG1hdGhzZntpZH1fQSIsMSx7ImN1cnZlIjo0fV1d
   \[\begin{tikzcd}
-    {F A} && A \\
+    {F A} && {F (F A)} && {F A} \\
     \\
-    {F (F A)} && {F A}
-    \arrow["{\mathsf{in}_F}", from=1-1, to=1-3]
-    \arrow["{F \llpr{F~\mathsf{in}_F}}"{description}, from=1-1, to=3-1]
-    \arrow["{\llpr{F~\mathsf{in}_F}}"{description}, from=1-3, to=3-3]
-    \arrow["{F~\mathsf{in}_F}", from=3-1, to=3-3]
+    A && {F A} && A
+    \arrow["{F \llpr{F~\mathsf{in}_F}}", from=1-1, to=1-3]
+    \arrow["{\mathsf{in}_F}"', from=1-1, to=3-1, blue, line width=0.75pt]
+    \arrow["{F~\mathsf{in}_F}", from=1-3, to=1-5]
+    \arrow["{F~\mathsf{in}_F}"', from=1-3, to=3-3]
+    \arrow["{\mathsf{in}_F}", from=1-5, to=3-5]
+    \arrow["{\llpr{F~\mathsf{in}_F}}"', from=3-1, to=3-3, blue, line width=0.75pt]
+    \arrow["{\mathsf{id}_A}"{description}, curve={height=24pt}, from=3-1, to=3-5]
+    \arrow["{\mathsf{in}_F}"', from=3-3, to=3-5]
   \end{tikzcd}\]
-  So, substituting the second equation into the first, we have
-  \[ \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} = \mathsf{id}_{F A}, \]
-  completing the proof that $\mathsf{in}_F : F A \to A$ is an isomorphism.
+
+  In order to show that $\llpr{F~\mathsf{in}_F}$ is a left inverse of $\mathsf{in}_F$, we must show
+  that the highlighted lower-left path through the left square is equal to $\mathsf{id}_A$.
+
+  Observe, however, that the upper-right path through the same square is $F~\mathsf{in}_F \circ F
+  \llpr{F~\mathsf{in}_F}$, which we can rewrite as follows by functoriality:
+  \begin{align*}
+    F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} &= F \left(\mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} \right)\\
+      &= F~\mathsf{id}_A \tag{Equation \ref{eqn:lambek-right-inv}}\\
+      &= \mathsf{id}_{F A}.
+  \end{align*}
+  Adding this fact to our diagram, we can read off the desired equation
+  \[ \llpr{F~\mathsf{in}_F} \circ \mathsf{in}_F = \mathsf{id}_{F A} \]
+  by tracing the lower-left path:
+  % https://q.uiver.app/#q=WzAsNixbMCwwLCJGIEEiXSxbMCwyLCJBIl0sWzIsMCwiRiAoRiBBKSJdLFsyLDIsIkYgQSJdLFs0LDAsIkYgQSJdLFs0LDIsIkEiXSxbMCwxLCJcXG1hdGhzZntpbn1fRiIsMl0sWzIsMywiRn5cXG1hdGhzZntpbn1fRiIsMl0sWzAsMiwiRiBcXGxscHJ7Rn5cXG1hdGhzZntpbn1fRn0iXSxbMSwzLCJcXGxscHJ7Rn5cXG1hdGhzZntpbn1fRn0iLDJdLFsyLDQsIkZ+XFxtYXRoc2Z7aW59X0YiXSxbMyw1LCJcXG1hdGhzZntpbn1fRiIsMl0sWzQsNSwiXFxtYXRoc2Z7aW59X0YiXSxbMSw1LCJcXG1hdGhzZntpZH1fQSIsMSx7ImN1cnZlIjo0fV0sWzAsMywiXFxtYXRoc2Z7aWR9X3tGIEF9IiwxXV0=
+  \[\begin{tikzcd}
+    {F A} && {F (F A)} && {F A} \\
+    \\
+    A && {F A} && A
+    \arrow["{F \llpr{F~\mathsf{in}_F}}", from=1-1, to=1-3]
+    \arrow["{\mathsf{in}_F}"', from=1-1, to=3-1, blue, line width=0.75pt]
+    \arrow["{\mathsf{id}_{F A}}"{description}, from=1-1, to=3-3, blue, line width=0.75pt]
+    \arrow["{F~\mathsf{in}_F}", from=1-3, to=1-5]
+    \arrow["{F~\mathsf{in}_F}"', from=1-3, to=3-3]
+    \arrow["{\mathsf{in}_F}", from=1-5, to=3-5]
+    \arrow["{\llpr{F~\mathsf{in}_F}}"', from=3-1, to=3-3, blue, line width=0.75pt]
+    \arrow["{\mathsf{id}_A}"{description}, curve={height=24pt}, from=3-1, to=3-5]
+    \arrow["{\mathsf{in}_F}"', from=3-3, to=3-5]
+  \end{tikzcd}\]
+  Thus, $\mathsf{in}_F : F A \to A$ is indeed an isomorphism.
+  % To show that it is also a left inverse, we apply $F$ to both sides of the preceding equation and
+  % rewrite using the functor laws:
+  % \begin{equation}
+  %   \label{eqn:lambek1}
+  %   F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{id}_{F A}.
+  % \end{equation}
+  % Then we observe that
+  % \begin{equation}
+  %   \label{eqn:lambek2}
+  %   F~\mathsf{in}_F \circ F \llpr{F~\mathsf{in}_F} = \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} 
+  % \end{equation}
+  % from the fact that $\llpr{F~\mathsf{in}_F}$ is an $F$-algebra morphism:
+  % % https://q.uiver.app/#q=WzAsNCxbMCwwLCJGIEEiXSxbMCwyLCJBIl0sWzIsMCwiRiAoRiBBKSJdLFsyLDIsIkYgQSJdLFswLDEsIlxcbWF0aHNme2lufV9GIiwyXSxbMiwzLCJGflxcbWF0aHNme2lufV9GIiwyXSxbMCwyLCJGIFxcbGxwcntGflxcbWF0aHNme2lufV9GfSJdLFsxLDMsIlxcbGxwcntGflxcbWF0aHNme2lufV9GfSIsMl1d
+  % \[\begin{tikzcd}
+  %   {F A} && {F (F A)} \\
+  %   \\
+  %   A && {F A}
+  %   \arrow["{F \llpr{F~\mathsf{in}_F}}", from=1-1, to=1-3]
+  %   \arrow["{\mathsf{in}_F}"', from=1-1, to=3-1]
+  %   \arrow["{F~\mathsf{in}_F}"', from=1-3, to=3-3]
+  %   \arrow["{\llpr{F~\mathsf{in}_F}}"', from=3-1, to=3-3]
+  % \end{tikzcd}\]
+  % So, substituting Equation (\ref{eqn:lambek2}) into Equation (\ref{eqn:lambek1}), we have
+  % \[ \mathsf{in}_F \circ \llpr{F~\mathsf{in}_F} = \mathsf{id}_{F A}, \]
+  % completing the proof that $\mathsf{in}_F : F A \to A$ is an isomorphism.
 \end{proof}
 
 With Lambek's lemma in hand, we can now give a precise categorification of inductive types: the
 inductive type represented by $\mu t.~\tau$ is interpreted as the initial algebra of the endofunctor
 $F(t) = \llbr{\tau}$, where we extend our previous translation of types to map the free type
 variable $t$ to the functor variable of the same name.\footnote{The action of $F$ on morphisms must
-also be defined in the ``obvious'' way. We elide the details, but one can inspect the definition of
-$F_\texttt{Nat}$ at the beginning of this subsection for an example.} The algebra's carrier $\mu F$
-is the object representing the type, while its structure map $\mathsf{in}_F$ represents the type's
-constructor.
+also be defined in the ``obvious'' way (which can be derived from viewing products and coproducts of
+interpreted types in $\calC$ as categorical constructions in the functor category $[\calC; \calC]$).
+We elide the details, but one can inspect the definition of $F_\texttt{Nat}$ at the beginning of
+this subsection for an example.} The algebra's carrier $\mu F$ is the object representing the type,
+while its structure map $\mathsf{in}_F$ represents the type's constructor.
 
 It remains only to precisify our former account of recursors. Recall our previous observation that
 recursors map out of an inductive type $\mu F$ into some other type $A$ using a ``combining
@@ -585,30 +652,48 @@ object that ``replaces'' instances of $\mu F$ with instances of $A$. Using our n
 functors, we can phrase this much more concisely: a recursor maps from $\mu F$ to some type $A$
 using a ``combining morphism'' $f_c : F A \to A$. Or, as a diagram:
 
-% https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKFxcbXUgRikiXSxbMiwwLCJcXG11IEYiXSxbMCwyLCJGIEEiXSxbMiwyLCJBIl0sWzAsMSwiYyJdLFsyLDMsImZfYyJdLFswLDIsIkYgKFxcbWF0aHNme2l0ZXJ9X3tmX2N9KSIsMV0sWzEsMywiXFxtYXRoc2Z7aXRlcn1fe2ZfY30iLDFdXQ==
+% https://q.uiver.app/#q=WzAsNCxbMCwwLCJGKFxcbXUgRikiXSxbMCwyLCJcXG11IEYiXSxbMiwwLCJGIEEiXSxbMiwyLCJBIl0sWzAsMSwiYyIsMl0sWzIsMywiZl9jIiwyXSxbMCwyLCJGIChcXG1hdGhzZntyZWN9X3tmX2N9KSJdLFsxLDMsIlxcbWF0aHNme3JlY31fe2ZfY30iXV0=
 \[\begin{tikzcd}
-	{F(\mu F)} && {\mu F} \\
+	{F(\mu F)} && {F A} \\
 	\\
-	{F A} && A
-	\arrow["c", from=1-1, to=1-3]
-	\arrow["{F (\texttt{rec}_{f_c})}"{description}, from=1-1, to=3-1]
-	\arrow["{\texttt{rec}_{f_c}}"{description}, from=1-3, to=3-3]
-	\arrow["{f_c}", from=3-1, to=3-3]
+	{\mu F} && A
+	\arrow["{F (\mathsf{rec}_{f_c})}", from=1-1, to=1-3]
+	\arrow["c"', from=1-1, to=3-1]
+	\arrow["{f_c}"', from=1-3, to=3-3]
+	\arrow["{\mathsf{rec}_{f_c}}", from=3-1, to=3-3]
 \end{tikzcd}\]
 
-In fact, we already saw this diagram (diagrams (\ref{fig:bool-squares}) and (\ref{fig:nat-squares})
+In fact, we already saw this diagram (Diagrams (\ref{fig:bool-squares}) and (\ref{fig:nat-squares})
 are variations of it in the particular cases of natural numbers and Booleans). But having now
 developed the vocabulary of $F$-algebras, this should look familiar for another reason: recursors
 are $F$-algebra morphisms! More precisely, given an inductive type $\mu F$, the ``unapplied''
 recursor function is represented by $\llpr{-}_F$; given a particular ``combining morphism'' $f_c : F
-A \to A$---which is precisely an $F$-algebra over $A$---the resulting parameterized recursor is
+A \to A$---which is precisely an $F$-algebra over $A$---the resulting recursor application is
 $\llpr{f_c} : \mu F \to A$.
 
 As an example, we translate the parity function on natural numbers, which returns \texttt{true} if
 its input is even and \texttt{false} if it is odd, as an application of the natural-number recursor.
-First, we identify the appopriate ``combining function'' for this fold. Since we are ultimately
+First, we identify the appropriate ``combining function'' for this fold. Since we are ultimately
 producing a Boolean, this function should translate to a morphism of type $F_\texttt{Nat}
 \llbr{\texttt{Bool}} \to \llbr{\texttt{Bool}}$. We first define its programmatic version below:
+\footnote{It may be helpful to compare this definition to the following equivalent, structurally
+recursive definition in a more familiar programmatic style:
+
+\lstinline!def even : Nat -> Bool!
+
+\lstinline!\ \ | 0 => true!
+
+\lstinline!\ \ | n + 1 => not (even n)!
+
+\noindent Similarly, \texttt{not} would be defined as:
+
+\lstinline!def not : Bool -> Bool!
+
+\lstinline!\ \ | true => false!
+
+\lstinline!\ \ | false => true!
+}
+
 
 \begin{align*}
 \texttt{f}_\texttt{even} &: 1 \oplus \texttt{Bool} \to \texttt{Bool}\\
@@ -621,8 +706,8 @@ This becomes the $F_\texttt{Nat}$-algebra
 the parity function to be $\llpr{\alpha_\texttt{even}} : \llbr{\texttt{Nat}} \to
 \llbr{\texttt{Bool}}$.
 
-Note that \texttt{not} is, in turn, defined by an algebra over $F_\texttt{Bool}$, the constant-$1
-\oplus 1$ functor. In particular, $\llbr{not} = \llpr{\alpha_\texttt{not}}$ where
+Note that \texttt{not} is, in turn, defined by an algebra over $F_\texttt{Bool}$, the constant-$(1
+\oplus 1)$ functor. In particular, $\llbr{\texttt{not}} = \llpr{\alpha_\texttt{not}}$ where
 $\alpha_\texttt{not} : 1 \oplus 1 \to 1 \oplus 1$ is $[\inr, \inl]$.
 
 % \begin{exercise}
@@ -735,8 +820,8 @@ which we just arrived.
 Note that these rules introduce two new auxiliary definitions:
 \gdef\NL{\\} % See https://tex.stackexchange.com/a/519322 and https://tex.stackexchange.com/a/234314
 \begin{itemize}
-  \item The judgment $\vdash t. \tau~\mathsf{pos}$ asserts that $t$ has only \emph{positive}
-        occurrences in $\tau$; i.e., it never appears to the left of an arrow. Note that all of the
+  \item The judgment ${\vdash}\, t. \tau~\mathsf{pos}$ asserts that $t$ has only \emph{positive}
+        occurrences in $\tau$; i.e., $t$ never appears to the left of an arrow. Note that all of the
         rules implicitly carry this hypothesis, though we have only explicitly stated it for the
         first.
   \item The auxiliary function $\texttt{map}(e)(e')$ ``unpacks'' the structure of $e$ based on its
@@ -824,9 +909,9 @@ The category $\Set$ alone, however, lacks the structure to give an elegant seman
 inductive types. Instead, we will turn to a new category built atop $\Set$ that is equipped with a
 notion of ``indexing'' that will afford a straightforward interpretation of our inductive types'
 indices.\footnote{Be careful when reading the following definition and elsewhere in this chapter:
-the notation $\prod_{a \in A} S(a)$ below refers to a \emph{set-theoretic} indexed product, not,
-e.g., a $\Pi$-type. The symbols $\prod$, $\sum$, and $\to$ are regrettably highly overloaded (we
-will see yet another denotation of $\sum$ later on), so the meanings of these notations are highly
+the notation $\prod_{a \in A} S(a)$ below refers to a \emph{set-theoretic} indexed product, not a
+$\Pi$-type. The symbols $\prod$, $\sum$, and $\to$ are regrettably overloaded (we will see yet
+another denotation of $\sum$ later on), so the meanings of these notations are highly
 context-sensitive.}
 
 \begin{definition}[Families fibration]
@@ -895,7 +980,7 @@ families. Therefore, it is \emph{not} an endofunctor on $\FamSet$, whose objects
 indexing sets. Yet this $\N$-indexing really is essential: our functor cannot perform a case split
 on zero and successors if our indexing set does not have such elements! Indeed, this ability to
 analyze the structure of a type index is precisely one of the key attributes that makes indexed
-inductive types more powerful than traditional parametric polymorphism.
+inductive types more powerful than mere parametric polymorphism.
 
 Therefore, to represent an indexed inductive type, we take the initial algebra of an endofunctor not
 on $\FamSet$ itself, but on a restriction of $\FamSet$ where we consider only families indexed by
@@ -910,6 +995,7 @@ of the families fibration over $A$.
     \item Objects are families $(A, P : A \to \Ob(\Set))$
     \item Morphisms are pairs $(\id_A, f^\sim : \prod_{a \in A} P(a) \to Q(a))$
   \end{itemize}
+  That is, $\FamSet_A$ is the preimage of $\mathsf{id}_A$ under $U$.
 \end{definition}
 
 Thus, although it will at times be useful to consider the category $\FamSet$ in its entirety, we
@@ -938,6 +1024,7 @@ $a$, i.e.,
 \[ \texttt{\{t : T | }\texttt{rec}_\texttt{A}\texttt{(f)(t) = a} \texttt{\}} \]
 can be translated as the family
 \[ (A, a \mapsto \{ x \in \mu F \mid \llpr{f}_{F}(x) = a \}). \]
+
 This is the ``na\"ive'' subset interpretation of refinements that we discussed previously. Our
 objective will be to turn this family into one that is the denotation of an indexed inductive type.
 
@@ -1022,7 +1109,7 @@ functor, known as the \emph{op-reindexing functor}.
 
 \begin{definition}[Indexed coproduct]
 % \sloppy % Not worth it
-  Let $f : A \to B$ be a set function, and let $(A, P)$ be a family of sets. The \emph{indexed
+  Let $f : A \to B$ be a function, and let $(A, P)$ be a family of sets. The \emph{indexed
   coproduct of $(A, P)$ along $f$}, written $\Sigma_f (A, P)$, is defined as
   \[ \left(B, b \mapsto \sum_{a \in A} (b = f(a)) \times P(a)\right) \]
   where $(b = f(a))$ is a set that is inhabited if the equality holds and uninhabited if not.
@@ -1084,7 +1171,7 @@ have more to say about this diagram later.
 
 \begin{exercise}
   \label{ex:very-strong-coprods}
-  Fix a family $(A, P)$. Let $f : A \to B$ be a set function. Consider the following diagram, where
+  Fix a family $(A, P)$. Let $f : A \to B$ be a function. Consider the following diagram, where
   $\psi : (A, P) \to \Sigma_f (A, P)$ acts in the straightforward way:
 
   % https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHsoQSxQKVxcfSJdLFsyLDAsIlxce1xcU2lnbWFfZihBLCBQKVxcfSJdLFswLDIsIkEiXSxbMiwyLCJCIl0sWzAsMSwiXFx7XFxwc2lcXH0iXSxbMCwyLCJcXHBpX3soQSwgUCl9IiwyXSxbMiwzLCJmIiwyXSxbMSwzLCJcXHBpX3tcXFNpZ21hX2YoQSwgUCl9Il1d
@@ -1100,10 +1187,9 @@ have more to say about this diagram later.
 
   \begin{enumerate}
     \item Show that this diagram commutes.
-    \item Show that $\{\psi\}$ is an isomorphism.
+    \item Show that $\{\psi\}$ is an isomorphism. (This shows that the families fibration has
+    \emph{very strong coproducts}.)
   \end{enumerate}
-
-  This shows that the families fibration has \emph{very strong coproducts}.
 \end{exercise}
 
 \subsection{Liftings}
@@ -1148,7 +1234,7 @@ is captured by natural isomorphism.
   Verify that
   \begin{align*}
     \hat F(A, P) &= (F A,\, \_ \mapsto 1)\\
-    \hat F(f, f^\sim) &= (f,\, \_ \mapsto \id_1)
+    \hat F(f, f^\sim) &= (F f,\, \_ \mapsto \id_1)
   \end{align*}
   defines a trivial truth-preserving lifting of $F : \Set \to \Set$.
 \end{exercise}
@@ -1190,8 +1276,12 @@ As a concrete example, consider the truth-preserving lifting of $F_\texttt{Nat}$
            \oplus \left(\begin{array}{ll} \varnothing & \text{if } b = \inl~() \\ \{a\} \times P(a) & \text{if } b = \inr~a \end{array}\right)\right)
 \end{align*}
 
-Finally, since our objective was to obtain an endofunctor on $\FamSet_A$---not $\FamSet$---we define
-the functor $\hat F_A$ to be the restriction of $\hat F$ to $\FamSet_A$.
+Finally, since our objective is ultimately to obtain an endofunctor on $\FamSet_A$---not
+$\FamSet$---we define the functor $\hat F_A$ to be the restriction of $\hat F$ to $\FamSet_A$. The
+attentive reader may notice that that this is not an endofunctor: $\hat F_A$ maps from the fiber
+$\FamSet_A$ to the fiber $\FamSet_{F A}$. However, it is the first half of a construction that will
+yield the endofunctor we desire; we will fill in the remaining piece that takes us back to
+$\FamSet_A$ in the following section.
 
 \subsection{Translating Refinements}
 
@@ -1234,18 +1324,20 @@ Once again, it is illuminating to expand this functor's action on objects:
 
 Upon cursory inspection, at least, the general shape of this family should seem reasonable: it is
 $A$-indexed, with elements drawn from a set of ``$F$-shaped objects'' restricted to those ``on
-which'' (after a certain projection) $\alpha$ attains value $a$.
+which'' (after a certain projection) $\alpha$ attains value $a$. To grasp the significance of this
+final expression more completely, it may be helpful to return to it after observing the example
+below.
 
-We illustrate how this works in practice with our example from the beginning: deriving the type of
-length-indexed vectors from the refinement of lists by their length. To simplify, we will consider
-just lists of Booleans, and attempt to derive the type \texttt{BitVec} from before.
+We illustrate this construction in practice with our example from the beginning: deriving the type
+of length-indexed vectors from the refinement of lists by their length. To simplify, we will
+consider just lists of Booleans, and attempt to derive the type \texttt{BitVec} from before.
 
 First, letting $2 \cong 1 \oplus 1$ be the object denoted by the Boolean type, we recall the
 definition of $F_\texttt{BitList} : \Set \to \Set$ and the algebra $(\N, \texttt{length})$
 thereover:
 \begin{align*}
   F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
-  F_\texttt{BitList}(f) &= [\inl \circ \id_1, \inr \circ \langle \mathsf{id}_2, f\rangle]\\
+  F_\texttt{BitList}(f) &= [\inl \circ \id_1, \inr \circ (\mathsf{id}_2 \times f)]\\
   \\[-10pt] % Spacing hack
   % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\texttt{z}, \texttt{s} \circ \pi_2]
   \texttt{length} ~ (\inl~ ()) &= 0\\
@@ -1253,12 +1345,13 @@ thereover:
 \end{align*}
 
 We now compute the corresponding indexed inductive type. Note that we use the isomorphic expansion
-from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions:
+of $F^\alpha$ from Equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions:
 
 \begin{align*}
   &F^\texttt{length}_\texttt{BitList}(\N, P)\\
   &\cong (\N, n \mapsto \{ y \in F_\texttt{BitList}\{(\N, P)\} \mid \texttt{length}((F_\texttt{BitList} \pi_{(\N, P)})(y)) = n\})\\
-  &= (\N, n \mapsto \left\{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \inl~() \text{ and } 0 = n) \text{ or } (y = \inr~(b, (n_1, p)) \text{ and } \texttt{succ}(n_1) = n) \right\})\\
+  &= (\N, n \mapsto \{ y \in 1 \oplus 2 \times (\N, P) \mid (y = \inl~() \text{ and } 0 = n) \text{ or }\\
+    &\hspace{5.3cm} (y = \inr~(b, (n_1, p)) \text{ and } \texttt{succ}(n_1) = n) \})\\
   &= \left(\N, \begin{cases}0 \mapsto \{\inl~()\} \\ \mathsf{succ}(n_1) \mapsto \{\inr~(b, (n_1, p)) \mid b \in 2, p \in P(n_1)\} \end{cases} \right)\\
   &= (\N, (n \mapsto
     \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
@@ -1268,7 +1361,7 @@ from equation (\ref{eqn:translation-expanded}) to avoid re-unfolding definitions
 \end{align*}
 
 Up to isomorphism (specifically, with a minor rearrangement and reassociation in the right-hand
-summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in equation
+summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in Equation
 (\ref{eqn:functor-bitvec})!
 
 \begin{exercise}
@@ -1284,9 +1377,9 @@ summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in equatio
 \end{lstlisting}
 
   \begin{enumerate}
-    \item Define the endofunctor $F_\texttt{RBTree} : \Set \to \Set$ such that
+    \item \fussy Define the endofunctor $F_\texttt{RBTree} : \Set \to \Set$ such that
           $\llbr{\texttt{RBTree}} \cong \mu F_\texttt{RBTree}$.
-    \item Define an $F_\texttt{RBTree}$-algebra $\texttt{bh}$ that computes the \emph{black height}
+    \item \sloppy Define an $F_\texttt{RBTree}$-algebra $\texttt{bh}$ that computes the \emph{black height}
           of an \texttt{RBTree}, i.e., the maximum number of black nodes on a path from the root to
           a leaf. You may assume the existence of a function $\texttt{max} : \N \times \N \to \N$.
     \item Using the above, compute $F_\texttt{RBTree}^\texttt{bh} : \FamSet_\N \to \FamSet_\N$, and
@@ -1325,9 +1418,12 @@ our observation from the previous section that the functors $\top : \Set \to \Fa
   $\Set(A, B)$. Naturality is straightforward.
 \end{proof}
 
-As before, we now turn from functors between $\FamSet$ and $\Set$---i.e., between families and their
-index sets---to those between fibers $\FamSet_A$ and $\FamSet_B$---i.e., between families with
-distinct index sets. While our construction in the previous section required only the op-reindexing
+It turns out that $\top$ is also \emph{left} adjoint, in particular to the comprehension functor $\{
+- \}$, but we will not make use of this fact.
+
+As before, we now turn from functors between $\FamSet$ and $\Set$ (i.e., between families and their
+index sets) to those between fibers $\FamSet_A$ and $\FamSet_B$ (i.e., between families with
+distinct index sets). While our construction in the previous section required only the op-reindexing
 functor $\Sigma_f$, the following alternative means of reindexing will be useful for our proof.
 
 \begin{definition}[Reindexing functor]
@@ -1359,7 +1455,7 @@ $\FamSet_B$ and $\FamSet_A$. Moreover, these functors are adjoint.
   \[ \FamSet_B(\Sigma_f(A, P), (B, Q)) \cong \FamSet_A((A, P), f^*(B, Q)). \]
   Recall that morphisms in these fibers are fully characterized by their second component (i.e.,
   their mapping on families), so, unfolding definitions (and using the isomorphic representation of
-  the indexed coproduct from equation (\ref{eqn:indexed-coprod-simplified})), it suffices to show
+  the indexed coproduct from Equation (\ref{eqn:indexed-coprod-simplified})), it suffices to show
   \[ \left\{ g : \prod_{b \in B} \sum_{a \in f^{-1}[\{b\}]} P(a) \to Q(b) \right\} \cong \left\{ h :
   \prod_{a \in A} P(a) \to Q(f(a)) \right\} \]
   satisfying naturality. It is straightforward to check that $\iota$ (mapping from left to right)
@@ -1471,7 +1567,7 @@ $F$ has an initial algebra, than so does $\hat F$:
 \end{theorem}
 \begin{proof}
   The key insight for this proof is that $F$-algebras with carrier $\{(A, P)\}$ are interderivable
-  with $\hat F$-algebras with carrier $\{(A, P)\}$. A proof is provided by Ghani et
+  with $\hat F$-algebras with carrier $(A, P)$. A proof of this fact is provided by Ghani et
   al.~\citep{ghani2010fibrational}; we will not give one here. Using this fact, the result follows
   almost immediately: the carrier $\mu F$ of the initial $F$-algebra is isomorphic to $\sum_{t \in
   \mu F}\{(\_ \mapsto \star)\}$ as a set, since the summand is a singleton. This set is precisely
@@ -1646,6 +1742,17 @@ Before concluding this section, it is worth noting that the construction given h
 in various ways, such as to support refinements defined in terms of functions that are not directly
 expressed as folds. We direct the reader to Atkey et al.~\citep{atkey2011refining} for details.
 
+Let us finally take stock of what we have done. We began by interpreting simple inductive types as
+initial algebras $(\mu F, \mathsf{in}_{\mu F})$ of endofunctors $F$. On this interpretation, maps
+out of the datatype defined in terms of folds are the $F$-algebra homomorphisms $\llpr{\alpha}$
+guaranteed by initiality. We then gave a categorical semantics of indexed inductive types in terms
+of initial algebras of endofunctors on \emph{families}, in which we gave a ``na\"ive'' subset
+interpretation of the refinement $\{ x : \mu F \mid \llpr{\alpha}(x) = a \}$. To identify the
+indexed inductive type corresponding to this semantic interpretation, we constructed the endofunctor
+on families $F^\alpha$ using a \emph{lifting} of the functor $F$ characterizing the unrefined simple
+inductive type. Lastly, we showed that this construction yielded an initial algebra with the
+carrier we identified in our na\"ive translation.
+
 \section{A (Literal) Invitation to Fibered Category Theory}
 
 Throughout this chapter, we have followed Atkey et al.~\citep{atkey2011refining} in carefully
@@ -1664,9 +1771,9 @@ derivation of the truth-preserving lifting $\hat F$ we employ in this paper. Som
 background can also be found in Jacobs' paper on comprehension
 categories~\citep{jacobs1993comprehension}, while the same author's textbook \emph{Categorical Logic
 and Type Theory}~\citep{jacobs1999categorical} provides an exposition of fibered category theory and
-several applications. A relatively limited selection of reading from among these sources should
-provide sufficient background to interpret this chapter in a general fibrational setting, thereby
-characterizing the precise categorical structure required to unify refinement and indexed types.
+several applications. A selection of material from among these sources should provide sufficient
+background to interpret this chapter in a general fibrational setting, thereby characterizing the
+precise categorical structure required to unify refinement and indexed types.
 
 \newpage
 \section*{Solutions to Exercises}
@@ -1679,7 +1786,8 @@ Commutativity and recursor uniqueness are immediate from the universal property 
 
 \soltitle{ex:interp-exnat}
 
-Since the recursor for \texttt{ExtNat} is not explicitly given, we first derive it:
+Since the recursor for \texttt{ExtNat} is not explicitly given, we first derive its typing rule (its
+equational laws are analogous to those for the regular natural-number recursor):
 
 \begin{mathpar}
 \inferrule*
@@ -1718,19 +1826,20 @@ rather than a pair of squares. It looks as follows:
   \item The actions of $F_{\texttt{SelfTree}}$ on objects and morphisms are given below:
   \begin{align*}
     F_{\texttt{SelfTree}}(X) &= 1 \oplus A \times X^A\\
-    F_{\texttt{SelfTree}}(e) &= [\mathsf{id}_1, \langle \mathsf{id}_A \circ \pi_2, (e \circ -) \circ \pi_1\rangle]
+    F_{\texttt{SelfTree}}(e) &= \mathsf{id}_1 \oplus (\mathsf{id}_A \times \lambda (e \circ \mathsf{app}))
   \end{align*}
+
   \item The relevant algebra is
-  \[ \alpha_{\texttt{selfHeight}} : F_{\texttt{SelfTree}} \llbr{\texttt{Nat}} \to \llbr{\texttt{Nat}} = [0, \texttt{succ} \circ \mathsf{app} \circ \mathsf{flip} ] \]
-  where $\mathsf{flip}$ is the isomorphism that witnesses the commutativity of products.
+  \[ \alpha_{\texttt{selfHeight}} : F_{\texttt{SelfTree}} \llbr{\texttt{Nat}} \to \llbr{\texttt{Nat}} = [0, \texttt{succ} \circ \mathsf{app} \circ \mathsf{flip} ]. \]
+  We denote by $\mathsf{flip} : A \times X^A \to X^A \times A$ the isomorphism that witnesses the commutativity of products.
 \end{enumerate}
 
 \soltitle{ex:app-as-algebra}
 
 Fix objects $A, B$ and consider their exponential. Since $\texttt{app} : B^A \times A \to B$, we are
 led to define the endofunctor $F(X) = X^A \times A$, whose action on morphisms is given by $F(e) =
-\langle (e \circ -) \circ \pi_1, \mathsf{id}_A \circ \pi_2\rangle$. (Notice that, despite the type
-of \texttt{app} containing two objects, there is only one possible choice of endofunctor: if we
+\lambda(e \circ \mathsf{app}) \times \mathsf{id}_A$. (Notice that, despite the type
+of \texttt{app} mentioning two objects, there is only one possible choice of endofunctor: if we
 tried to define the functor in $A$, it would be contravariant.)
 
 We claim that the identity morphism for the initial object $0$ is the initial $F$-algebra. To see
@@ -1754,8 +1863,8 @@ We translate each rule in turn.
   \item \textsc{T-fold}: As previously discussed, the positivity hypothesis of this rule is
         analogous to the requirement that the endofunctor $F$ denoted by $t. \tau$ has an initial
         algebra. The substitution $\tau[\mu t.\tau/t]$ corresponds to plugging in $\llbr{\tau}$ for
-        the functor variable $t$ in $F(t)$: it is functor action on objects. Thus, the conclusion of
-        the rule induces the following morphism:
+        the functor variable $t$ in $F(t)$: it is the functor action on objects. Thus, the
+        conclusion of the rule induces the following morphism:
 
         % https://q.uiver.app/#q=WzAsMixbMCwwLCJcXGxsYnJ7RiAoXFxtdSBGKX0iXSxbMiwwLCJcXGxsYnJ7XFxtdSBGfSJdLFswLDEsIlxcdGV4dHR0e2ZvbGR9Il1d
         \[\begin{tikzcd}
@@ -1882,17 +1991,16 @@ the following square trivially commutes:
 \soltitle{ex:bh-indexed-rbtrees}
 
 \begin{enumerate}
-  \item
+  \item The endofunctor $F_\texttt{RBTree}$ has the following actions on objects and morphisms:
     \begin{align*}
       F_{\texttt{RBTree}}(X) &= 1 \oplus ((A \times (X \times X)) \oplus (A \times (X \times X)))\\
-      F_{\texttt{RBTree}}(e) &= [\inl \circ \mathsf{id}_1, \inl \circ \inr \circ m, \inr \circ \inr \circ m ]\\
-      &\text{where } m = \langle\mathsf{id}_A \circ \pi_1 \circ \pi_1, \langle e \circ \pi_1 \circ \pi_2, e \circ \pi_2 \circ \pi_2\rangle\rangle
+      F_{\texttt{RBTree}}(e) &= \mathsf{id}_1 \oplus ((\mathsf{id}_A \times (e \times e)) \oplus (\mathsf{id}_A \times (e \times e)))
     \end{align*}
 
-  \item
-  \[ \alpha_{\texttt{bh}} = [0, \texttt{succ} \circ \texttt{max} \circ \pi_2, \texttt{max} \circ \pi_2] \]
+  \item The desired $F_\texttt{RBTree}$-algebra is
+  \[ \alpha_{\texttt{bh}} = [0, [\texttt{succ} \circ \texttt{max} \circ \pi_2, \texttt{max} \circ \pi_2]] \]
 
-  \item 
+  \item We compute as follows:
   \begin{align*}
     &F^\texttt{bh}_\texttt{RBTree}(\N, P)\\
     &\cong (\N, n \mapsto \{y \in F_\texttt{RBTree}(\N, P) \mid \texttt{bh}((F_\texttt{RBTree}\pi_{(\N, P)})(y)) = n\})\\
@@ -1900,12 +2008,12 @@ the following square trivially commutes:
     &\hspace{6em} (y = \inl~() \text{ and } 0 = n)\text{ or}\\
     &\hspace{6em} (y = \inr~(\inl~(a, ((m_\ell, p_\ell), (m_r, p_r)))) \text{ and } n = \texttt{succ}(\texttt{max}(n_\ell, n_r)))\\
     &\hspace{6em} (y = \inr~(\inr~(a, ((m_\ell, p_\ell), (m_r, p_r)))) \text{ and } n = \texttt{max}(n_\ell, n_r))\})\\
-    &= (\N, (n \mapsto
+    &= \Bigg(\N, \Bigg(n \mapsto
     \left(\begin{array}{ll}1 & \text{if } n = 0 \\ \varnothing & \text{else} \end{array}\right)
     \oplus\\
-    &\hspace{5.75em}(\left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{succ}(\texttt{max}(m_\ell, m_r)) \\ \varnothing & \text{else}\end{array} \right)\oplus\\
-    &\hspace{6.25em} \left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{max}(m_\ell, m_r) \\ \varnothing & \text{else} \end{array} \right))
-  ))
+    &\hspace{7em}\Bigg(\left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{succ}(\texttt{max}(m_\ell, m_r)) \\ \varnothing & \text{else}\end{array} \right)\oplus\\
+    &\hspace{7.75em} \left(\begin{array}{ll} A \times ((\{m_\ell\} \times P(m_\ell)) \times (\{m_r\} \times P(m_r))) & \text{if } n = \texttt{max}(m_\ell, m_r) \\ \varnothing & \text{else} \end{array} \right)\Bigg)
+  \Bigg)\Bigg)
   \end{align*}
 
   One can verify that this is isomorphic to the translation of the following inductive type:
