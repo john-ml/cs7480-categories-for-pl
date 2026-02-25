@@ -1338,7 +1338,7 @@ definition of $F_\texttt{BitList} : \Set \to \Set$ and the algebra $(\N, \texttt
 thereover:
 \begin{align*}
   F_\texttt{BitList}(X) &= 1 \oplus 2 \times X\\
-  F_\texttt{BitList}(f) &= [\inl \circ \id_1, \inr \circ (\mathsf{id}_2 \times f)]\\
+  F_\texttt{BitList}(f) &= \id_1 \oplus~(\mathsf{id}_2 \times f)\\
   \\[-10pt] % Spacing hack
   % \texttt{length} : F_\texttt{BitList} \N \to \N &= [\texttt{z}, \texttt{s} \circ \pi_2]
   \texttt{length} ~ (\inl~ ()) &= 0\\
