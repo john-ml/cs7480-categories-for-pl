@@ -1,5 +1,6 @@
 % Exercise boxes
-\mdtheorem[style=theoremstyle,frametitlebackgroundcolor=black,frametitlefontcolor=white]{exercise}{Exercise}
+\mdtheorem[style=theoremstyle,frametitlebackgroundcolor=black,frametitlefontcolor=white]{refinementexercise}{Exercise}
+\numberwithin{refinementexercise}{chapter}
 
 % Try to find better workaround for \sloppy (cf https://tex.stackexchange.com/q/153872)
 
@@ -221,12 +222,12 @@ For reasons that will become clear shortly, it is helpful to expand these triang
 \label{fig:bool-squares}
 \end{equation}
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:denote-bool}
 \sloppy
 Verify that $1 \oplus 1$ is a suitable choice for $\llbr{\texttt{Bool}}$. What are the denotations
 of \texttt{true}, \texttt{false}, and $\texttt{if}(t,e)$?
-\end{exercise}
+\end{refinementexercise}
 
 \subsection{Categorifying Natural Numbers}
 
@@ -321,7 +322,7 @@ diagram as a pair of squares:
 \label{fig:nat-squares}
 \end{equation}
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:interp-exnat}
 \sloppy
   Give a categorical interpretation of the type of \emph{extended natural numbers}, i.e., the type
@@ -335,7 +336,7 @@ inductive ExtNat : Type where
 
   \emph{Hint:} The resulting diagram will look a bit different from the two preceding examples.
 \label{ex:ext-nat-interp}
-\end{exercise}
+\end{refinementexercise}
 
 \subsection{A General Categorification of Inductive Types}
 
@@ -419,11 +420,11 @@ constructor with domain $1 \oplus 1$:
 	\arrow["{\texttt{if}([ t, e ])}", from=1-3, to=3-3, dashed]
 	\arrow["{[ t, e ]}"', from=3-1, to=3-3]
 \end{tikzcd}\]
-% \begin{exercise}
+% \begin{refinementexercise}
 % \sloppy
 %   ``Consolidate'' diagram (\ref{fig:bool-squares}) as we did for diagram (\ref{fig:nat-squares})
 %   above, and verify that the (degenerate) recursive type equation for Booleans emerges.
-% \end{exercise}
+% \end{refinementexercise}
 
 With this consolidation, every inductive type now translates to a single object (the top-left
 corner of the square), a single morphism (the constructor), and a universal property that translates
@@ -710,11 +711,11 @@ Note that \texttt{not} is, in turn, defined by an algebra over $F_\texttt{Bool}$
 \oplus 1)$ functor. In particular, $\llbr{\texttt{not}} = \llpr{\alpha_\texttt{not}}$ where
 $\alpha_\texttt{not} : 1 \oplus 1 \to 1 \oplus 1$ is $[\inr, \inl]$.
 
-% \begin{exercise}
+% \begin{refinementexercise}
 % \sloppy
 %   Fill in the missing piece of the above translation by categorifying \texttt{not} using a suitable
 %   algebra over the endofunctor characterizing Booleans.
-% \end{exercise}
+% \end{refinementexercise}
 
 To put together the developments in this section, let's consider one more example of a categorified
 inductive datatype, now expressed in terms of initial algebras. Recall the inductive datatype of
@@ -742,7 +743,7 @@ which we translate into the $F_{\texttt{List}_\texttt{A}}$-algebra
 \[ \alpha_\texttt{length} = [z, s \circ \pi_1] \]
 to obtain the fold $\llpr{\alpha_\texttt{length}} : \mu F_{\texttt{List}_\texttt{A}} \to \llbr{\texttt{Nat}}$.
 
-\begin{exercise}
+\begin{refinementexercise}
   \label{ex:self-trees}
 Below, we define a strange type of so-called ``self-trees:'' each node can have as many children as
 the parameterizing type has elements (i.e., a \texttt{SelfTree A} node can have, as it were,
@@ -759,9 +760,9 @@ inductive SelfTree (A : Type) : Type where
         successively visiting the $a$th child of a node containing $a$. (The self-height of a leaf
         is 0.) Categorify this operation using a suitable $F_{\texttt{SelfTree}}$-algebra.
 \end{enumerate}
-\end{exercise}
+\end{refinementexercise}
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:app-as-algebra}
   Show that the morphism $\mathsf{app}$ induced by the universal property of exponentials is the
   structure map for an algebra whose carrier is the initial object. Use this to give a non-empty
@@ -769,7 +770,7 @@ inductive SelfTree (A : Type) : Type where
   putative constructor) that is isomorphic to the empty type.
 
   \emph{Hint:} Recall that in a CCC, $0^A \cong 0 \cong 0 \times A$.
-\end{exercise}
+\end{refinementexercise}
 
 \subsection{On the Existence of Initial Algebras}
 
@@ -787,7 +788,7 @@ take us too far afield. For the purposes of this chapter, it suffices to know th
 strictly positive inductive types of interest are characterized by endofunctors that admit initial
 algebras.
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:isorec-translation}
 \sloppy
 There is another way to think about interpreting inductive types. While we gave an interpretation by
@@ -863,9 +864,9 @@ Your translation should give an account of what these definitions mean categoric
         correspond?
   \item $\texttt{map}(e)$ will not be translated as a morphism.
 \end{itemize}
-\end{exercise}
+\end{refinementexercise}
 
-% \begin{exercise}
+% \begin{refinementexercise}
 % \sloppy
 % (Note that this exercise is independent of the preceding one.)
 
@@ -883,7 +884,7 @@ Your translation should give an account of what these definitions mean categoric
 %     \item How do we interpret the unique $F$-coalgebra morphism from another $F$-coalgebra into the
 %           terminal one?
 %   \end{enumerate}
-% \end{exercise}
+% \end{refinementexercise}
 
 \section{The Families Fibration: Indexing Inductive Types}
 
@@ -1003,7 +1004,7 @@ will represent $A$-indexed inductive types by initial algebras of endofunctors o
 the families fibration over $A$. As before, the morphisms induced by initiality correspond to folds
 using the target algebras' structure maps.
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:fin-functor}
 \sloppy
 Identify the endofunctor on $\FamSet_\N$ that characterizes \texttt{Fin n}, the type of ``natural
@@ -1015,7 +1016,7 @@ inductive Fin : Nat -> Type where
 \end{lstlisting}
 
 \emph{Hint:} Notice that, for a given index, there maybe multiple (or no) applicable constructors.
-\end{exercise}
+\end{refinementexercise}
 
 Notice that we can also interpret refinements of simple types in the category of families. If $T =
 \mu F$ is an inductive type, then given an $A$-valued combining function $f$ for $T$ (i.e., an
@@ -1169,7 +1170,7 @@ have more to say about this diagram later.
 \label{fig:famset-diag-no-adjoints}
 \end{center}
 
-\begin{exercise}
+\begin{refinementexercise}
   \label{ex:very-strong-coprods}
   Fix a family $(A, P)$. Let $f : A \to B$ be a function. Consider the following diagram, where
   $\psi : (A, P) \to \Sigma_f (A, P)$ acts in the straightforward way:
@@ -1190,7 +1191,7 @@ have more to say about this diagram later.
     \item Show that $\{\psi\}$ is an isomorphism. (This shows that the families fibration has
     \emph{very strong coproducts}.)
   \end{enumerate}
-\end{exercise}
+\end{refinementexercise}
 
 \subsection{Liftings}
 
@@ -1229,7 +1230,7 @@ is captured by natural isomorphism.
   exists a natural isomorphism $\top \circ F \cong \hat F \circ \top$.
 \end{definition}
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:trivial-truth-pres}
   Verify that
   \begin{align*}
@@ -1237,7 +1238,7 @@ is captured by natural isomorphism.
     \hat F(f, f^\sim) &= (F f,\, \_ \mapsto \id_1)
   \end{align*}
   defines a trivial truth-preserving lifting of $F : \Set \to \Set$.
-\end{exercise}
+\end{refinementexercise}
 
 The truth-preserving lifting above, however, is degenerate in the sense that it entirely forgets the
 structure of the original family. We therefore instead define the following truth-preserving
@@ -1364,7 +1365,7 @@ Up to isomorphism (specifically, with a minor rearrangement and reassociation in
 summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in Equation
 (\ref{eqn:functor-bitvec})!
 
-\begin{exercise}
+\begin{refinementexercise}
 \label{ex:bh-indexed-rbtrees}
 \sloppy
   Consider the following inductive type of trees with colored nodes (we refrain from calling these
@@ -1387,7 +1388,7 @@ summand), this is precisely the functor $F_{\texttt{BitVec}}$ derived in Equatio
           trees. Verify that your definition matches how you would intuitively define this type from
           scratch.
   \end{enumerate}
-\end{exercise}
+\end{refinementexercise}
 
 \section{Correctness}
 
@@ -1483,10 +1484,10 @@ isomorphic to those morphisms into the original family that mapped indexing sets
   \end{align*}
 \end{lemma}
 
-\begin{exercise}
+\begin{refinementexercise}
   \label{ex:famset-morphism-iso}
   Prove Lemma \ref{lem:famset-morphism-iso}.
-\end{exercise}
+\end{refinementexercise}
 
 We can now update Figure \ref{fig:famset-diag-no-adjoints} to summarize these additional results:
 
