@@ -22,6 +22,9 @@
   }
 
   First, let us interpret \textsc{Calc} types.
+  We assume given the interpretation of base types,
+  with each base type \(b\) denoting some chosen object \(\llbr{b}\) of \(\calC\).
+  This interpretation is bootstrapped into one for all types by induction:
   \begin{align}
     \llbr{\plUnit} &= 1 \\
     \llbr{A \pltimes B} &= \llbr{A} \times \llbr{B}
@@ -40,7 +43,8 @@
 
   The interpretation of \textsc{Calc} contexts is similarly straightforward.
   The empty context is interpreted as the terminal object
-  and context extension is interpreted via product.
+  and context extension is interpreted via product---again, we are using the same symbols for the abstract categorical definitions
+  rather than the set-theoretic ones.
   \begin{align}
     \llbr{\ctxemp} &= 1 \\
     \llbr{\Gamma, x\ofty A} &= \llbr{\Gamma} \times \llbr{A}

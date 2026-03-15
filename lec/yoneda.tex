@@ -1,7 +1,7 @@
 \chapter{Yoneda I: Internal vs. external}
 
 This section marks the start of a long journey that ends in
-the statement and proof of the famous Yoneda lemma in category theory (\todo).
+the statement and proof of the Yoneda lemma.
 As with any important concept in category theory, the Yoneda lemma
 can be understood through a variety of perspectives. In these
 notes we will explore a particular perspective that feels most
@@ -43,12 +43,6 @@ of \(\calC\), this definition characterizes the product in terms of \emph{functi
 \emph{sets} of morphisms. This gives it an ``external'' character,
 because it defines the product in terms of set-theoretic objects (sets and functions)
 that live \emph{outside} of \(\calC\).
-
-Of course, it will make no difference whether one chooses the internal
-or the external definition of product: as we will see further down the line,
-the Yoneda lemma implies that the two formulations are equivalent.
-As a warm up to this abstract proof, this section will show
-concretely how the equivalence works for the special case of products.
 
 First, we must make precise what we mean by this ``external'' definition of product
 that defines product in terms of functions on morphisms.
@@ -117,7 +111,7 @@ Concretely, this means that if any input \(f\) as shown in the picture above is 
 $s : \Gamma' \to \Gamma$,
 it must be the case that \(\mathsf{Fst}_\Gamma(f)\) is changed into \(\mathsf{Fst}_{\Gamma'}(f\circ s)\)
 via \(s\) too. Formally, the following \emph{naturality condition} must hold for any such \(f\) and \(s\):\marginnote{We will save a formal abstract definition
-of naturality for \todo.}
+of naturality for later on.}
 
 %% There may be many morphisms that satisfy the type signature of $\mathsf{Fst}$,
 %% but the key is that there are relatively few that are
@@ -1705,7 +1699,7 @@ that sends all elements of $(\yo \star)(\star)$ to $d$.
 % like some number of copies of the monoid. 
 
 \section{Proving the baby Yoneda lemma}
-\marginnote{Thanks to Bex Golovanov for the scribe notes for the next two subsections. \todo{} these can be tidied 
+\marginnote{Thanks to Bex Golovanov for the scribe notes for the next two subsections.
 up a bit.}
 Now we are ready to prove \cref{thm:baby-yo}. Let $\calC$ be a 
 category, $P$ be a $\calC$-indexed set, and $X$ be an object 
@@ -1770,8 +1764,6 @@ transformation.
 \end{remark}
 
 \section{The category of elements}
-
-\todo{bridge these ideas -- surprisingly tricky}
 
 \begin{definition}[Category of elements]
   Let $P$ be a $\calC$-indexed set.
@@ -2301,13 +2293,14 @@ We have to finally confront the set-theoretic minutiae that we have swept under 
 Russell famously showed that the collection of all sets does not form a set; it is ``too big''.
 We will adopt a way out which has become standard when doing highly categorical things:
 postulate the existence of a ``very big set'' that contains ``enough sets to look like the set of all sets''.
-\begin{definition}[Grothendieck universe]
-  A Grothendieck universe is a set \(U\) satisfying the following properties:
-  \begin{itemize}
-    \item Copy from Definition 2.1 of \href{https://ncatlab.org/nlab/show/Grothendieck+universe}{the nLab page}
-  \end{itemize}
-\end{definition}
-Every Grothendieck universe \(\calU\) is a model of ZFC, hence ``looks like the set of all sets''.
+Such a set is called a \emph{Grothendieck universe}.
+We won't give the formal definition here; it's not essential
+to understand the details.\footnote{%
+If you're curious, check out the
+\href{https://ncatlab.org/nlab/show/Grothendieck+universe}{nLab page}
+for Grothendieck universe.}
+For our purposes, all that matters is that
+every Grothendieck universe \(\calU\) is a model of ZFC, hence ``looks like the set of all sets''.
 From now on we assume the following axiom.
 \begin{axiom}
   There exists a Grothendieck universe \(\calU\).
@@ -2343,7 +2336,9 @@ hence this condition is called being ``locally'' small.
 Finally, a category is \(\calU\)-large if it is neither small nor locally small.
 
 \subsection{Indexed set theory as a category}
-Now we can show that \(\calC\)-indexed sets form a category.
+Now we can show that \(\calC\)-indexed sets form a category,
+so long as we take \(\Set\) to mean the category of \(\calU\)-small sets,
+and \(\calC\) is locally \(\calU\)-small.
 \begin{definition}[category of \(\calC\)-indexed sets]
   Let \(\calC\) be a locally \(\calU\)-small category.
   Then \(\calC\)-indexed sets and functions between them form a functor category \([\calC^{\mathsf{op}};\Set]\).

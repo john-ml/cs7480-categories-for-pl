@@ -6,31 +6,53 @@
 \newcommand\jl{{\color{red}JL: }}
 \newcommand\sh[1]{{\color{red}SH: #1}}
 
-
 \usepackage{amsmath,amsthm}
 \usepackage{quiver}
 \input{lib/preamble.tex}
 \input{explainer/realizability-macros}
 
-\title{Category Theory for\\Programming Languages}
-\author{John M. Li and Steven Holtzen}
+\AtBeginDocument{%
+  \fancyhead[LE]{\thepage\quad\smallcaps{\newlinetospace{\plaintitle}}}%
+}
+
+\newcommand\subtitle{Notes from CS7480 (Fall 2025)}
+\title{Categories for PL}
+\author{Steven Holtzen and John M. Li
+\\[1em]
+with Shubh Agrawal, Jialu Bao, Bex Golovanov, Mingtong Lin, Joseph Rotella, and Michael Zhang
+}
 
 \makeatletter
 \renewcommand{\maketitlepage}{%
-\begingroup%
-\setlength{\parindent}{0pt}
-
-{\fontsize{24}{24}\selectfont\textit{\@author}\par}
-
-\vspace{1.75in}{\fontsize{28}{28}\selectfont\@title\par}
-
-\vspace{0.5in}{\fontsize{14}{14}\selectfont\textsf{\smallcaps{\@date}}\par}
-
-\vfill{\fontsize{14}{14}\selectfont\textit{\@publisher}\par}
-
-\thispagestyle{empty}
-\endgroup
+  \cleardoublepage
+  \begingroup
+  \setlength{\parindent}{0pt}
+  \vspace*{0.2\textheight}
+  {\fontsize{36}{36}\selectfont\@title\par}
+  \vspace{1em}{\fontsize{20}{20}\selectfont\subtitle\par}
+  \vfill{\fontsize{20}{20}\selectfont\textit{\@author}\par}
+  \vspace{0.5in}{\fontsize{14}{14}\selectfont\textsf{\smallcaps{\@date}}\par}
+  \vfill
+  {\fontsize{14}{14}\selectfont\textit{\@publisher}\par}
+  \endgroup
+  \thispagestyle{empty}
+  \clearpage
 }
+%% \renewcommand{\maketitlepage}{%
+%% \begingroup%
+%% \setlength{\parindent}{0pt}
+%% {\vfill\vspace{10em}
+%% {\fontsize{36}{36}\selectfont\@title\par}
+%% \vspace{1em}{\fontsize{20}{20}\selectfont\subtitle\par}
+%% \vspace{1em}\fontsize{20}{20}\selectfont\textit{\@author}\par}
+
+%% \vspace{0.5in}{\fontsize{14}{14}\selectfont\textsf{\smallcaps{\@date}}\par}
+
+%% \vfill{\fontsize{14}{14}\selectfont\textit{\@publisher}\par}
+
+%% \thispagestyle{empty}
+%% \endgroup
+%% }
 \makeatother
 
 \titlecontents{part}%

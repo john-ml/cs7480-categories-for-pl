@@ -295,31 +295,36 @@ $\gamma(a)$ is the largest $c \in \calC$
   \end{theorem}
 
   \item This is going to be a big proof. First we'll prove 
-  that (1) implies (2).
+  that (1) implies (2) and (3).
+  Then we'll prove that (2) and (3) both imply (4).
+  Finally, we'll prove that (4) implies (1),
+  giving the following strongly connected graph:
+  \[% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZARgBoAGAXVJADcBDAGwFcYkRiQBfU9TXfIRTlSxanSat2AJm68QGbHgJFpo8QxZtEIAMxy+SwUTLSNk7SAAs3cTCgBzeEVAAzAE4QAtkhEgcEEjEPG6ePoh+AUjSISAe3kE0UYi6sfHhav6BKWlhSLpJ2eRclFxAA
+\begin{tikzcd}[sep=tiny]
+             & 1 \arrow[ld] \arrow[rd] &              \\
+2 \arrow[rd] &                         & 3 \arrow[ld] \\
+             & 4 \arrow[uu]            &
+\end{tikzcd}\]
 
-  \todo{} fell behind. Same as the next one really.
-
-  \item If $\alpha \dashv \gamma$ then for all 
-  $a \in \calA$, $\gamma(a)$ is the largest 
-  $c \in \calC$ such that $\alpha(c) \le a$
-
-  First, $\alpha(\gamma(a)) \le a$, holds by 
-  $\alpha \dashv a$
-
-  Now we need to show $\gamma(a)$ is the largest such. 
-  Suppose $c \in \calC$ such that $\alpha(c) \le a$. 
+  \item (1) implies (3): Suppose $\alpha \dashv \gamma$.
+    Then by definition $\alpha(\gamma(a)) \le a$.
+    So it only remains to show that \(\gamma(a)\)
+    is the largest \(c\) satisfying \(\alpha(c) \le a\).
+  Suppose $c \in \calC$ such that $\alpha(c) \le a$.
   Need to show that $c \le \gamma(a)$. 
-  By $\gamma$ is monotone, 
+  By $\gamma$ monotone,
   \begin{align*}
     \gamma(\alpha(c)) \le \gamma(a)
   \end{align*}
   By definition of adjoint, $c \le \gamma(\alpha(c))$, 
   which completes the proof.
 
-  \item Proof that (2) implies (4). 
+  \item (1) implies (2): analogous to the previous case.
 
-    For any $c \in \calC$, $\alpha(c)$ is the 
-    smallest $a \in \calA$ such t hat $c \le \gamma(a)$.
+  \item Proof that (2) implies (4).
+
+    Suppose that for any $c \in \calC$, $\alpha(c)$ is the
+    smallest $a \in \calA$ such that $c \le \gamma(a)$.
     Want to show that for all $a \in \calA$, $c \in \calC$, 
     $\alpha(c) \le a \iff c \le \gamma(a)$.
 
@@ -331,10 +336,11 @@ $\gamma(a)$ is the largest $c \in \calC$
     in equivalent condition (2).}
 
     $(\Leftarrow)$: Have $ c \le \gamma(a)$. Want $\alpha(c) \le a$.
-    Define some helpful notation: the \emph{downset} $c \downarrow \gamma = \{a
-    \mid c \le \gamma(a) \}$. 
-    Let $\varphi(a) = \text{min}(c \downarrow \gamma)$. 
-    \todo {get the rest}
+    Since \(\alpha(c)\) is the smallest \(a'\)
+    such that \(c \le \gamma(a')\),
+    and \(a\) is one such \(a'\),
+    it must be that
+    \(\alpha(c) \le a\).
 
     \item Proof that (4) implies (1).
     If for all $a \in \calA, c \in \calC$ 
@@ -344,12 +350,23 @@ $\gamma(a)$ is the largest $c \in \calC$
     it holds that $\alpha(\gamma(a)) \le a$ and 
     $c \le \gamma(\alpha(c))$.
 
-
-    First, show $\alpha(\gamma(a)) \le a$. 
+    First, show $\alpha(\gamma(a)) \le a$.
     By assumption this is true if and only if 
     $\gamma(a) \le \gamma(a)$, which vacuously holds.
     The other side is identical.
+
+\item
+    Define some helpful notation: the sets $c \downarrow \gamma = \{a \mid c \le \gamma(a) \}$
+    and \(\alpha \downarrow a = \{c \mid \alpha(c) \le a\}\).
+    Then the previous theorem can be re-expressed as
+    \begin{align*}
+    &\alpha\dashv\gamma\\
+    \iff &(\forall c.\, \alpha(c) = \min (c \downarrow \gamma))\\
+    \iff &(\forall a.\, \gamma(c) = \max (\alpha \downarrow a))\\
+    \iff &(\forall a\,c.\, \alpha(c)\le a \iff c\le \gamma(a)).
+    \end{align*}
 \end{itemize}
+
 
 \section{Generalizing beyond preorders}
 \begin{itemize}
@@ -363,9 +380,11 @@ $\gamma(a)$ is the largest $c \in \calC$
   whose objects are morphisms $c \to G(a)$ for each 
   object $a \in \calA$.
   Morphisms are commuting triangles:\marginnote{This is an 
-  instance of a \emph{comma category}.
-  Thing of note: notice how the preorder notion of a 
-  ``downset'' uses the same notation as comma category.}
+  instance of a \emph{comma category},
+  and explains the notation we chose for the
+  sets \(c\downarrow\gamma\)
+  and \(\alpha\downarrow a\)
+  in the previous section.}
 
   \begin{center}
     % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAGMQBfU9TXfIRQBGclVqMWbAOIAKOgEpuvEBmx4CRUcPH1mrRCDl0A5Eq7iYUAObwioAGYAnCAFskZEDghJRE-WwOyo4u7oh+3kgATNR6UoZy1uYqzm4e1JGIMf7xIA4m3BRcQA

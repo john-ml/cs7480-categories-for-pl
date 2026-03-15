@@ -1,5 +1,5 @@
 \chapter{Realizability}
-\marginnote{This chapter was written by Mingtong Lin. It is heavily based on~\citep{bauer25:notes_realizability}.  The reader is only assumed to have acquaintance with previous chapters in this book.}
+\marginnote{This chapter was written by Mingtong Lin. It is heavily based on~\citep{bauer25:notes_realizability}.  The reader is only assumed to have acquaintance with previous chapters.}
 
 Realizability originated from Kleene~\citep{kleene45:interpretation_intuitionistic_number} as a semantics for Heyting arithmetic.  In this article, Kleene motivates the concept by calling logical statements ``incomplete communication'' and ``partial judgment'' from the perspective of constructivists and intuitionists.
 For instance, a proposition ``\(A\) implies \(B\)'', when interpreted intuitionistically, is an incomplete communication of another statement which gives a general procedure that: when receiving the information that completes \(A\), it finds the information that completes \(B\).
@@ -271,11 +271,11 @@ In a uniform assembly \(\nabla X\), every \(x \in X\) is realized by every \(r \
 
 \begin{proposition}
     \label{prop:set-func-asm-map}
-    Given an assembly \(X\) and a uniform assembly \(\nabla Y\) over a PCA \(\rzpca{A}\), every set function \(\rzset{X} \rightarrow Y\) is an assembly map \(X \rightarrow \nabla Y\).
+    Given an assembly \(X\) and a uniform assembly \(\nabla Y\) over a PCA \(\rzpca{A}\), every function \(\rzset{X} \rightarrow Y\) is an assembly map \(X \rightarrow \nabla Y\).
 \end{proposition}
 
 \begin{proof}
-    For a set function \(f : \rzset{X} \rightarrow Y\), we pair it with a trivial tracker \(\rzI\), where for all \(a \in A\), \(\rzI \rzapp a\) is always defined.
+    For a function \(f : \rzset{X} \rightarrow Y\), we pair it with a trivial tracker \(\rzI\), where for all \(a \in A\), \(\rzI \rzapp a\) is always defined.
 \end{proof}
 
 \begin{definition}[Uniform assembly functor (\(\nabla\))]
@@ -314,7 +314,7 @@ In a uniform assembly \(\nabla X\), every \(x \in X\) is realized by every \(r \
     Recall the natural transformations \(\eta : \id_{\rzasm(\rzpca{A})} \Rightarrow \nabla \Gamma\) and \(\varepsilon : \Gamma \nabla \Rightarrow \id_{\Set}\) are the unit and counit of the adjunction.
     \begin{itemize}
         \item For any \(X \in \rzasm(\rzpca{A})\), the component of the unit \(\eta_X : X \rightarrow \nabla \Gamma X\) is defined by the assembly map \((\id_{\rzset{X}}, \rzI)\), where \(\rzI\) is a trivial tracker.
-        \item For any \(S \in \Set\), the component of the counit \(\varepsilon_S : \Gamma \nabla S \rightarrow S\) is given by the identity set function \(\id_S\).
+        \item For any \(S \in \Set\), the component of the counit \(\varepsilon_S : \Gamma \nabla S \rightarrow S\) is given by the identity function \(\id_S\).
         \item Show \(\varepsilon \Gamma \circ \Gamma \eta = \id_{\Gamma}\): for an assembly \(X \in \rzasm(\rzpca{A})\),
         \[
             (\varepsilon \Gamma \circ \Gamma \eta)_X = \varepsilon_{\Gamma X} \circ \Gamma(\eta_X) = \id_{\rzset{X}} \circ \id_{\rzset{X}} = \id_{\rzset{X}}
