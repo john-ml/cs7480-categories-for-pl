@@ -15,7 +15,8 @@
 #import cosmos.rainbow: *
 #show: show-theorion
 // #set par.line(numbering: it => text(fill: gray, [#it]))
-#set page(numbering: "1 of 1")
+// #set page(numbering: "1 of 1")
+#set page(numbering: none)
 #set heading(numbering: "1.1.1.1")
 #set math.equation(numbering: "(1)")
 #show link: this => underline(text(this, fill: blue))
